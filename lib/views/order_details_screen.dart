@@ -84,7 +84,6 @@ class OrderDetailsScreen extends StatelessWidget {
                               OrderStatus.delivered,
                             );
                             Navigator.pop(context);
-                            Navigator.pop(context);
                           },
                           gradientColors:
                               AppConstants.acceptButtonGradientColors,
@@ -110,7 +109,6 @@ class OrderDetailsScreen extends StatelessWidget {
                               OrderStatus.cancelled,
                               cancelReason: reason,
                             );
-                            Navigator.pop(context);
                             Navigator.pop(context);
                           },
                           gradientColors:

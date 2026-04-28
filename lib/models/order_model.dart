@@ -1,6 +1,6 @@
 enum OrderStatus { waiting, accepted, delivered, cancelled, newOrder }
 
-enum OrderStatusFilter { waiting, accepted, delivered }
+enum OrderStatusFilter { waiting, accepted, delivered, newOrder }
 
 enum OrderKind {
   company,

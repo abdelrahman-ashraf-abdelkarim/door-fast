@@ -18,7 +18,9 @@ class OrdersCubit extends Cubit<OrdersState> {
       if (order.id == orderId) {
         return order.copyWith(
           status: newStatus,
-          cancelReason: newStatus == OrderStatus.cancelled ? cancelReason : null,
+          cancelReason: newStatus == OrderStatus.cancelled
+              ? cancelReason
+              : null,
         );
       }
       return order;
@@ -40,8 +42,9 @@ class OrdersCubit extends Cubit<OrdersState> {
   }
 
   /// الحصول على الطلبات الجديدة فقط
-  List<Order> get pendingOrders =>
-      state.orders.where((o) => o.status == OrderStatus.waiting).toList();
+  List<Order> get pendingOrders => state.orders.where((o) {
+    return o.status == OrderStatus.waiting || o.status == OrderStatus.newOrder;
+  }).toList();
 
   /// الحصول على الطلبات المقبولة
   List<Order> get acceptedOrders =>
@@ -53,8 +56,9 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   /// عدد الطلبات حسب الحالة
   /// عدد الطلبات الجديدة
-  int get pendingCount =>
-      state.orders.where((o) => o.status == OrderStatus.waiting).length;
+  int get pendingCount => state.orders.where((o) {
+    return o.status == OrderStatus.waiting || o.status == OrderStatus.newOrder;
+  }).length;
 
   /// عدد الطلبات المقبولة
   int get acceptedCount =>
@@ -77,5 +81,4 @@ class OrdersCubit extends Cubit<OrdersState> {
   double get totalDeliveryEarnings => state.orders
       .where((o) => o.status == OrderStatus.delivered)
       .fold(0.0, (sum, order) => sum + order.deliveryPrice);
-
 }

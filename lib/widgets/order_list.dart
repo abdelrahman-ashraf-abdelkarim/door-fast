@@ -9,7 +9,7 @@ class OrdersList extends StatelessWidget {
   final OrderStatusFilter status;
   final double paddingValue;
 
-  const OrdersList({super.key,this.paddingValue = 12, required this.status, });
+  const OrdersList({super.key, this.paddingValue = 12, required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,7 @@ class OrdersList extends StatelessWidget {
         final List<Order> orders;
         switch (status) {
           case OrderStatusFilter.waiting:
+          case OrderStatusFilter.newOrder:
             orders = cubit.pendingOrders;
             break;
           case OrderStatusFilter.accepted:

@@ -91,7 +91,6 @@ class OrderCard extends StatelessWidget {
                               order.id,
                               OrderStatus.accepted,
                             );
-                            Navigator.pop(context);
                           },
                           gradientColors:
                               AppConstants.acceptButtonGradientColors,

@@ -14,11 +14,11 @@ void showConfirmationDialog(
 
   showDialog(
     context: context,
-    builder: (_) {
+    builder: (dialogContext) {
       String? errorText;
 
       return StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (dialogContext, setState) => AlertDialog(
           title: Text(title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -53,8 +53,7 @@ void showConfirmationDialog(
           actions: [
             TextButton(
               onPressed: () {
-                reasonController.dispose();
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               child: const Text('إلغاء'),
             ),
@@ -68,13 +67,16 @@ void showConfirmationDialog(
                   onPressed: () {
                     final reason = reasonController.text.trim();
                     if (isCancelled && reason.isEmpty) {
+                      if (!dialogContext.mounted) return;
                       setState(() {
                         errorText = 'سبب الرفض مطلوب';
                       });
                       return;
                     }
-                    onConfirm(isCancelled ? reason : null);
-                    reasonController.dispose();
+                    Navigator.pop(dialogContext);
+                    Future.microtask(() {
+                      onConfirm(isCancelled ? reason : null);
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
@@ -89,13 +91,16 @@ void showConfirmationDialog(
                 onPressed: () {
                   final reason = reasonController.text.trim();
                   if (isCancelled && reason.isEmpty) {
+                    if (!dialogContext.mounted) return;
                     setState(() {
                       errorText = 'سبب الرفض مطلوب';
                     });
                     return;
                   }
-                  onConfirm(isCancelled ? reason : null);
-                  reasonController.dispose();
+                  Navigator.pop(dialogContext);
+                  Future.microtask(() {
+                    onConfirm(isCancelled ? reason : null);
+                  });
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: color),
                 child: Text(buttonText),
