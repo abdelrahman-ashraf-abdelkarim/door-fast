@@ -8,20 +8,21 @@ class MyOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("طلباتى"),
           centerTitle: true,
           bottom: const TabBar(
             tabs: [
+              Tab(text: "طلبات مقبلة"),
               Tab(text: "طلبات مقبولة"),
-              Tab(text: "تم التوصيل"),
-            ],
+              Tab(text: "تم التوصيل"),            ],
           ),
         ),
         body: const TabBarView(
           children: [
+            OrdersList(status: OrderStatusFilter.waiting),
             OrdersList(status: OrderStatusFilter.accepted),
             OrdersList(status: OrderStatusFilter.delivered),
           ],

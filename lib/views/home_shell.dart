@@ -1,7 +1,6 @@
 import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
 import 'package:captain_app/views/my_order_screen.dart';
-import 'package:captain_app/views/new_order_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeShell extends StatefulWidget {
@@ -16,7 +15,6 @@ class _HomeShellState extends State<HomeShell> {
 
   final List<Widget> _screens = const [
     DashboardScreen(),
-    OrdersScreen(),
     MyOrderScreen(),
     AccountStatementScreen(),
   ];
@@ -55,11 +53,6 @@ class _HomeShellState extends State<HomeShell> {
                   icon: Icon(Icons.receipt_long_outlined),
                   activeIcon: Icon(Icons.receipt_long),
                   label: 'الطلبات',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.local_shipping_rounded),
-                  activeIcon: Icon(Icons.local_shipping),
-                  label: 'طلباتي',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.account_balance_wallet_outlined),
