@@ -3,7 +3,6 @@ import 'package:captain_app/core/show_confirmation_dialog.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/views/order_details_screen.dart';
-import 'package:captain_app/widgets/order_item_card.dart';
 import 'package:captain_app/widgets/order_small_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
