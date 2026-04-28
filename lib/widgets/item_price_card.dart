@@ -3,10 +3,7 @@ import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
 
 class ItemPriceCard extends StatelessWidget {
-  const ItemPriceCard({
-    super.key,
-    required this.order,
-  });
+  const ItemPriceCard({super.key, required this.order});
 
   final Order order;
 

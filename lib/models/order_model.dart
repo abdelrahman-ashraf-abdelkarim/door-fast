@@ -2,10 +2,7 @@ enum OrderStatus { waiting, accepted, delivered, cancelled, newOrder }
 
 enum OrderStatusFilter { waiting, accepted, delivered, newOrder }
 
-enum OrderKind {
-  company,
-  personToPerson,
-}
+enum OrderKind { company, personToPerson }
 
 class OrderContact {
   final String name;

@@ -6,11 +6,7 @@ class ShiftState extends Equatable {
   final Duration duration;
   final AuthModel? user;
 
-  const ShiftState({
-    this.startTime,
-    required this.duration,
-    this.user,
-  });
+  const ShiftState({this.startTime, required this.duration, this.user});
 
   factory ShiftState.initial() {
     return const ShiftState(
@@ -36,6 +32,5 @@ class ShiftState extends Equatable {
 
   @override
   List<Object?> get props => [startTime, duration, user];
-bool get isUserActive => user?.status == CaptainStatus.active;
-
+  bool get isUserActive => user?.status == CaptainStatus.active;
 }

@@ -13,6 +13,35 @@ class OrderCard extends StatelessWidget {
   final int itemsCount;
   final Order order;
 
+  bool get _isPendingOrder {
+    return order.status == OrderStatus.newOrder ||
+        order.status == OrderStatus.waiting;
+  }
+
+  void _handleTap(BuildContext context) {
+    if (_isPendingOrder) {
+      showConfirmationDialog(
+        context,
+        title: 'تأكيد القبول',
+        message: 'هل تريد قبول هذا الطلب؟',
+        onConfirm: (_) {
+          context.read<OrdersCubit>().updateOrderStatus(
+            order.id,
+            OrderStatus.accepted,
+          );
+        },
+        gradientColors: AppConstants.acceptButtonGradientColors,
+        buttonText: 'تأكيد القبول',
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -78,33 +107,7 @@ class OrderCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 if (order.status != OrderStatus.cancelled)
                   GestureDetector(
-                    onTap: () {
-                      if (order.status == OrderStatus.newOrder ||
-                          order.status == OrderStatus.waiting) {
-                        /// هنا تعديل
-                        showConfirmationDialog(
-                          context,
-                          title: 'تأكيد القبول',
-                          message: 'هل تريد قبول هذا الطلب؟',
-                          onConfirm: (_) {
-                            context.read<OrdersCubit>().updateOrderStatus(
-                              order.id,
-                              OrderStatus.accepted,
-                            );
-                          },
-                          gradientColors:
-                              AppConstants.acceptButtonGradientColors,
-                          buttonText: 'تأكيد القبول',
-                        );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => OrderDetailsScreen(order: order),
-                          ),
-                        );
-                      }
-                    },
+                    onTap: () => _handleTap(context),
                     child: Container(
                       width: double.infinity,
                       height: 48,

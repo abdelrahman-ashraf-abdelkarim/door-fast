@@ -6,8 +6,6 @@ class OrdersState {
   OrdersState({required this.orders});
 
   OrdersState copyWith({List<Order>? orders}) {
-    return OrdersState(
-      orders: orders ?? this.orders,
-    );
+    return OrdersState(orders: orders ?? this.orders);
   }
 }

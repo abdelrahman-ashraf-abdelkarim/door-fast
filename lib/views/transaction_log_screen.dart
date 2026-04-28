@@ -1,11 +1,10 @@
-// import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/transaction_model.dart';
 import 'package:captain_app/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
 
 class TransactionLogScreen extends StatelessWidget {
   const TransactionLogScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,26 +13,25 @@ class TransactionLogScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView.builder(
-  itemCount: data.length,
-  itemBuilder: (context, index) {
-    final item = data[index];
+        itemCount: transactionLogData.length,
+        itemBuilder: (context, index) {
+          final item = transactionLogData[index];
 
-    return TransactionCard(
-      id: item.id,
-      date: item.date,
-      note: item.note,
-      debit: item.debit,
-      credit: item.credit,
-      balance: item.balance,
-    );
-  },
-)
-,
+          return TransactionCard(
+            id: item.id,
+            date: item.date,
+            note: item.note,
+            debit: item.debit,
+            credit: item.credit,
+            balance: item.balance,
+          );
+        },
+      ),
     );
   }
 }
 
-List<TransactionModel> data = [
+final List<TransactionModel> transactionLogData = [
   TransactionModel(
     id: 1025,
     date: "24 أكتوبر 2023 . 09:00ص",

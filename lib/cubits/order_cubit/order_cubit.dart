@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrdersCubit extends Cubit<OrdersState> {
   OrdersCubit() : super(OrdersState(orders: dummyOrders));
+
+  static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
+
   bool isOnline = true;
 
   /// تحديث حالة الطلب
@@ -41,36 +44,41 @@ class OrdersCubit extends Cubit<OrdersState> {
     );
   }
 
+  List<Order> _ordersWithStatus(OrderStatus status) {
+    return state.orders.where((order) => order.status == status).toList();
+  }
+
+  List<Order> _ordersWithStatuses(Set<OrderStatus> statuses) {
+    return state.orders
+        .where((order) => statuses.contains(order.status))
+        .toList();
+  }
+
+  int _countOrdersWithStatus(OrderStatus status) {
+    return state.orders.where((order) => order.status == status).length;
+  }
+
   /// الحصول على الطلبات الجديدة فقط
-  List<Order> get pendingOrders => state.orders.where((o) {
-    return o.status == OrderStatus.waiting || o.status == OrderStatus.newOrder;
-  }).toList();
+  List<Order> get pendingOrders => _ordersWithStatuses(_pendingStatuses);
 
   /// الحصول على الطلبات المقبولة
-  List<Order> get acceptedOrders =>
-      state.orders.where((o) => o.status == OrderStatus.accepted).toList();
+  List<Order> get acceptedOrders => _ordersWithStatus(OrderStatus.accepted);
 
   /// الحصول على الطلبات التي تم تسليمها
-  List<Order> get deliveredOrders =>
-      state.orders.where((o) => o.status == OrderStatus.delivered).toList();
+  List<Order> get deliveredOrders => _ordersWithStatus(OrderStatus.delivered);
 
   /// عدد الطلبات حسب الحالة
   /// عدد الطلبات الجديدة
-  int get pendingCount => state.orders.where((o) {
-    return o.status == OrderStatus.waiting || o.status == OrderStatus.newOrder;
-  }).length;
+  int get pendingCount => _ordersWithStatuses(_pendingStatuses).length;
 
   /// عدد الطلبات المقبولة
-  int get acceptedCount =>
-      state.orders.where((o) => o.status == OrderStatus.accepted).length;
+  int get acceptedCount => _countOrdersWithStatus(OrderStatus.accepted);
 
   /// عدد الطلبات التي تم تسليمها
-  int get deliveredCount =>
-      state.orders.where((o) => o.status == OrderStatus.delivered).length;
+  int get deliveredCount => _countOrdersWithStatus(OrderStatus.delivered);
 
   /// عدد الطلبات الملغاة
-  int get cancelledCount =>
-      state.orders.where((o) => o.status == OrderStatus.cancelled).length;
+  int get cancelledCount => _countOrdersWithStatus(OrderStatus.cancelled);
 
   /// إجمالي الأرباح من الطلبات التي تم تسليمها
   double get totalEarnings => state.orders

@@ -153,9 +153,9 @@ class AccountStatementScreen extends StatelessWidget {
                   ),
                   TransactionLogWidget(
                     icon: FontAwesomeIcons.truckFast,
-                    foregraoundIconColor:
+                    foregroundIconColor:
                         AppColors.customerIconSecondaryForeground,
-                    backgraoundIconColor:
+                    backgroundIconColor:
                         AppColors.customerIconSecondaryBackground,
                     title: 'رسوم توصيل - طلب 8852#',
                     day: '23',
@@ -165,9 +165,9 @@ class AccountStatementScreen extends StatelessWidget {
                   ),
                   TransactionLogWidget(
                     icon: FontAwesomeIcons.moneyBills,
-                    foregraoundIconColor:
+                    foregroundIconColor:
                         AppColors.customerIconPrimaryForeground,
-                    backgraoundIconColor:
+                    backgroundIconColor:
                         AppColors.customerIconPrimaryBackground,
                     title: 'استلام نقدى من سامى محمد',
                     day: '15',

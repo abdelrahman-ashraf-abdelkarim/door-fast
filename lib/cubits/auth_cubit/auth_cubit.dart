@@ -12,11 +12,7 @@ class AuthCubit extends Cubit<AuthState> {
     await Future.delayed(const Duration(seconds: 2));
 
     // محاكاة استجابة API
-    final user = AuthModel(
-      id: '1',
-      name: name,
-      status: CaptainStatus.active,
-    );
+    final user = AuthModel(id: '1', name: name, status: CaptainStatus.active);
 
     emit(AuthAuthenticated(user));
   }
@@ -30,11 +26,7 @@ class AuthCubit extends Cubit<AuthState> {
   void updateCaptainStatus(CaptainStatus status) {
     if (state is AuthAuthenticated) {
       final currentUser = (state as AuthAuthenticated).user;
-      emit(
-        AuthAuthenticated(
-          currentUser.copyWith(status: status),
-        ),
-      );
+      emit(AuthAuthenticated(currentUser.copyWith(status: status)));
     }
   }
 }

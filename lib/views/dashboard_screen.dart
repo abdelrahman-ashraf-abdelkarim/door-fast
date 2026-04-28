@@ -19,189 +19,23 @@ class DashboardScreen extends StatelessWidget {
     return BlocBuilder<ShiftCubit, ShiftState>(
       builder: (context, state) {
         final isOnline = state.user?.status == CaptainStatus.active;
+
         return Scaffold(
           appBar: AppBar(
             title: AppBarWidget(
               isOnline: isOnline,
-              userName: state.user?.name ?? "كابتن",
+              userName: state.user?.name ?? 'كابتن',
             ),
           ),
           body: BlocBuilder<OrdersCubit, OrdersState>(
             builder: (context, orderState) {
-              final cubit = context.read<OrdersCubit>();
-              return !isOnline
-                  ? Center(
-                      child: Text(
-                        "انت غير نشط حاليا",
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xffbe2c2d),
-                        ),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "احصائياتي اليوم",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
+              final ordersCubit = context.read<OrdersCubit>();
 
-                          Container(
-                            width: double.infinity,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: Colors.white70,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  "اجمالى التحصيل اليومى",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.teal,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "${cubit.totalEarnings.toStringAsFixed(0)} ",
-                                      style: TextStyle(
-                                        fontSize: 36,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      "ج",
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+              if (!isOnline) {
+                return const _OfflineMessage();
+              }
 
-                          const SizedBox(height: 20),
-
-                          /// 📊 الإحصائيات
-                          GridView.count(
-                            crossAxisCount: 2,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 1.5,
-                            children: [
-                              StatCard(
-                                title: "بداية الوردية",
-                                valueWidget: StartShiftTimeWidget(),
-                                icon: Icons.access_time,
-                                cardColor: true,
-                              ),
-                              StatCard(
-                                title: "مدة العمل",
-                                valueWidget: WorkTimerWidget(),
-                                icon: Icons.timer_outlined,
-                                cardColor: true,
-                              ),
-                              StatCard(
-                                title: "طلبات مكتمله",
-                                value: cubit.deliveredCount.toString(),
-                                icon: Icons.check_circle,
-                                color: Colors.green,
-                              ),
-                              StatCard(
-                                title: "طلبات معلقة",
-                                value: cubit.pendingCount.toString(),
-                                icon: Icons.add_circle,
-                                color: Colors.blue,
-                              ),
-                              StatCard(
-                                title: "خدمة التوصيل",
-                                value: cubit.totalDeliveryEarnings.toString(),
-                                icon: Icons.local_shipping,
-                                color: Colors.orange,
-                                cardColor: true,
-                              ),
-                              StatCard(
-                                title: "إجمالي الخصومات",
-                                value: "10 ج",
-                                icon: Icons.money_off,
-                                color: Colors.red,
-                                cardColor: true,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          /// 🚫 طلبات ملغاة
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: Colors.pink[50],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor: Colors.red[100],
-                                      child: Icon(
-                                        Icons.cancel,
-                                        color: Color(0xffbe2c2d),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "طلبات ملغاة",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  " ${cubit.cancelledCount.toString()} ",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Color(0xffbe2c2d),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+              return _DashboardContent(ordersCubit: ordersCubit);
             },
           ),
         );
@@ -209,108 +43,206 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
-// SizedBox(height: 20),
-// Container(
-//   width: double.infinity,
-//   padding: EdgeInsets.all(16),
-//   decoration: BoxDecoration(
-//     borderRadius: BorderRadius.circular(16),
-//     color: Colors.white,
-//   ),
-// child: Column(
-//   crossAxisAlignment: CrossAxisAlignment.start,
-//   children: [
-//     Row(
-//       mainAxisAlignment:
-//           MainAxisAlignment.spaceBetween,
-//       children: [
-//         Text(
-//           "الطاقة الاستيعابية",
-//           style: TextStyle(
-//             fontWeight: FontWeight.bold,
-//             fontSize: 16,
-//           ),
-//         ),
 
-//         const SizedBox(width: 10),
-//         Container(
-//           padding: const EdgeInsets.symmetric(
-//             horizontal: 12,
-//             vertical: 6,
-//           ),
-//           decoration: BoxDecoration(
-//             color: Color(0xff97F3E2),
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//           child: Text(
-//             '${cubit.deliveredCount} / 20',
-//             style: const TextStyle(
-//               color: Colors.teal,
-//             ),
-//           ),
+class _OfflineMessage extends StatelessWidget {
+  const _OfflineMessage();
 
-//           /// عدد الطلبات المكتمله / الطاقه الاسيعابيه للدليفرى
-//         ),
-//       ],
-//     ),
-// const SizedBox(height: 20),
-// LinearProgressIndicator(
-//   value: cubit.myEnergyOrder,
-//
-/// الطاقه الاستيعابيه للدليفرى/ عدد الطلبات المكتمله
-//   minHeight: 8,
-//   borderRadius: BorderRadius.circular(16),
-//   backgroundColor: Color(0xffE0E0E0),
-//   color: Color(0xff00796B),
-// ),
-// const SizedBox(height: 10),
-// Text(
-//   'لديك مساحة لـ ${20 - cubit.deliveredCount} طلب إضافيًا في حقيبتك حاليًا.',
-//   style: const TextStyle(color: Colors.grey),
-// ),
-//   ],
-// ),
-// ),
-// const SizedBox(height: 20),
-// ShiftButton(isOnline: isOnline),
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'انت غير نشط حاليا',
+        style: TextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+          color: Color(0xffbe2c2d),
+        ),
+      ),
+    );
+  }
+}
 
-// class ShiftButton extends StatelessWidget {
-//   const ShiftButton({super.key, required this.isOnline});
-//   final bool isOnline;
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       width: double.infinity,
-//       child: ElevatedButton(
-//         onPressed: () {
-//           if (isOnline) {
-//             context.read<ShiftCubit>().startShift();
-//           } else {
-//             context.read<ShiftCubit>().endShift();
-//           }
-//         },
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Color(0xff97F3E2),
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//         ),
-//         child: isOnline
-//             ? Text(
-//                 "بدأ الشفت",
-//                 style: TextStyle(
-//                   color: Colors.teal,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               )
-//             : Text(
-//                 "انهاء الشفت",
-//                 style: TextStyle(
-//                   color: Colors.red[900],
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//       ),
-//     );
-//   }
-// }
+class _DashboardContent extends StatelessWidget {
+  const _DashboardContent({required this.ordersCubit});
+
+  final OrdersCubit ordersCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'احصائياتي اليوم',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
+            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 20),
+          _TotalEarningsCard(totalEarnings: ordersCubit.totalEarnings),
+          const SizedBox(height: 20),
+          _StatsGrid(ordersCubit: ordersCubit),
+          const SizedBox(height: 20),
+          _CancelledOrdersCard(cancelledCount: ordersCubit.cancelledCount),
+        ],
+      ),
+    );
+  }
+}
+
+class _TotalEarningsCard extends StatelessWidget {
+  const _TotalEarningsCard({required this.totalEarnings});
+
+  final double totalEarnings;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white70,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          const Text(
+            'اجمالى التحصيل اليومى',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.teal,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${totalEarnings.toStringAsFixed(0)} ',
+                style: const TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'ج',
+                style: TextStyle(fontSize: 22, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsGrid extends StatelessWidget {
+  const _StatsGrid({required this.ordersCubit});
+
+  final OrdersCubit ordersCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.5,
+      children: [
+        const StatCard(
+          title: 'بداية الوردية',
+          valueWidget: StartShiftTimeWidget(),
+          icon: Icons.access_time,
+          cardColor: true,
+        ),
+        const StatCard(
+          title: 'مدة العمل',
+          valueWidget: WorkTimerWidget(),
+          icon: Icons.timer_outlined,
+          cardColor: true,
+        ),
+        StatCard(
+          title: 'طلبات مكتمله',
+          value: ordersCubit.deliveredCount.toString(),
+          icon: Icons.check_circle,
+          color: Colors.green,
+        ),
+        StatCard(
+          title: 'طلبات معلقة',
+          value: ordersCubit.pendingCount.toString(),
+          icon: Icons.add_circle,
+          color: Colors.blue,
+        ),
+        StatCard(
+          title: 'خدمة التوصيل',
+          value: ordersCubit.totalDeliveryEarnings.toString(),
+          icon: Icons.local_shipping,
+          color: Colors.orange,
+          cardColor: true,
+        ),
+        const StatCard(
+          title: 'إجمالي الخصومات',
+          value: '10 ج',
+          icon: Icons.money_off,
+          color: Colors.red,
+          cardColor: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _CancelledOrdersCard extends StatelessWidget {
+  const _CancelledOrdersCard({required this.cancelledCount});
+
+  final int cancelledCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.pink[50],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.red[100],
+                child: const Icon(Icons.cancel, color: Color(0xffbe2c2d)),
+              ),
+              const SizedBox(width: 4),
+              const Text(
+                'طلبات ملغاة',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Text(
+            ' $cancelledCount ',
+            style: const TextStyle(
+              fontSize: 20,
+              color: Color(0xffbe2c2d),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

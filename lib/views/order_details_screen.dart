@@ -123,16 +123,15 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              if(order.status == OrderStatus.delivered)
+              if (order.status == OrderStatus.delivered)
                 GestureDetector(
-                  onTap: (){},
+                  onTap: () {},
                   child: ContainerButtonWidget(
                     colors: AppConstants.acceptButtonGradientColors,
                     text: 'ارسال الفاتوره للعميل',
                   ),
-
-                )
-                ],
+                ),
+            ],
           ),
         ),
       ),

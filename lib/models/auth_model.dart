@@ -5,17 +5,9 @@ class AuthModel {
   final String name;
   final CaptainStatus status;
 
-  const AuthModel({
-    required this.id,
-    required this.name,
-    required this.status,
-  });
+  const AuthModel({required this.id, required this.name, required this.status});
 
-  AuthModel copyWith({
-    String? id,
-    String? name,
-    CaptainStatus? status,
-  }) {
+  AuthModel copyWith({String? id, String? name, CaptainStatus? status}) {
     return AuthModel(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -34,10 +26,6 @@ class AuthModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'status': status.name,
-    };
+    return {'id': id, 'name': name, 'status': status.name};
   }
 }
