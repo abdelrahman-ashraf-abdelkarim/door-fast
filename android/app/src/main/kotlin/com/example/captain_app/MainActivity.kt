@@ -1,4 +1,5 @@
-package com.example.captain_app
+package com.doorfast.captain
+
 
 import io.flutter.embedding.android.FlutterActivity
 

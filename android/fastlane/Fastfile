@@ -1,0 +1,74 @@
+default_platform(:android)
+
+platform :android do
+
+  # =========================
+  # 🧹 Clean
+  # =========================
+  lane :clean do
+    sh("flutter clean")
+    sh("flutter pub get")
+  end
+
+  # =========================
+  # 🧪 Run Tests
+  # =========================
+  lane :test do
+    gradle(task: "test")
+  end
+
+  # =========================
+  # 📦 Build APK (Release)
+  # =========================
+  lane :apk do
+    clean
+
+    gradle(
+      task: "assembleRelease"
+    )
+
+    UI.success("✅ APK build completed")
+  end
+
+  # =========================
+  # 📦 Build AAB (Play Store)
+  # =========================
+  lane :aab do
+    clean
+
+    gradle(
+      task: "bundleRelease"
+    )
+
+    UI.success("🚀 AAB build completed")
+  end
+
+  # =========================
+  # 🔥 Full Release (APK + AAB)
+  # =========================
+  lane :release do
+    clean
+
+    gradle(task: "assembleRelease")
+    gradle(task: "bundleRelease")
+
+    UI.success("🎉 Full release completed (APK + AAB)")
+  end
+
+  # =========================
+  # 🚀 Deploy to Play Store
+  # =========================
+  lane :deploy do
+    clean
+
+    gradle(task: "bundleRelease")
+
+    upload_to_play_store(
+      track: "internal", # internal testing
+      release_status: "completed"
+    )
+
+    UI.success("📤 Uploaded to Play Store")
+  end
+
+end

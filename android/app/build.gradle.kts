@@ -6,7 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.example.captain_app"
+    namespace = "com.doorfast.captain
+"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
     
