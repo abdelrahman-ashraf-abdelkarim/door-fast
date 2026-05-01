@@ -17,6 +17,10 @@ class OrdersList extends StatelessWidget {
       builder: (context, state) {
         final cubit = context.read<OrdersCubit>();
 
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         final List<Order> orders;
         switch (status) {
           case OrderStatusFilter.waiting:
@@ -40,6 +44,7 @@ class OrdersList extends StatelessWidget {
         return ListView.builder(
           padding: EdgeInsets.all(paddingValue),
           itemCount: orders.length,
+          // reverse: true,
           itemBuilder: (context, index) {
             final order = orders[index];
             return OrderCard(itemsCount: order.totalItemsCount, order: order);

@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
         body: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
+              NotificationService.scheduleMockOrderNotifications();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const HomeShell()),

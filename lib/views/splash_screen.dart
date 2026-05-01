@@ -1,6 +1,11 @@
 import 'dart:async';
+import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:captain_app/services/notification_service.dart';
+import 'package:captain_app/views/home_shell.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,11 +36,24 @@ class _SplashScreenState extends State<SplashScreen>
 
     _navTimer = Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      _navigateAfterSplash();
     });
+  }
+
+  void _navigateAfterSplash() {
+    final authState = context.read<AuthCubit>().state;
+    final destination = authState is AuthAuthenticated
+        ? const HomeShell()
+        : const LoginScreen();
+
+    if (authState is AuthAuthenticated) {
+      NotificationService.scheduleMockOrderNotifications();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => destination),
+    );
   }
 
   @override

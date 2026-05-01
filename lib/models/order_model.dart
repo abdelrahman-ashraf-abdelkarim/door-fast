@@ -47,6 +47,8 @@ class Order {
   final String? cancelReason;
   final List<OrderItem> items;
   final OrderStatus status;
+  final DateTime createdAt;
+  final DateTime? acceptedAt;
   final double? pickupLat;
   final double? pickupLng;
   final double? deliveryLat;
@@ -55,6 +57,9 @@ class Order {
   String get customerName => dropoffContact.name;
   String get phone => dropoffContact.phone ?? "";
   bool get isPersonToPerson => kind == OrderKind.personToPerson;
+  bool get isPending {
+    return status == OrderStatus.waiting || status == OrderStatus.newOrder;
+  }
 
   String get formattedId {
     return '#${id.padLeft(6, '0')}';
@@ -72,6 +77,22 @@ class Order {
     return itemsTotalPrice + deliveryPrice;
   }
 
+  Duration get waitingDuration {
+    return DateTime.now().difference(createdAt);
+  }
+
+  Duration get acceptedDuration {
+    final acceptedTime = acceptedAt;
+    if (acceptedTime == null) return Duration.zero;
+    return DateTime.now().difference(acceptedTime);
+  }
+
+  Duration get activeDuration {
+    if (isPending) return waitingDuration;
+    if (status == OrderStatus.accepted) return acceptedDuration;
+    return acceptedAt == null ? waitingDuration : acceptedDuration;
+  }
+
   Order({
     required this.id,
     required this.dropoffContact,
@@ -84,12 +105,14 @@ class Order {
     required this.notes,
     this.cancelReason,
     required this.status,
+    DateTime? createdAt,
+    this.acceptedAt,
     this.items = const [],
     this.pickupLat,
     this.pickupLng,
     this.deliveryLat,
     this.deliveryLng,
-  });
+  }) : createdAt = createdAt ?? DateTime.now();
 
   Order copyWith({
     OrderStatus? status,
@@ -98,6 +121,8 @@ class Order {
     OrderContact? pickupContact,
     OrderContact? dropoffContact,
     OrderKind? kind,
+    DateTime? createdAt,
+    DateTime? acceptedAt,
   }) {
     return Order(
       id: id,
@@ -111,6 +136,8 @@ class Order {
       notes: notes,
       cancelReason: cancelReason ?? this.cancelReason,
       status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      acceptedAt: acceptedAt ?? this.acceptedAt,
       items: items ?? this.items,
       pickupLat: pickupLat,
       pickupLng: pickupLng,

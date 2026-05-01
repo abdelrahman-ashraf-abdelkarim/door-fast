@@ -79,10 +79,7 @@ class OrderDetailsScreen extends StatelessWidget {
                           title: 'تأكيد',
                           message: 'هل تم توصيل الطلب؟',
                           onConfirm: (_) {
-                            context.read<OrdersCubit>().updateOrderStatus(
-                              order.id,
-                              OrderStatus.delivered,
-                            );
+                            context.read<OrdersCubit>().completeOrder(order.id);
                             Navigator.pop(context);
                           },
                           gradientColors:
@@ -104,10 +101,9 @@ class OrderDetailsScreen extends StatelessWidget {
                           message: 'لماذا تريد رفض هذا الطلب؟',
                           isCancelled: true,
                           onConfirm: (reason) {
-                            context.read<OrdersCubit>().updateOrderStatus(
+                            context.read<OrdersCubit>().cancelOrder(
                               order.id,
-                              OrderStatus.cancelled,
-                              cancelReason: reason,
+                              reason ?? '',
                             );
                             Navigator.pop(context);
                           },

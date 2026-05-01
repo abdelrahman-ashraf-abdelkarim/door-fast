@@ -1,26 +1,25 @@
 import 'dart:async';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import '../../models/auth_model.dart';
 import 'shift_state.dart';
 
-class ShiftCubit extends Cubit<ShiftState> {
+class ShiftCubit extends HydratedCubit<ShiftState> {
   final AuthCubit authCubit;
   late final StreamSubscription<AuthState> authSubscription;
   Timer? _timer;
 
   ShiftCubit(this.authCubit) : super(ShiftState.initial()) {
-    // تعيين الحالة الابتدائية بعد بناء الشجرة
+    _resumeTimerIfNeeded();
+
     Future.microtask(() {
       _onAuthChanged(authCubit.state);
     });
 
-    // الاستماع لأي تغييرات مستقبلية
     authSubscription = authCubit.stream.listen(_onAuthChanged);
   }
 
-  /// 🔄 يتم استدعاؤها عند تغير حالة المصادقة
   void _onAuthChanged(AuthState authState) {
     if (authState is AuthAuthenticated) {
       final user = authState.user;
@@ -32,13 +31,12 @@ class ShiftCubit extends Cubit<ShiftState> {
       } else {
         endShift();
       }
-    } else {
+    } else if (authState is AuthUnauthenticated) {
       endShift();
-      emit(state.copyWith(user: null));
+      emit(state.copyWith(clearUser: true));
     }
   }
 
-  /// ▶️ بدء الشيفت
   void startShift() {
     if (state.user?.status != CaptainStatus.active) return;
     if (state.startTime != null) return;
@@ -47,6 +45,10 @@ class ShiftCubit extends Cubit<ShiftState> {
 
     emit(state.copyWith(startTime: start, duration: Duration.zero));
 
+    _startTimer(start);
+  }
+
+  void _startTimer(DateTime start) {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final duration = DateTime.now().difference(start);
@@ -54,10 +56,27 @@ class ShiftCubit extends Cubit<ShiftState> {
     });
   }
 
-  /// ⏹️ إنهاء الشيفت
+  void _resumeTimerIfNeeded() {
+    final start = state.startTime;
+    if (start == null) return;
+
+    emit(state.copyWith(duration: DateTime.now().difference(start)));
+    _startTimer(start);
+  }
+
   void endShift() {
     _timer?.cancel();
-    emit(state.copyWith(startTime: null, duration: Duration.zero));
+    emit(state.copyWith(clearStartTime: true, duration: Duration.zero));
+  }
+
+  @override
+  ShiftState? fromJson(Map<String, dynamic> json) {
+    return ShiftState.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic>? toJson(ShiftState state) {
+    return state.toJson();
   }
 
   @override

@@ -16,18 +16,45 @@ class ShiftState extends Equatable {
     );
   }
 
+  factory ShiftState.fromJson(Map<String, dynamic> json) {
+    final startTimeValue = json['startTime'] as String?;
+    final startTime = startTimeValue == null
+        ? null
+        : DateTime.tryParse(startTimeValue);
+
+    return ShiftState(
+      startTime: startTime,
+      duration: startTime == null
+          ? Duration(milliseconds: json['durationInMilliseconds'] as int? ?? 0)
+          : DateTime.now().difference(startTime),
+      user: json['user'] == null
+          ? null
+          : AuthModel.fromJson(Map<String, dynamic>.from(json['user'] as Map)),
+    );
+  }
+
   bool get isStarted => startTime != null;
 
   ShiftState copyWith({
     DateTime? startTime,
     Duration? duration,
     AuthModel? user,
+    bool clearStartTime = false,
+    bool clearUser = false,
   }) {
     return ShiftState(
-      startTime: startTime ?? this.startTime,
+      startTime: clearStartTime ? null : startTime ?? this.startTime,
       duration: duration ?? this.duration,
-      user: user ?? this.user,
+      user: clearUser ? null : user ?? this.user,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'startTime': startTime?.toIso8601String(),
+      'durationInMilliseconds': duration.inMilliseconds,
+      'user': user?.toJson(),
+    };
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:captain_app/core/show_confirmation_dialog.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/views/order_details_screen.dart';
+import 'package:captain_app/widgets/order_timer_widget.dart';
 import 'package:captain_app/widgets/order_small_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,10 +26,7 @@ class OrderCard extends StatelessWidget {
         title: 'تأكيد القبول',
         message: 'هل تريد قبول هذا الطلب؟',
         onConfirm: (_) {
-          context.read<OrdersCubit>().updateOrderStatus(
-            order.id,
-            OrderStatus.accepted,
-          );
+          context.read<OrdersCubit>().acceptOrder(order.id);
         },
         gradientColors: AppConstants.acceptButtonGradientColors,
         buttonText: 'تأكيد القبول',
@@ -95,9 +93,12 @@ class OrderCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                         color: Colors.tealAccent[100],
                       ),
-                      child: const Text(
-                        'منذ قليل',
-                        style: TextStyle(fontSize: 16, color: Colors.teal),
+                      child: OrderTimerWidget(
+                        order: order,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.teal,
+                        ),
                       ),
                     ),
                   ],
