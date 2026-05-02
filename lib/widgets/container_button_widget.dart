@@ -4,10 +4,12 @@ class ContainerButtonWidget extends StatelessWidget {
   const ContainerButtonWidget({
     super.key,
     required this.colors,
-    required this.text,
+    this.text, this.widget, this.isText = true,
   });
   final List<Color> colors;
-  final String text;
+  final String? text;
+  final Widget? widget;
+  final bool isText;
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +25,16 @@ class ContainerButtonWidget extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: isText
+            ? Text(
+                text ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : widget,
       ),
     );
   }

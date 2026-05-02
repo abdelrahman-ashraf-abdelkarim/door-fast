@@ -5,7 +5,7 @@ final List<Order> dummyOrders = [
     id: '1',
     dropoffContact: const OrderContact(
       name: 'أحمد محمد (المستلم)',
-      phone: '01012345678',
+      phone: '01123682940',
       notes: 'يرجى الاتصال قبل الوصول',
     ),
     kind: OrderKind.company,
@@ -40,7 +40,7 @@ final List<Order> dummyOrders = [
     id: '2',
     dropoffContact: const OrderContact(
       name: 'هبة (المستلمة)',
-      phone: '01098765432',
+      phone: '01123682940',
       notes: '',
     ),
     kind: OrderKind.company,
@@ -113,7 +113,7 @@ final List<Order> dummyOrders = [
     ),
     dropoffContact: const OrderContact(
       name: 'أحمد (المستلم)',
-      phone: '01234567890',
+      phone: '01123682940',
       notes: '',
     ),
     kind: OrderKind.personToPerson,
@@ -148,7 +148,7 @@ final List<Order> dummyOrders = [
     id: '5',
     dropoffContact: const OrderContact(
       name: 'منى (المستلمة)',
-      phone: '01055554444',
+      phone: '01123682940',
       notes: '',
     ),
     kind: OrderKind.company,

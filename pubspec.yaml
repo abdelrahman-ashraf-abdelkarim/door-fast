@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  dio: ^5.9.2
   equatable: ^2.0.8
   flutter:
     sdk: flutter
@@ -43,6 +44,9 @@ dependencies:
   intl: any
   latlong2: ^0.9.1
   path_provider: ^2.1.5
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  share_plus: ^12.0.2
   timezone: ^0.9.4
   url_launcher: ^6.3.2
 
@@ -68,6 +72,7 @@ flutter:
     - assets/fonts/Cairo/Cairo-Regular.ttf
     - assets/fonts/Noto_Naskh_Arabic/NotoNaskhArabic-Regular.ttf
     - assets/images/logo-removebg-preview.png
+    - assets/pdfs/Invoice_ORD-ORD-000105.pdf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 flutter_native_splash:
