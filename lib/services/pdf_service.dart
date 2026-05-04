@@ -102,7 +102,9 @@ class PdfService {
     // ✅ cache
     if (await file.exists()) return file;
 
-    final data = await rootBundle.load("assets/pdfs/invoice.pdf");
+    final data = await rootBundle.load(
+      "assets/pdfs/Invoice_ORD-ORD-000105.pdf",
+    );
 
     await file.writeAsBytes(data.buffer.asUint8List());
 
@@ -137,10 +139,10 @@ class PdfService {
       ),
     );
 
-    // 🔍 Debug (تشيله بعد ما تتأكد)
-    print("HEADERS: ${response.headers}");
-    print("CONTENT TYPE: ${response.headers.value('content-type')}");
-    print("FIRST BYTES: ${response.data.sublist(0, 10)}");
+    // // 🔍 Debug (تشيله بعد ما تتأكد)
+    // print("HEADERS: ${response.headers}");
+    // print("CONTENT TYPE: ${response.headers.value('content-type')}");
+    // print("FIRST BYTES: ${response.data.sublist(0, 10)}");
 
     final contentType = response.headers.value('content-type');
 

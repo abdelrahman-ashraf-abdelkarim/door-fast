@@ -55,15 +55,15 @@ class _DateFilterCardState extends State<DateFilterCard> {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: pickToDate,
-            child: _dateField(format(toDate)),
+            onTap: pickFromDate,
+            child: _dateField(format(fromDate)),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: GestureDetector(
-            onTap: pickFromDate,
-            child: _dateField(format(fromDate)),
+            onTap: pickToDate,
+            child: _dateField(format(toDate)),
           ),
         ),
       ],

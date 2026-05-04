@@ -60,154 +60,162 @@ class _LoginScreenState extends State<LoginScreen> {
               );
             }
           },
-          child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.only(bottom: keyboardInset),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: screenHeight / 3,
-                          decoration: const BoxDecoration(
-                            color: Color(0xffF9C724),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(60),
-                            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: EdgeInsets.only(bottom: keyboardInset),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: screenHeight / 2.8,
+                        decoration: BoxDecoration(
+                          color: Color(0xffF9C724),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(45),
+                            bottomRight: Radius.circular(45),
                           ),
-                          child: const Image(
-                            image: AssetImage(
-                              'assets/images/logo-removebg-preview.png',
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
                             ),
+                          ],
+                        ),
+                        child: const Image(
+                          image: AssetImage(
+                            'assets/images/logo-removebg-preview.png',
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'اهلاً بك مجدداً ايها الكابتن!',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 32),
+                              const Text(
+                                'اهلاً بك مجدداً ايها الكابتن!',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'سجل دخولك لمتابعة مهام التوصيل اليوميه',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.textSecondary,
-                                    // fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'سجل دخولك لمتابعة مهام التوصيل اليوميه',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.textSecondary,
+                                  // fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 32),
-                                TextFormField(
-                                  controller: _nameController,
-                                  decoration: InputDecoration(
-                                    labelText: 'اسم المستخدم',
-                                    prefixIcon: const Icon(Icons.person),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                              ),
+                              const SizedBox(height: 40),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                  labelText: 'اسم المستخدم',
+                                  labelStyle: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  hintText: "أدخل اسم المستخدم",
+                                  prefixIcon: const Icon(Icons.person),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'يرجى إدخال اسم المستخدم';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                    labelText: 'كلمة المرور',
-                                    prefixIcon: const Icon(Icons.lock),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xffBA282E),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'يرجى إدخال كلمة المرور';
-                                    }
-                                    if (value.length < 4) {
-                                      return 'كلمة المرور يجب أن تكون 4 أحرف على الأقل';
-                                    }
-                                    return null;
-                                  },
                                 ),
-                                const SizedBox(height: 24),
-                                BlocBuilder<AuthCubit, AuthState>(
-                                  builder: (context, state) {
-                                    final isLoading = state is AuthLoading;
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'يرجى إدخال اسم المستخدم';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'كلمة المرور',
+                                  hintText: "أدخل كلمة المرور",
+                                  prefixIcon: const Icon(Icons.lock),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xffBA282E),
+                                    ),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'يرجى إدخال كلمة المرور';
+                                  }
+                                  if (value.length < 4) {
+                                    return 'كلمة المرور يجب أن تكون 4 أحرف على الأقل';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+                              BlocBuilder<AuthCubit, AuthState>(
+                                builder: (context, state) {
+                                  final isLoading = state is AuthLoading;
 
-                                    return GestureDetector(
-                                      onTap: isLoading ? null : _login,
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Colors.orangeAccent,
-                                              Color(0xffF9C724),
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            tileMode: TileMode.clamp,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: isLoading
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white,
-                                              )
-                                            : const Text(
-                                                'تسجيل الدخول',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w900,
-                                                  // color: AppColors.textPrimary,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                                  return GestureDetector(
+                                    onTap: isLoading ? null : _login,
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xffBA282E),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'بيانات تجريبية: أي اسم وكلمة مرور',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
+                                      alignment: Alignment.center,
+                                      child: isLoading
+                                          ? const CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )
+                                          : const Text(
+                                              'تسجيل الدخول',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w900,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

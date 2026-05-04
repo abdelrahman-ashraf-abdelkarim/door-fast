@@ -88,14 +88,15 @@ class OrderDetailsScreen extends StatelessWidget {
                               );
                               Navigator.pop(context);
                             },
-                            gradientColors:
-                                AppConstants.acceptButtonGradientColors,
+                            colorContainer: AppColors.buttonOrderDialog,
                             buttonText: 'تم التوصيل',
                           );
                         },
                         child: ContainerButtonWidget(
-                          colors: AppConstants.acceptButtonGradientColors,
-                          text: 'تم التوصيل',
+                          // colors: AppConstants.acceptButtonGradientColors,
+                          color: AppColors.buttonOrderCard,
+
+                          text: '✓ تم التوصيل بنجاح',
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -113,14 +114,14 @@ class OrderDetailsScreen extends StatelessWidget {
                               );
                               Navigator.pop(context);
                             },
-                            gradientColors:
-                                AppConstants.rejectButtonGradientColors,
                             buttonText: 'تأكيد الرفض',
                           );
                         },
                         child: ContainerButtonWidget(
-                          colors: AppConstants.rejectButtonGradientColors,
-                          text: 'رفض الطلب',
+                          color: Colors.red,
+                          textColor: Colors.red,
+                          isWhite: true,
+                          text: 'إلغاء الطلب',
                         ),
                       ),
                     ],
@@ -137,7 +138,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     builder: (context, state) {
                       if (state is InvoiceLoading) {
                         return ContainerButtonWidget(
-                          colors: AppConstants.acceptButtonGradientColors,
+                          color: AppColors.buttonOrderCard,
                           isText: false,
                           widget: const CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation(Colors.white),
@@ -154,7 +155,7 @@ class OrderDetailsScreen extends StatelessWidget {
                           );
                         },
                         child: ContainerButtonWidget(
-                          colors: AppConstants.acceptButtonGradientColors,
+                          color: AppColors.buttonOrderCard,
                           text: 'ارسال الفاتوره للعميل',
                         ),
                       );

@@ -44,10 +44,11 @@ class AppBarWidget extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        const Text(
+        Text(
           "DoorFast",
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontFamily: "Roboto",
             fontSize: 24,
             color: Color(0xffec6623),
           ),

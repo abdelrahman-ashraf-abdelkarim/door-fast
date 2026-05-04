@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 class ContainerButtonWidget extends StatelessWidget {
   const ContainerButtonWidget({
     super.key,
-    required this.colors,
-    this.text, this.widget, this.isText = true,
+    required this.color,
+    this.text,
+    this.widget,
+    this.isText = true,
+    this.textColor = Colors.white,
+    this.isWhite = false,
   });
-  final List<Color> colors;
+  final Color color;
+  final bool? isWhite;
   final String? text;
+  final Color? textColor;
   final Widget? widget;
   final bool isText;
 
@@ -17,19 +23,16 @@ class ContainerButtonWidget extends StatelessWidget {
       width: double.infinity,
       height: 50,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: colors,
-        ),
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(12),
+        color: isWhite == true ? Colors.white : color,
       ),
       child: Center(
         child: isText
             ? Text(
                 text ?? '',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

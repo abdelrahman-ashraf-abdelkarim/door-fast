@@ -16,6 +16,8 @@ class AppColors {
   static const pickupMarkerOrange = Colors.orange;
   static const textPrimary = Color(0xFF121212);
   static const textSecondary = Color(0xFF7A7A7A);
+  static const buttonOrderCard = Color.fromARGB(255, 13, 155, 108);
+  static const buttonOrderDialog = Color(0xff7066E0);
 }
 
 class AppConstants {

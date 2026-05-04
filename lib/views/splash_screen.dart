@@ -1,7 +1,5 @@
-import 'dart:async';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
-import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  Timer? _navTimer;
-
+  bool _animationDone = false;
   @override
   void initState() {
     super.initState();
@@ -34,22 +31,20 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _navTimer = Timer(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      _navigateAfterSplash();
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationDone = true;
+        _tryNavigate();
+      }
     });
   }
 
-  void _navigateAfterSplash() {
+  void _tryNavigate() {
+    if (!mounted || !_animationDone) return;
     final authState = context.read<AuthCubit>().state;
     final destination = authState is AuthAuthenticated
         ? const HomeShell()
         : const LoginScreen();
-
-    if (authState is AuthAuthenticated) {
-      NotificationService.scheduleMockOrderNotifications();
-    }
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => destination),
@@ -58,7 +53,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _navTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

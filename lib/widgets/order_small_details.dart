@@ -1,15 +1,9 @@
 import 'package:captain_app/models/order_model.dart';
-import 'package:captain_app/widgets/order_item_card.dart';
 import 'package:flutter/material.dart';
 
 class OrderContainer extends StatelessWidget {
-  const OrderContainer({
-    super.key,
-    required this.itemsCount,
-    required this.order,
-  });
+  const OrderContainer({super.key, required this.order});
 
-  final int itemsCount;
   final Order order;
 
   @override
@@ -21,7 +15,7 @@ class OrderContainer extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        // color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: isCustomerHidden
@@ -46,13 +40,13 @@ class OrderContainer extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.shopping_bag_outlined,
-                      color: Colors.black54,
-                      size: 18,
+                      Icons.person_2_sharp,
+                      color: Colors.blueGrey,
+                      size: 24,
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '$itemsCount صنف داخل الطلب',
+                      order.customerName,
                       style: const TextStyle(
                         color: Colors.black54,
                         fontSize: 14,
@@ -62,10 +56,67 @@ class OrderContainer extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                ...order.items.map(
-                  (item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: OrderItemCard(item: item),
+                Row(
+                  children: [
+                    const Icon(Icons.phone, color: Colors.green, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      order.phone,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(Icons.location_pin, color: Colors.red, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      order.deliveryLocation,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xffBAE6FD)),
+                    color: Color(0xffBAE6FD).withValues(alpha: 0.3),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "الأجمالى المطلوب",
+                        style: TextStyle(
+                          color: Color(0xff0369A1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        "${order.totalPrice.toString()} ج",
+                        style: TextStyle(
+                          color: Color(0xff0369A1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

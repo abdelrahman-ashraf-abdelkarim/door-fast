@@ -74,7 +74,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     final digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.isEmpty) return null;
     if (digitsOnly.startsWith('01') && digitsOnly.length == 11) {
-      return '20${digitsOnly.substring(1)}';
+      return digitsOnly;
     }
     // keep it as-is and let the backend/team decide format consistency.
     return digitsOnly;

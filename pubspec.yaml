@@ -73,6 +73,11 @@ flutter:
     - assets/fonts/Noto_Naskh_Arabic/NotoNaskhArabic-Regular.ttf
     - assets/images/logo-removebg-preview.png
     - assets/pdfs/Invoice_ORD-ORD-000105.pdf
+
+  fonts:
+  - family: Roboto
+    fonts:
+      - asset: assets/fonts/Roboto/Roboto-Regular.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 flutter_native_splash:

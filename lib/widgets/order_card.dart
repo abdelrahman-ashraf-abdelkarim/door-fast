@@ -24,11 +24,11 @@ class OrderCard extends StatelessWidget {
       showConfirmationDialog(
         context,
         title: 'تأكيد القبول',
-        message: 'هل تريد قبول هذا الطلب؟',
+        message: 'هل أنت متأكد من قبول هذا الطلب؟',
         onConfirm: (_) {
           context.read<OrdersCubit>().acceptOrder(order.id);
         },
-        gradientColors: AppConstants.acceptButtonGradientColors,
+        colorContainer: AppColors.buttonOrderDialog,
         buttonText: 'تأكيد القبول',
       );
       return;
@@ -44,91 +44,71 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          border: const Border(
-            right: BorderSide(color: Colors.orange, width: 5),
-          ),
-        ),
-        child: Card(
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'رقم الطلب',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFFE59E0B),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          order.formattedId,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F2937),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.tealAccent[100],
-                      ),
-                      child: OrderTimerWidget(
-                        order: order,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.teal,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                OrderContainer(itemsCount: itemsCount, order: order),
-                const SizedBox(height: 16),
-                if (order.status != OrderStatus.cancelled)
-                  GestureDetector(
-                    onTap: () => _handleTap(context),
-                    child: Container(
-                      width: double.infinity,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xff00796B),
-                            Color(0xff00796B),
-                            Color(0xff26A69A),
-                          ],
-                        ),
-                      ),
-                      child: ButtonCard(text: _getButtonText(order.status)),
+      child: Card(
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    order.formattedId,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1F2937),
                     ),
                   ),
-              ],
-            ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      // color: Colors.tealAccent[100],
+                    ),
+                    child: OrderTimerWidget(
+                      order: order,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              OrderContainer(order: order),
+              const SizedBox(height: 16),
+              if (order.status != OrderStatus.cancelled)
+                GestureDetector(
+                  onTap: () => _handleTap(context),
+                  child: Container(
+                    width: double.infinity,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      // gradient: const LinearGradient(
+                      //   begin: Alignment.topLeft,
+                      //   end: Alignment.bottomRight,
+                      //   colors: [
+                      //     Color(0xff10B981),
+
+                      //     Color(0xff10B981),
+                      //     Color(0xff00796B),
+                      //     Color(0xff26A69A),
+                      //   ],
+                      // ),
+                      color: Color.fromARGB(255, 13, 155, 108),
+                    ),
+                    child: ButtonCard(text: _getButtonText(order.status)),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -145,7 +125,7 @@ String _getButtonText(OrderStatus status) {
     case OrderStatus.accepted:
       return 'تفاصيل الطلب';
     case OrderStatus.delivered:
-      return 'عرض تفاصيل الرحله';
+      return '📋 عرض تفاصيل الطلب';
     case OrderStatus.cancelled:
       return 'تم الإلغاء';
   }

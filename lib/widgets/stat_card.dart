@@ -7,7 +7,6 @@ class StatCard extends StatelessWidget {
     this.value,
     this.icon,
     this.color,
-    this.cardColor,
     this.valueWidget,
   });
   final String title;
@@ -15,14 +14,13 @@ class StatCard extends StatelessWidget {
   final Widget? valueWidget;
   final IconData? icon;
   final Color? color;
-  final bool? cardColor;
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 120,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardColor == true ? Color(0xffEFF1F3) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

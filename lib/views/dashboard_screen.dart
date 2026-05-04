@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/format_arabic_date_for_dashboard.dart';
 import 'package:captain_app/core/time_now.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
@@ -26,6 +27,7 @@ class DashboardScreen extends StatelessWidget {
               isOnline: isOnline,
               userName: state.user?.name ?? 'كابتن',
             ),
+            backgroundColor: AppColors.screenBackground,
           ),
           body: BlocBuilder<OrdersCubit, OrdersState>(
             builder: (context, orderState) {
@@ -84,7 +86,7 @@ class _DashboardContent extends StatelessWidget {
             style: TextStyle(fontSize: 18, color: Colors.grey[600]),
           ),
           const SizedBox(height: 20),
-          _TotalEarningsCard(totalEarnings: ordersCubit.totalEarnings),
+          _TotalEarningsCard(totalEarnings: ordersCubit.totalDeliveryEarnings),
           const SizedBox(height: 20),
           _StatsGrid(ordersCubit: ordersCubit),
           const SizedBox(height: 20),
@@ -114,19 +116,19 @@ class _TotalEarningsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           const Text(
-            'اجمالى التحصيل اليومى',
+            'خدمة التوصيل',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.w600,
               color: Colors.teal,
             ),
           ),
-          const SizedBox(height: 10),
+          // const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${totalEarnings.toStringAsFixed(0)} ',
+                ' ${totalEarnings.toString()} ',
                 style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -163,13 +165,11 @@ class _StatsGrid extends StatelessWidget {
           title: 'بداية الوردية',
           valueWidget: StartShiftTimeWidget(),
           icon: Icons.access_time,
-          cardColor: true,
         ),
         const StatCard(
           title: 'مدة العمل',
           valueWidget: WorkTimerWidget(),
           icon: Icons.timer_outlined,
-          cardColor: true,
         ),
         StatCard(
           title: 'طلبات مكتمله',
@@ -184,18 +184,16 @@ class _StatsGrid extends StatelessWidget {
           color: Colors.blue,
         ),
         StatCard(
-          title: 'خدمة التوصيل',
-          value: ordersCubit.totalDeliveryEarnings.toString(),
-          icon: Icons.local_shipping,
+          title: 'اجمالى التحصيل اليومى',
+          value: "${ordersCubit.totalEarnings.toStringAsFixed(0)} ج",
+          // icon: Icons.local_shipping,
           color: Colors.orange,
-          cardColor: true,
         ),
         const StatCard(
           title: 'إجمالي الخصومات',
           value: '10 ج',
           icon: Icons.money_off,
           color: Colors.red,
-          cardColor: true,
         ),
       ],
     );

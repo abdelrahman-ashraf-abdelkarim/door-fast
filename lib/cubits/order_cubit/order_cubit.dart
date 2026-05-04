@@ -94,8 +94,6 @@ class OrdersCubit extends Cubit<OrdersState> {
   void _showNewOrderNotification(Order order) {
     NotificationService.showNotification(
       title: 'طلب جديد 🚚',
-      body:
-          'طلب من ${order.pickupLocation} إلى ${order.deliveryLocation} - ${order.deliveryPrice} ج',
     );
   }
 
