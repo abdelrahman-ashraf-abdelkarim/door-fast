@@ -93,6 +93,21 @@ class Order {
     return acceptedAt == null ? waitingDuration : acceptedDuration;
   }
 
+  static OrderStatus _parseStatus(String status) {
+  switch (status) {
+    case 'pending':
+      return OrderStatus.waiting;
+    case 'received':
+      return OrderStatus.accepted;
+    case 'delivered':
+      return OrderStatus.delivered;
+    case 'cancelled':
+      return OrderStatus.cancelled;
+    default:
+      return OrderStatus.waiting;
+  }
+}
+
   Order({
     required this.id,
     required this.dropoffContact,
@@ -145,4 +160,38 @@ class Order {
       deliveryLng: deliveryLng,
     );
   }
+
+factory Order.fromJson(Map<String, dynamic> json) {
+  final client = json['client'];
+  final sendTo = json['send_to'];
+
+  return Order(
+    id: json['id'].toString(),
+    dropoffContact: OrderContact(
+      name: sendTo != null ? sendTo['name'] ?? client['name'] : client['name'],
+      phone: sendTo != null ? sendTo['phone'] : client['phone'],
+      notes: json['notes'] ?? '',
+    ),
+    pickupContact: null,
+    kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
+    pickupLocation: '',
+    deliveryLocation: sendTo != null
+        ? sendTo['address'] ?? ''
+        : client['address'] ?? '',
+    deliveryPrice: (json['delivery_fee'] as num).toDouble(),
+    paymentMethod: 'cash',
+    notes: json['notes'] ?? '',
+    status: Order._parseStatus(json['status']),
+    createdAt: DateTime.parse(json['created_at']),
+    acceptedAt: json['accepted_at'] != null
+        ? DateTime.parse(json['accepted_at'])
+        : null,
+    items: (json['items'] as List).map((item) => OrderItem(
+      productName: item['item_name'],
+      quantity: item['quantity'],
+      deliveryPrice: (item['unit_price'] as num).toDouble(),
+      marketPlace: item['shop']?['name'] ?? '',
+    )).toList(),
+  );
+}
 }

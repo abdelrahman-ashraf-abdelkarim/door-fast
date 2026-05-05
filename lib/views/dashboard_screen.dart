@@ -185,7 +185,7 @@ class _StatsGrid extends StatelessWidget {
         ),
         StatCard(
           title: 'اجمالى التحصيل اليومى',
-          value: "${ordersCubit.totalEarnings.toStringAsFixed(0)} ج",
+          value: "${ordersCubit.totalDeliveryEarnings.toStringAsFixed(0)} ج",
           // icon: Icons.local_shipping,
           color: Colors.orange,
         ),

@@ -14,8 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Order order;
-
-  const OrderDetailsScreen({super.key, required this.order});
+  final String token;
+  const OrderDetailsScreen({super.key, required this.order, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +85,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             onConfirm: (_) {
                               context.read<OrdersCubit>().completeOrder(
                                 order.id,
+                                token,
                               );
                               Navigator.pop(context);
                             },
@@ -110,6 +111,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             onConfirm: (reason) {
                               context.read<OrdersCubit>().cancelOrder(
                                 order.id,
+                                token,
                                 reason ?? '',
                               );
                               Navigator.pop(context);

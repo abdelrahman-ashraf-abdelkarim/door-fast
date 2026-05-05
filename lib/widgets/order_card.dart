@@ -9,10 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrderCard extends StatelessWidget {
-  const OrderCard({super.key, required this.itemsCount, required this.order});
+  const OrderCard({
+    super.key,
+    required this.itemsCount,
+    required this.order,
+    required this.token,
+  });
 
   final int itemsCount;
   final Order order;
+  final String token;
 
   bool get _isPendingOrder {
     return order.status == OrderStatus.newOrder ||
@@ -26,7 +32,8 @@ class OrderCard extends StatelessWidget {
         title: 'تأكيد القبول',
         message: 'هل أنت متأكد من قبول هذا الطلب؟',
         onConfirm: (_) {
-          context.read<OrdersCubit>().acceptOrder(order.id);
+          context.read<OrdersCubit>().acceptOrder(order.id, token);
+          Navigator.pop(context); // إغلاق الديالوج
         },
         colorContainer: AppColors.buttonOrderDialog,
         buttonText: 'تأكيد القبول',
@@ -36,7 +43,9 @@ class OrderCard extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
+      MaterialPageRoute(
+        builder: (_) => OrderDetailsScreen(order: order, token: token),
+      ),
     );
   }
 
@@ -92,17 +101,6 @@ class OrderCard extends StatelessWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      // gradient: const LinearGradient(
-                      //   begin: Alignment.topLeft,
-                      //   end: Alignment.bottomRight,
-                      //   colors: [
-                      //     Color(0xff10B981),
-
-                      //     Color(0xff10B981),
-                      //     Color(0xff00796B),
-                      //     Color(0xff26A69A),
-                      //   ],
-                      // ),
                       color: Color.fromARGB(255, 13, 155, 108),
                     ),
                     child: ButtonCard(text: _getButtonText(order.status)),

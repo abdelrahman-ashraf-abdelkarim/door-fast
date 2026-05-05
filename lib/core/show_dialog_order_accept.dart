@@ -2,7 +2,7 @@ import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/views/order_details_screen.dart';
 import 'package:flutter/material.dart';
 
-void showOrderAcceptedDialog(BuildContext context, Order order) {
+void showOrderAcceptedDialog(BuildContext context, Order order, String token) {
   final parentContext = context;
 
   showDialog(
@@ -15,7 +15,7 @@ void showOrderAcceptedDialog(BuildContext context, Order order) {
         Navigator.of(dialogContext).pop();
         Navigator.push(
           parentContext,
-          MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
+          MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order, token: token)),
         );
       });
 

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
@@ -12,127 +10,85 @@ class OrdersCubit extends Cubit<OrdersState> {
       super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
-
   final OrdersService _ordersService;
-  StreamSubscription<List<Order>>? _ordersSubscription;
-  bool isOnline = true;
 
-  Future<void> loadOrders() async {
+  Future<void> loadOrders(String token) async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
-
     try {
-      final orders = await _ordersService.fetchOrders();
-      emit(state.copyWith(orders: orders, isLoading: false));
-      listenToRealTimeOrders();
+      final resulte = await Future.wait([
+        _ordersService.fetchOrders(token),
+        _ordersService.fetchReceivedOrders(token),
+        _ordersService.fetchDeliveredOrders(token),
+      ]);
+      final allOrders = [...resulte[0], ...resulte[1], ...resulte[2]];
+      emit(state.copyWith(orders: allOrders, isLoading: false));
     } catch (error) {
       emit(state.copyWith(isLoading: false, errorMessage: error.toString()));
     }
   }
 
-  void listenToRealTimeOrders() {
-    _ordersService.startRealTimeSimulation();
-    _ordersSubscription ??= _ordersService.ordersStream.listen((orders) {
-      final knownOrderIds = state.orders.map((order) => order.id).toSet();
-      final newOrders = orders.where((order) {
-        return order.isPending && !knownOrderIds.contains(order.id);
-      });
-
-      emit(state.copyWith(orders: orders, errorMessage: null));
-
-      for (final order in newOrders) {
-        _showNewOrderNotification(order);
-      }
-    });
-  }
-
-  Future<void> acceptOrder(String orderId) async {
+  Future<void> acceptOrder(String orderId, String token) async {
     try {
-      await _ordersService.acceptOrder(orderId);
-    } on OrderAlreadyAcceptedException {
-      emit(state.copyWith(errorMessage: 'لا يمكن قبول نفس الطلب مرتين'));
+      await _ordersService.acceptOrder(orderId, token);
+      final updatedOrders = state.orders.map((o) {
+        if (o.id == orderId) {
+          return o.copyWith(
+            status: OrderStatus.accepted,
+            acceptedAt: DateTime.now(),
+          );
+        }
+        return o;
+      }).toList();
+      // await loadOrders(token); /
+      emit(state.copyWith(orders: updatedOrders));
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
 
-  Future<void> cancelOrder(String orderId, String reason) async {
+  Future<void> cancelOrder(String orderId, String reason, String token) async {
     try {
-      await _ordersService.cancelOrder(orderId, reason);
+      await _ordersService.cancelOrder(orderId, reason, token);
+      await loadOrders(token); // رفريش بعد الإلغاء
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
 
-  Future<void> completeOrder(String orderId) async {
+  Future<void> completeOrder(String orderId, String token) async {
     try {
-      await _ordersService.completeOrder(orderId);
+      await _ordersService.completeOrder(orderId, token);
+      await loadOrders(token); // رفريش بعد التسليم
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
 
-  void addOrder(Order order) {
-    final updatedOrders = List<Order>.from(state.orders)..add(order);
-    emit(state.copyWith(orders: updatedOrders));
-    _showNewOrderNotification(order);
+  void _showNewOrderNotification() {
+    NotificationService.showNotification(title: 'طلب جديد 🚚');
   }
 
-  List<Order> _ordersWithStatus(OrderStatus status) {
-    return state.orders.where((order) => order.status == status).toList();
-  }
+  List<Order> get pendingOrders =>
+      state.orders.where((o) => _pendingStatuses.contains(o.status)).toList();
 
-  List<Order> _ordersWithStatuses(Set<OrderStatus> statuses) {
-    return state.orders
-        .where((order) => statuses.contains(order.status))
-        .toList();
-  }
+  List<Order> get acceptedOrders =>
+      state.orders.where((o) => o.status == OrderStatus.accepted).toList();
 
-  int _countOrdersWithStatus(OrderStatus status) {
-    return state.orders.where((order) => order.status == status).length;
-  }
+  List<Order> get deliveredOrders =>
+      state.orders.where((o) => o.status == OrderStatus.delivered).toList();
 
-  void _showNewOrderNotification(Order order) {
-    NotificationService.showNotification(
-      title: 'طلب جديد 🚚',
-    );
-  }
+  int get pendingCount => pendingOrders.length;
+  int get acceptedCount => acceptedOrders.length;
+  int get deliveredCount => deliveredOrders.length;
+  int get cancelledCount =>
+      state.orders.where((o) => o.status == OrderStatus.cancelled).length;
 
-  /// الحصول على الطلبات الجديدة فقط
-  List<Order> get pendingOrders => _ordersWithStatuses(_pendingStatuses);
-
-  /// الحصول على الطلبات المقبولة
-  List<Order> get acceptedOrders => _ordersWithStatus(OrderStatus.accepted);
-
-  /// الحصول على الطلبات التي تم تسليمها
-  List<Order> get deliveredOrders => _ordersWithStatus(OrderStatus.delivered);
-
-  /// عدد الطلبات حسب الحالة
-  /// عدد الطلبات الجديدة
-  int get pendingCount => _ordersWithStatuses(_pendingStatuses).length;
-
-  /// عدد الطلبات المقبولة
-  int get acceptedCount => _countOrdersWithStatus(OrderStatus.accepted);
-
-  /// عدد الطلبات التي تم تسليمها
-  int get deliveredCount => _countOrdersWithStatus(OrderStatus.delivered);
-
-  /// عدد الطلبات الملغاة
-  int get cancelledCount => _countOrdersWithStatus(OrderStatus.cancelled);
-
-  /// إجمالي الأرباح من الطلبات التي تم تسليمها
-  double get totalEarnings => state.orders
-      .where((o) => o.status == OrderStatus.delivered)
-      .fold(0.0, (sum, order) => sum + order.totalPrice);
-
-  /// اجمالى ارباح الكابتن من الطلبات التى تم توصيلها
   double get totalDeliveryEarnings => state.orders
       .where((o) => o.status == OrderStatus.delivered)
-      .fold(0.0, (sum, order) => sum + order.deliveryPrice);
+      .fold(0.0, (sum, o) => sum + o.deliveryPrice);
 
   @override
   Future<void> close() {
-    _ordersSubscription?.cancel();
-    _ordersService.dispose();
     return super.close();
   }
 }

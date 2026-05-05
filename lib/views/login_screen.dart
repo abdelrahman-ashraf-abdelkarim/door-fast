@@ -37,12 +37,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F7F7),
+        resizeToAvoidBottomInset: true,
         body: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
               return SingleChildScrollView(
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: EdgeInsets.only(bottom: keyboardInset),
+                // padding: EdgeInsets.only(bottom: keyboardInset),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Column(
