@@ -6,13 +6,18 @@ enum OrderKind { company, personToPerson }
 
 class OrderContact {
   final String name;
-  final String? phone;
+  final String? phoneOne;
+  final String? phoneTwo;
+
   final String notes;
+  final String? address;
 
   const OrderContact({
     required this.name,
-    required this.phone,
+    required this.phoneOne,
+    this.phoneTwo,
     this.notes = '',
+    this.address = '',
   });
 }
 
@@ -36,50 +41,37 @@ class OrderItem {
 
 class Order {
   final String id;
-  final OrderContact dropoffContact;
-  final OrderContact? pickupContact;
+  final OrderContact receiver;
+  final OrderContact? sender;
   final OrderKind kind;
-  final String pickupLocation;
-  final String deliveryLocation;
   final double deliveryPrice;
-  final String paymentMethod;
   final String notes;
   final String? cancelReason;
   final List<OrderItem> items;
   final OrderStatus status;
   final DateTime createdAt;
   final DateTime? acceptedAt;
-  final double? pickupLat;
-  final double? pickupLng;
-  final double? deliveryLat;
-  final double? deliveryLng;
 
-  String get customerName => dropoffContact.name;
-  String get phone => dropoffContact.phone ?? "";
-  bool get isPersonToPerson => kind == OrderKind.personToPerson;
-  bool get isPending {
-    return status == OrderStatus.waiting || status == OrderStatus.newOrder;
-  }
+  String get receiverName => receiver.name;
+  String get receiverPhoneOne => receiver.phoneOne ?? "";
+  String get receiverPhoneTwo => receiver.phoneTwo ?? "";
+  String get receiverAddress => receiver.address ?? "";
+  String get senderName => sender?.name ?? "";
+  String get senderPhoneOne => sender?.phoneOne ?? "";
+  String get senderPhoneTwo => sender?.phoneTwo ?? "";
+  String get senderAddress => sender?.address ?? "";
+  bool get isPersonToPerson => sender != null;
+  bool get isPending =>
+      status == OrderStatus.waiting || status == OrderStatus.newOrder;
 
-  String get formattedId {
-    return '#${id.padLeft(6, '0')}';
-  }
+  int get totalItemsCount => items.fold(0, (sum, item) => sum + item.quantity);
 
-  int get totalItemsCount {
-    return items.fold(0, (sum, item) => sum + item.quantity);
-  }
+  double get itemsTotalPrice =>
+      items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get itemsTotalPrice {
-    return items.fold(0, (sum, item) => sum + item.totalPrice);
-  }
+  double get totalPrice => itemsTotalPrice + deliveryPrice;
 
-  double get totalPrice {
-    return itemsTotalPrice + deliveryPrice;
-  }
-
-  Duration get waitingDuration {
-    return DateTime.now().difference(createdAt);
-  }
+  Duration get waitingDuration => DateTime.now().difference(createdAt);
 
   Duration get acceptedDuration {
     final acceptedTime = acceptedAt;
@@ -94,104 +86,103 @@ class Order {
   }
 
   static OrderStatus _parseStatus(String status) {
-  switch (status) {
-    case 'pending':
-      return OrderStatus.waiting;
-    case 'received':
-      return OrderStatus.accepted;
-    case 'delivered':
-      return OrderStatus.delivered;
-    case 'cancelled':
-      return OrderStatus.cancelled;
-    default:
-      return OrderStatus.waiting;
+    switch (status) {
+      case 'pending':
+        return OrderStatus.waiting;
+      case 'received':
+        return OrderStatus.accepted;
+      case 'delivered':
+        return OrderStatus.delivered;
+      case 'cancelled':
+        return OrderStatus.cancelled;
+      default:
+        return OrderStatus.waiting;
+    }
   }
-}
 
   Order({
     required this.id,
-    required this.dropoffContact,
-    this.pickupContact,
+    required this.receiver,
+    this.sender,
     this.kind = OrderKind.company,
-    required this.pickupLocation,
-    required this.deliveryLocation,
     required this.deliveryPrice,
-    required this.paymentMethod,
+
     required this.notes,
     this.cancelReason,
     required this.status,
-    DateTime? createdAt,
+    required this.createdAt,
     this.acceptedAt,
     this.items = const [],
-    this.pickupLat,
-    this.pickupLng,
-    this.deliveryLat,
-    this.deliveryLng,
-  }) : createdAt = createdAt ?? DateTime.now();
+  });
 
   Order copyWith({
     OrderStatus? status,
     List<OrderItem>? items,
     String? cancelReason,
-    OrderContact? pickupContact,
-    OrderContact? dropoffContact,
+    OrderContact? sender,
     OrderKind? kind,
     DateTime? createdAt,
     DateTime? acceptedAt,
   }) {
     return Order(
       id: id,
-      dropoffContact: dropoffContact ?? this.dropoffContact,
-      pickupContact: pickupContact ?? this.pickupContact,
+      receiver: receiver,
+      sender: sender ?? this.sender,
       kind: kind ?? this.kind,
-      pickupLocation: pickupLocation,
-      deliveryLocation: deliveryLocation,
       deliveryPrice: deliveryPrice,
-      paymentMethod: paymentMethod,
       notes: notes,
       cancelReason: cancelReason ?? this.cancelReason,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       acceptedAt: acceptedAt ?? this.acceptedAt,
       items: items ?? this.items,
-      pickupLat: pickupLat,
-      pickupLng: pickupLng,
-      deliveryLat: deliveryLat,
-      deliveryLng: deliveryLng,
     );
   }
 
-factory Order.fromJson(Map<String, dynamic> json) {
-  final client = json['client'];
-  final sendTo = json['send_to'];
+  factory Order.fromJson(Map<String, dynamic> json) {
+    final client = json['client'];
+    final sendTo = json['send_to'];
 
-  return Order(
-    id: json['id'].toString(),
-    dropoffContact: OrderContact(
-      name: sendTo != null ? sendTo['name'] ?? client['name'] : client['name'],
-      phone: sendTo != null ? sendTo['phone'] : client['phone'],
+    final receiver = OrderContact(
+      name: sendTo?['name'] ?? client['name'],
+      phoneOne: sendTo?['send_to_phone'] ?? client['send_to_phone'],
+      phoneTwo: sendTo?['send_to_phone2'] ?? client['send_to_phone2'],
+      address: sendTo?['address'] ?? client['address'] ?? '',
+    );
+
+    /// 👇 المرسل موجود بس في حالة person-to-person
+    OrderContact? sender;
+
+    if (sendTo != null) {
+      sender = OrderContact(
+        name: client['name'],
+        phoneOne: client['send_to_phone'],
+        phoneTwo: client['send_to_phone2'],
+        address: client['address'] ?? '',
+      );
+    }
+    return Order(
+      id: json['id'].toString(),
+      receiver: receiver,
+      sender: sender,
+      kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
+      deliveryPrice: (json['delivery_fee'] as num).toDouble(),
       notes: json['notes'] ?? '',
-    ),
-    pickupContact: null,
-    kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
-    pickupLocation: '',
-    deliveryLocation: sendTo != null
-        ? sendTo['address'] ?? ''
-        : client['address'] ?? '',
-    deliveryPrice: (json['delivery_fee'] as num).toDouble(),
-    paymentMethod: 'cash',
-    notes: json['notes'] ?? '',
-    status: Order._parseStatus(json['status']),
-    createdAt: DateTime.parse(json['created_at']),
-    acceptedAt: json['accepted_at'] != null
-        ? DateTime.parse(json['accepted_at'])
-        : null,
-    items: (json['items'] as List).map((item) => OrderItem(
-      productName: item['item_name'],
-      quantity: item['quantity'],
-      deliveryPrice: (item['unit_price'] as num).toDouble(),
-      marketPlace: item['shop']?['name'] ?? '',
-    )).toList(),
-  );
-}
+      status: Order._parseStatus(json['status']),
+      createdAt: DateTime.parse(json['created_at']),
+      acceptedAt: json['accepted_at'] != null
+          ? DateTime.parse(json['accepted_at'])
+          : null,
+      items: (json['items'] as List)
+          .map(
+            (item) => OrderItem(
+              productName: item['item_name'],
+              quantity: item['quantity'],
+              deliveryPrice: (item['unit_price'] as num).toDouble(),
+              marketPlace: item['shop']?['name'] ?? '',
+            ),
+          )
+          .toList(),
+    );
+  }
 }

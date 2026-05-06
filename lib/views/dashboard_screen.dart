@@ -161,6 +161,9 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       childAspectRatio: 1.5,
       children: [
+        ///  start time and work duration should be in the same card,
+        ///  and if the shift is not started show "انت غير نشط حاليا" instead of the time and duration
+        ///  Add real data for each stat card
         const StatCard(
           title: 'بداية الوردية',
           valueWidget: StartShiftTimeWidget(),
@@ -171,6 +174,8 @@ class _StatsGrid extends StatelessWidget {
           valueWidget: WorkTimerWidget(),
           icon: Icons.timer_outlined,
         ),
+
+        /// end task
         StatCard(
           title: 'طلبات مكتمله',
           value: ordersCubit.deliveredCount.toString(),

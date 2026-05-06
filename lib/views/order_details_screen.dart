@@ -6,7 +6,6 @@ import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/contact_card.dart';
 import 'package:captain_app/widgets/container_button_widget.dart';
-import 'package:captain_app/widgets/delivery_map_card.dart';
 import 'package:captain_app/widgets/item_price_card.dart';
 import 'package:captain_app/widgets/order_details_item_card.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class OrderDetailsScreen extends StatelessWidget {
   final Order order;
   final String token;
-  const OrderDetailsScreen({super.key, required this.order, required this.token});
+  const OrderDetailsScreen({
+    super.key,
+    required this.order,
+    required this.token,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class OrderDetailsScreen extends StatelessWidget {
               children: [
                 const Text('تفاصيل الطلب'),
                 Text(
-                  order.formattedId,
+                  order.id,
                   style: const TextStyle(color: AppColors.pickupMarkerOrange),
                 ),
               ],
@@ -43,25 +46,23 @@ class OrderDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DeliveryMapCard(order: order),
-                const SizedBox(height: 16),
                 if (order.kind == OrderKind.personToPerson)
                   ContactCard(
                     title: 'المرسل',
-                    contact: order.pickupContact,
+                    contact: order.sender,
                     iconBg: const Color(0xFFE3F2FD),
                     iconFg: const Color(0xFF1565C0),
                     titleLocation: "عنوان الاستلام",
-                    orderLocation: order.pickupLocation.toString(),
+                    orderLocation: order.senderAddress,
                   ),
                 const SizedBox(height: 12),
                 ContactCard(
                   title: 'المستلم',
-                  contact: order.dropoffContact,
+                  contact: order.receiver,
                   iconBg: const Color(0xFFFFF3E0),
                   iconFg: AppColors.accentOrange,
                   titleLocation: "عنوان التسليم",
-                  orderLocation: order.deliveryLocation,
+                  orderLocation: order.receiverAddress,
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -153,7 +154,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             // url: "https://yourapi.com/invoice/${order.id}",
                             url: "assets/pdfs/Invoice_ORD-ORD-000105.pdf",
                             orderId: order.id,
-                            customerPhone: order.phone,
+                            customerPhone: order.receiverPhoneOne,
                           );
                         },
                         child: ContainerButtonWidget(

@@ -1,4 +1,4 @@
-import 'package:captain_app/data/auth_api.dart' as authapi;
+import 'package:captain_app/api/auth_api/auth_api.dart' as authapi;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'auth_state.dart';
 import '../../models/auth_model.dart';

@@ -64,7 +64,7 @@ class OrderCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    order.formattedId,
+                    order.id,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -90,7 +90,17 @@ class OrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 12),
+
+              Divider(
+                color: Colors.grey.withValues(alpha: 0.2),
+                thickness: 1,
+                indent: 16,
+                endIndent: 16,
+              ),
+
+              const SizedBox(height: 12),
               OrderContainer(order: order),
               const SizedBox(height: 16),
               if (order.status != OrderStatus.cancelled)

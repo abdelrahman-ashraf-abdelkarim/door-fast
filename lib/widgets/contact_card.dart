@@ -21,7 +21,7 @@ class ContactCard extends StatelessWidget {
   final String orderLocation;
 
   String get contactName => contact?.name.trim() ?? '';
-  String get contactPhone => contact?.phone ?? '';
+  String get contactPhone => contact?.phoneOne ?? '';
   String get contactNotes => contact?.notes.trim() ?? '';
   bool get canCall => contactPhone.isNotEmpty;
 

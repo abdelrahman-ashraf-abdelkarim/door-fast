@@ -160,7 +160,7 @@ class NotificationService {
         _handleNotificationPayload(response.payload);
       },
     );
-    
+
     await _flutterLocalNotificationsPlugin.cancelAll();
 
     // ✅ permission (Android 13+)
