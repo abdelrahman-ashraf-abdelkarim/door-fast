@@ -33,8 +33,11 @@ class OrderDetailsScreen extends StatelessWidget {
               children: [
                 const Text('تفاصيل الطلب'),
                 Text(
-                  order.id,
-                  style: const TextStyle(color: AppColors.pickupMarkerOrange),
+                  "#${order.orderNumber}",
+                  style: const TextStyle(
+                    color: AppColors.pickupMarkerOrange,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

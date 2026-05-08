@@ -1,7 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
+import 'package:captain_app/widgets/show_model_sheet_bottom_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ContactCard extends StatelessWidget {
   const ContactCard({
@@ -21,15 +21,8 @@ class ContactCard extends StatelessWidget {
   final String orderLocation;
 
   String get contactName => contact?.name.trim() ?? '';
-  String get contactPhone => contact?.phoneOne ?? '';
   String get contactNotes => contact?.notes.trim() ?? '';
-  bool get canCall => contactPhone.isNotEmpty;
-
-  Future<void> _callPhone(String phone) async {
-    final url = Uri.parse('tel:$phone');
-    await launchUrl(url);
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -94,23 +87,128 @@ class ContactCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  if (canCall)
-                    GestureDetector(
-                      onTap: () => _callPhone(contactPhone),
-                      child: Container(
-                        width: 55,
-                        height: 55,
-                        decoration: BoxDecoration(
-                          color: AppColors.successGreen,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.call,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                  Container(
+                    width: 55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: AppColors.successGreen,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                          ),
+                          builder: (_) {
+                            return ShowModelSheetBottomWidget(contact: contact);
+                          },
+                        );
+                      },
+                      child: Icon(
+                        Icons.perm_contact_calendar_rounded,
+                        color: Colors.white,
+                        size: 28,
                       ),
                     ),
+                  ),
+                  // Column(
+                  //   children: [
+                  //     if (canCall) ...[
+                  //       Row(
+                  //         children: [
+                  //           GestureDetector(
+                  //             onTap: () => _callPhone(contactPhone),
+                  //             child: Container(
+                  //               width: 45,
+                  //               height: 45,
+                  //               decoration: BoxDecoration(
+                  //                 color: AppColors.successGreen,
+                  //                 borderRadius: BorderRadius.circular(14),
+                  //               ),
+                  //               child: const Icon(
+                  //                 Icons.call,
+                  //                 color: Colors.white,
+                  //                 size: 24,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(width: 8),
+                  //           GestureDetector(
+                  //             onTap: () => _openWhatsApp(
+                  //               phone: "2$contactPhone",
+                  //               message: 'السلام عليكم، معاك مندوب التوصيل',
+                  //             ),
+                  //             child: Container(
+                  //               width: 45,
+                  //               height: 45,
+                  //               alignment: Alignment.center,
+                  //               decoration: BoxDecoration(
+                  //                 color: AppColors.successGreen,
+                  //                 borderRadius: BorderRadius.circular(14),
+                  //               ),
+                  //               child: const FaIcon(
+                  //                 FontAwesomeIcons.whatsapp,
+                  //                 color: Colors.white,
+                  //                 size: 24,
+                  //                 fontWeight: FontWeight.w900,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ],
+                  //     const SizedBox(height: 8),
+                  //     if (canCallTwo) ...[
+                  //       Row(
+                  //         children: [
+                  //           GestureDetector(
+                  //             onTap: () => _callPhone(contactPhoneTwo),
+                  //             child: Container(
+                  //               width: 45,
+                  //               height: 45,
+                  //               decoration: BoxDecoration(
+                  //                 color: Color(0xFF128C7E),
+                  //                 borderRadius: BorderRadius.circular(14),
+                  //               ),
+                  //               child: const Icon(
+                  //                 Icons.call,
+                  //                 color: Colors.white,
+                  //                 size: 24,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           const SizedBox(width: 8),
+                  //           GestureDetector(
+                  //             onTap: () => _openWhatsApp(
+                  //               phone: "2$contactPhoneTwo",
+                  //               message: 'السلام عليكم، معاك مندوب التوصيل',
+                  //             ),
+                  //             child: Container(
+                  //               width: 45,
+                  //               height: 45,
+                  //               alignment: Alignment.center,
+                  //               decoration: BoxDecoration(
+                  //                 color: Color(0xFF128C7E),
+                  //                 borderRadius: BorderRadius.circular(14),
+                  //               ),
+                  //               child: const FaIcon(
+                  //                 FontAwesomeIcons.whatsapp,
+                  //                 color: Colors.white,
+                  //                 size: 24,
+                  //                 fontWeight: FontWeight.w900,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ],
+                  // ),
                 ],
               ),
             ),

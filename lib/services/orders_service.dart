@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/models/order_model.dart';
+import 'package:flutter/services.dart';
 
 class OrderAlreadyAcceptedException implements Exception {
   const OrderAlreadyAcceptedException(this.orderId);
@@ -18,6 +21,14 @@ class OrderNotFoundException implements Exception {
 
 class OrdersService {
   final Api _api = Api();
+
+  // fake orders for testing
+  Future<Map<String, dynamic>> getOrders() async {
+    final response =
+        await rootBundle.loadString('assets/json/orders.json');
+
+    return jsonDecode(response);
+  }
 
   // جلب الطلبات الجديدة
   Future<List<Order>> fetchOrders(String token) async {

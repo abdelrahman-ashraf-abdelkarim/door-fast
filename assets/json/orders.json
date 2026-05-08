@@ -1,0 +1,200 @@
+{
+    "success": true,
+    "orders": [
+        {
+            "id": 186,
+            "order_number": "ORD-0000145",
+            "status": "pending",
+            "total": 105,
+            "delivery_fee": 20,
+            "discount": 10,
+            "discount_type": "amount",
+            "notes": null,
+            "is_delivery_chosen": false,
+            "sent_to_delivery_at": "2026-05-07T03:29:53+03:00",
+            "accepted_at": null,
+            "delivered_at": null,
+            "created_at": "2026-05-07T03:28:19+03:00",
+            "client": {
+                "id": 7,
+                "name": "احمد علي محمد",
+                "phone": "01097331298",
+                "phone2": null,
+                "address": "مجاوره 8 بعد الجيم"
+            },
+            "send_to": {
+                "name": null,
+                "phone": "01009656303",
+                "phone2": "01096652681",
+                "address": "مجاوره 12 اخر شارع البنك"
+            },
+            "items": [
+                {
+                    "id": 221,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 10,
+                    "total": 10,
+                    "shop": {
+                        "id": 5,
+                        "name": "OK Market"
+                    }
+                },
+                {
+                    "id": 222,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 30,
+                    "total": 30,
+                    "shop": {
+                        "id": 9,
+                        "name": "الجنيني"
+                    }
+                },
+                {
+                    "id": 223,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 55,
+                    "total": 55,
+                    "shop": {
+                        "id": 2,
+                        "name": "جاردن ستور"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 186,
+            "order_number": "ORD-0000145",
+            "status": "accepted",
+            "total": 105,
+            "delivery_fee": 20,
+            "discount": 10,
+            "discount_type": "amount",
+            "notes": null,
+            "is_delivery_chosen": false,
+            "sent_to_delivery_at": "2026-05-07T03:29:53+03:00",
+            "accepted_at": null,
+            "delivered_at": null,
+            "created_at": "2026-05-07T03:28:19+03:00",
+            "client": {
+                "id": 7,
+                "name": "احمد علي محمد",
+                "phone": "01097331298",
+                "phone2": null,
+                "address": "مجاوره 8 بعد الجيم"
+            },
+            "send_to": {
+                "name": null,
+                "phone": "01009656303",
+                "phone2": "01096652681",
+                "address": "مجاوره 12 اخر شارع البنك"
+            },
+            "items": [
+                {
+                    "id": 221,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 10,
+                    "total": 10,
+                    "shop": {
+                        "id": 5,
+                        "name": "OK Market"
+                    }
+                },
+                {
+                    "id": 222,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 30,
+                    "total": 30,
+                    "shop": {
+                        "id": 9,
+                        "name": "الجنيني"
+                    }
+                },
+                {
+                    "id": 223,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 55,
+                    "total": 55,
+                    "shop": {
+                        "id": 2,
+                        "name": "جاردن ستور"
+                    }
+                }
+            ]
+        },
+        {
+            "id": 185,
+            "order_number": "ORD-0000144",
+            "status": "pending",
+            "total": 251.55,
+            "delivery_fee": 20,
+            "discount": 10,
+            "discount_type": "percent",
+            "notes": "يسىيخسبمسيوؤميةؤ",
+            "is_delivery_chosen": false,
+            "sent_to_delivery_at": "2026-05-07T03:29:55+03:00",
+            "accepted_at": null,
+            "delivered_at": null,
+            "created_at": "2026-05-07T03:26:43+03:00",
+            "client": {
+                "id": 7,
+                "name": "احمد علي محمد",
+                "phone": "01097331298",
+                "phone2": null,
+                "address": "مجاوره 8 بعد الجيم"
+            },
+            "send_to": null,
+            "items": [
+                {
+                    "id": 217,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 100,
+                    "total": 100,
+                    "shop": {
+                        "id": 5,
+                        "name": "OK Market"
+                    }
+                },
+                {
+                    "id": 218,
+                    "item_name": "طلب 1",
+                    "quantity": 1,
+                    "unit_price": 70,
+                    "total": 70,
+                    "shop": {
+                        "id": 9,
+                        "name": "الجنيني"
+                    }
+                },
+                {
+                    "id": 219,
+                    "item_name": "طلب 2",
+                    "quantity": 1,
+                    "unit_price": 40,
+                    "total": 40,
+                    "shop": {
+                        "id": 5,
+                        "name": "OK Market"
+                    }
+                },
+                {
+                    "id": 220,
+                    "item_name": "طلب 2",
+                    "quantity": 1,
+                    "unit_price": 49.5,
+                    "total": 49.5,
+                    "shop": {
+                        "id": 9,
+                        "name": "الجنيني"
+                    }
+                }
+            ]
+        }
+    ]
+}

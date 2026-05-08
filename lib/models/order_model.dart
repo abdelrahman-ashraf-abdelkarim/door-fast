@@ -41,6 +41,7 @@ class OrderItem {
 
 class Order {
   final String id;
+  final String orderNumber;
   final OrderContact receiver;
   final OrderContact? sender;
   final OrderKind kind;
@@ -51,6 +52,7 @@ class Order {
   final OrderStatus status;
   final DateTime createdAt;
   final DateTime? acceptedAt;
+  final double? descount;
 
   String get receiverName => receiver.name;
   String get receiverPhoneOne => receiver.phoneOne ?? "";
@@ -69,7 +71,7 @@ class Order {
   double get itemsTotalPrice =>
       items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalPrice => itemsTotalPrice + deliveryPrice;
+  double get totalPrice => itemsTotalPrice + deliveryPrice - (descount ?? 0);
 
   Duration get waitingDuration => DateTime.now().difference(createdAt);
 
@@ -102,11 +104,12 @@ class Order {
 
   Order({
     required this.id,
+    required this.orderNumber,
     required this.receiver,
     this.sender,
     this.kind = OrderKind.company,
     required this.deliveryPrice,
-
+    this.descount,
     required this.notes,
     this.cancelReason,
     required this.status,
@@ -123,9 +126,11 @@ class Order {
     OrderKind? kind,
     DateTime? createdAt,
     DateTime? acceptedAt,
+    double? descount,
   }) {
     return Order(
       id: id,
+      orderNumber: orderNumber,
       receiver: receiver,
       sender: sender ?? this.sender,
       kind: kind ?? this.kind,
@@ -136,6 +141,7 @@ class Order {
       createdAt: createdAt ?? this.createdAt,
       acceptedAt: acceptedAt ?? this.acceptedAt,
       items: items ?? this.items,
+      descount: descount ?? this.descount,
     );
   }
 
@@ -145,8 +151,8 @@ class Order {
 
     final receiver = OrderContact(
       name: sendTo?['name'] ?? client['name'],
-      phoneOne: sendTo?['send_to_phone'] ?? client['send_to_phone'],
-      phoneTwo: sendTo?['send_to_phone2'] ?? client['send_to_phone2'],
+      phoneOne: sendTo?['phone'] ?? client['phone'],
+      phoneTwo: sendTo?['phone2'] ?? client['phone2'],
       address: sendTo?['address'] ?? client['address'] ?? '',
     );
 
@@ -156,13 +162,14 @@ class Order {
     if (sendTo != null) {
       sender = OrderContact(
         name: client['name'],
-        phoneOne: client['send_to_phone'],
-        phoneTwo: client['send_to_phone2'],
+        phoneOne: client['phone'],
+        phoneTwo: client['phone2'],
         address: client['address'] ?? '',
       );
     }
     return Order(
       id: json['id'].toString(),
+      orderNumber: json['order_number'],
       receiver: receiver,
       sender: sender,
       kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
@@ -172,6 +179,9 @@ class Order {
       createdAt: DateTime.parse(json['created_at']),
       acceptedAt: json['accepted_at'] != null
           ? DateTime.parse(json['accepted_at'])
+          : null,
+      descount: json['discount'] != null
+          ? (json['discount'] as num).toDouble()
           : null,
       items: (json['items'] as List)
           .map(

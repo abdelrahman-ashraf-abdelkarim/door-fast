@@ -64,6 +64,23 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
+  Future<void> fetchLocalOrders() async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      final data = await _ordersService.getOrders();
+      print(data);
+      final ordersJson = data['orders'] as List;
+
+      final orders = ordersJson.map<Order>((e) => Order.fromJson(e)).toList();
+      print(orders.length);
+
+      emit(state.copyWith(orders: orders, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+    }
+  }
+
   void _showNewOrderNotification() {
     NotificationService.showNotification(title: 'طلب جديد 🚚');
   }
@@ -86,9 +103,4 @@ class OrdersCubit extends Cubit<OrdersState> {
   double get totalDeliveryEarnings => state.orders
       .where((o) => o.status == OrderStatus.delivered)
       .fold(0.0, (sum, o) => sum + o.deliveryPrice);
-
-  @override
-  Future<void> close() {
-    return super.close();
-  }
 }

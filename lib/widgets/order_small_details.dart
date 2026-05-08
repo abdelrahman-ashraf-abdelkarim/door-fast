@@ -1,5 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
+import 'package:captain_app/widgets/order_details_reciver_card.dart';
+import 'package:captain_app/widgets/total_order_small_details.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 
@@ -83,25 +85,46 @@ class OrderContainer extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.phone,
-                                  color: Colors.green,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  order.senderPhoneOne,
-                                  style: const TextStyle(
-                                    color: Color(0XFF2563EB),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
+                            // Row(
+                            //   children: [
+                            //     const Icon(
+                            //       Icons.phone,
+                            //       color: Colors.green,
+                            //       size: 24,
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     Text(
+                            //       order.senderPhoneOne,
+                            //       style: const TextStyle(
+                            //         color: Color(0XFF2563EB),
+                            //         fontSize: 14,
+                            //         fontWeight: FontWeight.w800,
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            // const SizedBox(height: 12),
+                            // if (isSenderTowPhone) ...[
+                            //   Row(
+                            //     children: [
+                            //       const Icon(
+                            //         Icons.phone,
+                            //         color: Colors.green,
+                            //         size: 24,
+                            //       ),
+                            //       const SizedBox(width: 8),
+                            //       Text(
+                            //         order.senderPhoneTwo,
+                            //         style: const TextStyle(
+                            //           color: Color(0XFF2563EB),
+                            //           fontSize: 14,
+                            //           fontWeight: FontWeight.w800,
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            //   const SizedBox(height: 12),
+                            // ],
                             Row(
                               children: [
                                 const Icon(
@@ -167,25 +190,46 @@ class OrderContainer extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.phone,
-                                          color: Colors.green,
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          order.receiverPhoneOne,
-                                          style: const TextStyle(
-                                            color: Color(0XFF2563EB),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
+                                    // Row(
+                                    //   children: [
+                                    //     const Icon(
+                                    //       Icons.phone,
+                                    //       color: Colors.green,
+                                    //       size: 24,
+                                    //     ),
+                                    //     const SizedBox(width: 8),
+                                    //     Text(
+                                    //       order.receiverPhoneOne,
+                                    //       style: const TextStyle(
+                                    //         color: Color(0XFF2563EB),
+                                    //         fontSize: 14,
+                                    //         fontWeight: FontWeight.w500,
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                    // const SizedBox(height: 12),
+                                    // if (isReceiverTowPhone) ...[
+                                    //   Row(
+                                    //     children: [
+                                    //       const Icon(
+                                    //         Icons.phone,
+                                    //         color: Colors.green,
+                                    //         size: 24,
+                                    //       ),
+                                    //       const SizedBox(width: 8),
+                                    //       Text(
+                                    //         order.receiverPhoneTwo,
+                                    //         style: const TextStyle(
+                                    //           color: Color(0XFF2563EB),
+                                    //           fontSize: 14,
+                                    //           fontWeight: FontWeight.w500,
+                                    //         ),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    //   const SizedBox(height: 12),
+                                    // ],
                                     Row(
                                       children: [
                                         const Icon(
@@ -215,103 +259,12 @@ class OrderContainer extends StatelessWidget {
                             ),
                           ],
                         )
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.person_2_sharp,
-                                  color: Colors.blueGrey,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  order.receiverName,
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.phone,
-                                  color: Colors.green,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  order.receiverPhoneOne,
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  color: Colors.red,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  order.senderAddress,
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ],
+                      : OrderDetailsReciverCard(
+                          order: order,
                         ),
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xffBAE6FD)),
-                    color: Color(0xffBAE6FD).withValues(alpha: 0.3),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "الإجمالى المطلوب",
-                        style: TextStyle(
-                          color: Color(0xff0369A1),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        "${order.totalPrice.toString()} ج",
-                        style: TextStyle(
-                          color: Color(0xff0369A1),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                TotalOrderSmallDetails(order: order),
               ],
             ),
     );

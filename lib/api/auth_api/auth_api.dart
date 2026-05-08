@@ -14,6 +14,7 @@ Future<AuthResponse> login(String username, String password) async {
   if (response.statusCode == 200) {
     return AuthResponse.fromJson(jsonDecode(response.body));
   } else {
-    throw Exception('فشل تسجيل الدخول');
+    final errorData = jsonDecode(response.body);
+    throw Exception(errorData['message'] ?? 'فشل تسجيل الدخول');
   }
 }

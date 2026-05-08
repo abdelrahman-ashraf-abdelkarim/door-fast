@@ -64,11 +64,11 @@ class OrderCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    order.id,
+                    "#${order.orderNumber}",
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.pickupMarkerOrange,
                     ),
                   ),
                   Container(

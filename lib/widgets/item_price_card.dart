@@ -58,6 +58,27 @@ class ItemPriceCard extends StatelessWidget {
                 ),
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'الخصم',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  'ج ${order.descount?.toStringAsFixed(2) ?? '0.00'}',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
             Divider(color: Colors.grey[200]),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

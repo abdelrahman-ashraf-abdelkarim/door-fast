@@ -30,8 +30,9 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
-    context.read<OrdersCubit>().loadOrders(token);
+    // final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
+    context.read<OrdersCubit>().fetchLocalOrders();
+    // context.read<OrdersCubit>().loadOrders(token);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
