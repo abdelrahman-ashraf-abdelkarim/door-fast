@@ -64,22 +64,20 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
-  Future<void> fetchLocalOrders() async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+  // Future<void> fetchLocalOrders() async {
+  //   emit(state.copyWith(isLoading: true, errorMessage: null));
 
-    try {
-      final data = await _ordersService.getOrders();
-      print(data);
-      final ordersJson = data['orders'] as List;
+  //   try {
+  //     final data = await _ordersService.getOrders();
+  //     final ordersJson = data['orders'] as List;
 
-      final orders = ordersJson.map<Order>((e) => Order.fromJson(e)).toList();
-      print(orders.length);
+  //     final orders = ordersJson.map<Order>((e) => Order.fromJson(e)).toList();
 
-      emit(state.copyWith(orders: orders, isLoading: false));
-    } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
-    }
-  }
+  //     emit(state.copyWith(orders: orders, isLoading: false));
+  //   } catch (e) {
+  //     emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+  //   }
+  // }
 
   void _showNewOrderNotification() {
     NotificationService.showNotification(title: 'طلب جديد 🚚');

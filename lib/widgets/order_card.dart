@@ -91,8 +91,6 @@ class OrderCard extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 12),
-
               Divider(
                 color: Colors.grey.withValues(alpha: 0.2),
                 thickness: 1,
@@ -100,20 +98,22 @@ class OrderCard extends StatelessWidget {
                 endIndent: 16,
               ),
 
-              const SizedBox(height: 12),
               OrderContainer(order: order),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               if (order.status != OrderStatus.cancelled)
-                GestureDetector(
-                  onTap: () => _handleTap(context),
-                  child: Container(
-                    width: double.infinity,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Color.fromARGB(255, 13, 155, 108),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: GestureDetector(
+                    onTap: () => _handleTap(context),
+                    child: Container(
+                      width: double.infinity,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color.fromARGB(255, 13, 155, 108),
+                      ),
+                      child: ButtonCard(text: _getButtonText(order.status)),
                     ),
-                    child: ButtonCard(text: _getButtonText(order.status)),
                   ),
                 ),
             ],

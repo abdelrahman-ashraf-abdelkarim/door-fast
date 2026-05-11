@@ -7,6 +7,7 @@ import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/contact_card.dart';
 import 'package:captain_app/widgets/container_button_widget.dart';
 import 'package:captain_app/widgets/item_price_card.dart';
+import 'package:captain_app/widgets/order_details_grouped_item_card.dart';
 import 'package:captain_app/widgets/order_details_item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,7 +74,21 @@ class OrderDetailsScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                ...order.items.map((item) => OrderDetailsItemCard(item: item)),
+                ...() {
+                  final grouped = <String, List<OrderItem>>{};
+                  for (final item in order.items) {
+                    final key = item.marketPlace.isEmpty
+                        ? 'غير محدد'
+                        : item.marketPlace;
+                    grouped.putIfAbsent(key, () => []).add(item);
+                  }
+                  return grouped.entries.map(
+                    (entry) => OrderDetailsGroupedItemCard(
+                      marketPlace: entry.key,
+                      items: entry.value,
+                    ),
+                  );
+                }(),
                 const SizedBox(height: 16),
                 ItemPriceCard(order: order),
                 const SizedBox(height: 20),

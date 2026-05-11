@@ -86,7 +86,9 @@ class _DashboardContent extends StatelessWidget {
             style: TextStyle(fontSize: 18, color: Colors.grey[600]),
           ),
           const SizedBox(height: 20),
-          _TotalEarningsCard(totalEarnings: ordersCubit.totalDeliveryEarnings),
+          _DeliveryEarningsCard(
+            deliveryEarnings: ordersCubit.totalDeliveryEarnings,
+          ),
           const SizedBox(height: 20),
           _StatsGrid(ordersCubit: ordersCubit),
           const SizedBox(height: 20),
@@ -97,10 +99,10 @@ class _DashboardContent extends StatelessWidget {
   }
 }
 
-class _TotalEarningsCard extends StatelessWidget {
-  const _TotalEarningsCard({required this.totalEarnings});
+class _DeliveryEarningsCard extends StatelessWidget {
+  const _DeliveryEarningsCard({required this.deliveryEarnings});
 
-  final double totalEarnings;
+  final double deliveryEarnings;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +130,7 @@ class _TotalEarningsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                ' ${totalEarnings.toString()} ',
+                ' ${deliveryEarnings.toString()} ',
                 style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -161,9 +163,6 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       childAspectRatio: 1.5,
       children: [
-        ///  start time and work duration should be in the same card,
-        ///  and if the shift is not started show "انت غير نشط حاليا" instead of the time and duration
-        ///  Add real data for each stat card
         const StatCard(
           title: 'بداية الوردية',
           valueWidget: StartShiftTimeWidget(),
@@ -199,6 +198,18 @@ class _StatsGrid extends StatelessWidget {
           value: '10 ج',
           icon: Icons.money_off,
           color: Colors.red,
+        ),
+        const StatCard(
+          title: 'الشريحة المحققة',
+          value: 'الشريحة 1',
+          isImportant: true,
+          color: Colors.deepPurpleAccent,
+        ),
+        const StatCard(
+          title: 'إجمالي الأرباح',
+          value: '10 ج',
+          isImportant: true,
+          color: Colors.deepPurpleAccent,
         ),
       ],
     );

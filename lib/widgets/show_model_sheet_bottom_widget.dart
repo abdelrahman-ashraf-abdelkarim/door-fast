@@ -119,8 +119,8 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
           if (canCallTwo) ...[
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
