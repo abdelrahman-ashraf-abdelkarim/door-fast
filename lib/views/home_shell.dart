@@ -1,7 +1,7 @@
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
-import 'package:captain_app/services/notification_service.dart';
+// import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
 import 'package:captain_app/views/my_order_screen.dart';
@@ -33,15 +33,7 @@ class _HomeShellState extends State<HomeShell> {
     final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
     // context.read<OrdersCubit>().fetchLocalOrders();
     context.read<OrdersCubit>().loadOrders(token);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-
-      final authState = context.read<AuthCubit>().state;
-
-      if (authState is AuthAuthenticated) {
-        NotificationService.scheduleMockOrderNotifications();
-      }
-    });
+    
   }
 
   @override

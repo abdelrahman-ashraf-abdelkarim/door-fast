@@ -1,16 +1,22 @@
+import 'dart:async';
+
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/orders_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:captain_app/services/web_socket_service.dart';
 
 class OrdersCubit extends Cubit<OrdersState> {
+
+  final OrdersService _ordersService;
+  final WebSocketService _wsService = WebSocketService();
+  StreamSubscription? _wsSubscription;
   OrdersCubit({OrdersService? ordersService})
     : _ordersService = ordersService ?? OrdersService(),
       super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
-  final OrdersService _ordersService;
 
   Future<void> loadOrders(String token) async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
@@ -22,9 +28,44 @@ class OrdersCubit extends Cubit<OrdersState> {
       ]);
       final allOrders = [...resulte[0], ...resulte[1], ...resulte[2]];
       emit(state.copyWith(orders: allOrders, isLoading: false));
+
+      connectWebSocket(token);
+
     } catch (error) {
       emit(state.copyWith(isLoading: false, errorMessage: error.toString()));
     }
+  }
+
+  void connectWebSocket(String token) {
+    _wsService.connect(token);
+
+    _wsSubscription = _wsService.stream.listen((data) {
+      final event = data['event'];
+
+      if (event == 'new_order') {
+        final order = Order.fromJson(data['order']);
+        _onNewOrder(order);
+      } else if (event == 'order_updated') {
+        final order = Order.fromJson(data['order']);
+        _onOrderUpdated(order);
+      }
+    });
+  }
+  
+  void _onOrderUpdated(Order order) {
+    final updated = state.orders.map((o) {
+      return o.id == order.id ? order : o;
+    }).toList();
+    emit(state.copyWith(orders: updated));
+  }
+  
+  void _onNewOrder(Order order) {
+    // إضافة الطلب الجديد للقائمة
+    final updated = [order, ...state.orders];
+    emit(state.copyWith(orders: updated));
+    
+    // إظهار notification
+    NotificationService.showNotification(title: 'طلب جديد 🚚');
   }
 
   Future<void> acceptOrder(String orderId, String token) async {
