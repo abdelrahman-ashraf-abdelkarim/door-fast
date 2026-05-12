@@ -33,6 +33,8 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
   final OrderContact? contact;
   String get contactPhone => contact?.phoneOne ?? '';
   String get contactPhoneTwo => contact?.phoneTwo ?? '';
+  String get contactAddress => contact?.linkAddress ?? '';
+  bool get canAddress => contactAddress.isNotEmpty;
   bool get canCall => contactPhone.isNotEmpty;
   bool get canCallTwo => contactPhoneTwo.isNotEmpty;
 
@@ -168,6 +170,33 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
                 ),
                 label: const Text(
                   "تواصل واتساب",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          if (canAddress) ...[
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff128C7E),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: () {},
+                icon: const FaIcon(
+                  FontAwesomeIcons.mapLocation,
+                  color: Colors.white,
+                  size: 24,
+                  fontWeight: FontWeight.w900,
+                ),
+                label: const Text(
+                  "موقع العميل",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,

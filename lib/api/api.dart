@@ -10,7 +10,13 @@ class Api {
     if (token != null) {
       headers.addAll({'Authorization': 'Bearer $token'});
     }
+
+     print('📤 Request URL: $url');
+  print('📤 Headers: $headers');
     http.Response response = await http.get(Uri.parse(url), headers: headers);
+
+    print('📥 Status Code: ${response.statusCode}');
+  print('📥 Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);

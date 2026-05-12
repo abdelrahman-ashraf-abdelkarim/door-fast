@@ -11,6 +11,7 @@ class OrderContact {
 
   final String notes;
   final String? address;
+  final String? linkAddress;
 
   const OrderContact({
     required this.name,
@@ -18,6 +19,7 @@ class OrderContact {
     this.phoneTwo,
     this.notes = '',
     this.address = '',
+    this.linkAddress = '',
   });
 }
 
@@ -58,10 +60,12 @@ class Order {
   String get receiverPhoneOne => receiver.phoneOne ?? "";
   String get receiverPhoneTwo => receiver.phoneTwo ?? "";
   String get receiverAddress => receiver.address ?? "";
+  String get receiverLinkAddress => receiver.linkAddress ?? "";
   String get senderName => sender?.name ?? "";
   String get senderPhoneOne => sender?.phoneOne ?? "";
   String get senderPhoneTwo => sender?.phoneTwo ?? "";
   String get senderAddress => sender?.address ?? "";
+  String get senderLinkAddress => sender?.linkAddress ?? "";
   bool get isPersonToPerson => sender != null;
   bool get isPending =>
       status == OrderStatus.waiting || status == OrderStatus.newOrder;
@@ -154,6 +158,7 @@ class Order {
       phoneOne: sendTo?['phone'] ?? client['phone'],
       phoneTwo: sendTo?['phone2'] ?? client['phone2'],
       address: sendTo?['address'] ?? client['address'] ?? '',
+      linkAddress: sendTo['delivery_link'] ?? client['delivery_link'] ?? '',
     );
 
     /// 👇 المرسل موجود بس في حالة person-to-person
@@ -165,6 +170,7 @@ class Order {
         phoneOne: client['phone'],
         phoneTwo: client['phone2'],
         address: client['address'] ?? '',
+        linkAddress: client['delivery_link'] ?? '',
       );
     }
     return Order(

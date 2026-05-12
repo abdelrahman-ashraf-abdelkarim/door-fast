@@ -1,3 +1,4 @@
+// lib/cubits/order_cubit/order_cubit.dart
 import 'dart:async';
 
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
@@ -8,65 +9,112 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:captain_app/services/web_socket_service.dart';
 
 class OrdersCubit extends Cubit<OrdersState> {
-
   final OrdersService _ordersService;
   final WebSocketService _wsService = WebSocketService();
   StreamSubscription? _wsSubscription;
+
+  String? _token;
+  String? _captainId;
+  bool _wsConnected = false;
+
   OrdersCubit({OrdersService? ordersService})
     : _ordersService = ordersService ?? OrdersService(),
       super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
 
-  Future<void> loadOrders(String token) async {
+  // ─── Load ─────────────────────────────────────────────────────
+
+  Future<void> loadOrders(String token, String captainId) async {
+    _token = token;
+    _captainId = captainId;
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
-      final resulte = await Future.wait([
+      final results = await Future.wait([
         _ordersService.fetchOrders(token),
         _ordersService.fetchReceivedOrders(token),
         _ordersService.fetchDeliveredOrders(token),
       ]);
-      final allOrders = [...resulte[0], ...resulte[1], ...resulte[2]];
+      final allOrders = [...results[0], ...results[1], ...results[2]];
       emit(state.copyWith(orders: allOrders, isLoading: false));
 
-      connectWebSocket(token);
-
+      if (!_wsConnected) {
+        _wsConnected = true;
+        _connectWebSocket(token, captainId);
+      }
     } catch (error) {
       emit(state.copyWith(isLoading: false, errorMessage: error.toString()));
     }
   }
 
-  void connectWebSocket(String token) {
-    _wsService.connect(token);
+  // ─── Pusher ───────────────────────────────────────────────────
 
-    _wsSubscription = _wsService.stream.listen((data) {
-      final event = data['event'];
+  void _connectWebSocket(String token, String captainId) {
+    _wsService.connect(token, captainId);
 
-      if (event == 'new_order') {
-        final order = Order.fromJson(data['order']);
-        _onNewOrder(order);
-      } else if (event == 'order_updated') {
-        final order = Order.fromJson(data['order']);
-        _onOrderUpdated(order);
+    _wsSubscription ??= _wsService.stream.listen((payload) {
+      // payload = { order_id, status, order_number, delivery_id }
+      final orderId = payload['order_id']?.toString();
+      final status = payload['status']?.toString();
+
+      if (orderId == null) return;
+
+      final existingOrder = state.orders.any((o) => o.id == orderId);
+
+      if (!existingOrder) {
+        // ✅ أوردر جديد → جيب بياناته الكاملة من الـ API
+        _fetchAndAddNewOrder(orderId);
+      } else {
+        // ✅ أوردر موجود تغيّر status → جيب بياناته المحدّثة
+        _fetchAndUpdateOrder(orderId, status);
       }
     });
   }
-  
-  void _onOrderUpdated(Order order) {
-    final updated = state.orders.map((o) {
-      return o.id == order.id ? order : o;
-    }).toList();
-    emit(state.copyWith(orders: updated));
+
+  Future<void> _fetchAndAddNewOrder(String orderId) async {
+    if (_token == null) return;
+    try {
+      // نجيب كل الـ pending orders واخد منها اللي id بتاعه orderId
+      final freshOrders = await _ordersService.fetchOrders(_token!);
+      final newOrder = freshOrders.where((o) => o.id == orderId).firstOrNull;
+
+      if (newOrder == null) return;
+
+      // تأكد إنه مش موجود عندنا أصلاً
+      if (state.orders.any((o) => o.id == orderId)) return;
+
+      emit(state.copyWith(orders: [newOrder, ...state.orders]));
+      NotificationService.showNotification(title: 'طلب جديد 🚚');
+    } catch (_) {
+      // لو فشل الـ fetch، تجاهل
+    }
   }
-  
-  void _onNewOrder(Order order) {
-    // إضافة الطلب الجديد للقائمة
-    final updated = [order, ...state.orders];
-    emit(state.copyWith(orders: updated));
-    
-    // إظهار notification
-    NotificationService.showNotification(title: 'طلب جديد 🚚');
+
+  Future<void> _fetchAndUpdateOrder(String orderId, String? status) async {
+    if (_token == null) return;
+    try {
+      // جيب القوائم الثلاث ودوّر على الأوردر فيهم
+      final results = await Future.wait([
+        _ordersService.fetchOrders(_token!),
+        _ordersService.fetchReceivedOrders(_token!),
+        _ordersService.fetchDeliveredOrders(_token!),
+      ]);
+      final allFresh = [...results[0], ...results[1], ...results[2]];
+      final updated = allFresh.where((o) => o.id == orderId).firstOrNull;
+
+      if (updated == null) return;
+
+      final updatedList = state.orders.map((o) {
+        return o.id == orderId ? updated : o;
+      }).toList();
+
+      emit(state.copyWith(orders: updatedList));
+    } catch (_) {
+      // ignore
+    }
   }
+
+  // ─── Actions ──────────────────────────────────────────────────
 
   Future<void> acceptOrder(String orderId, String token) async {
     try {
@@ -80,7 +128,6 @@ class OrdersCubit extends Cubit<OrdersState> {
         }
         return o;
       }).toList();
-      // await loadOrders(token); /
       emit(state.copyWith(orders: updatedOrders));
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
@@ -90,7 +137,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> cancelOrder(String orderId, String reason, String token) async {
     try {
       await _ordersService.cancelOrder(orderId, reason, token);
-      await loadOrders(token); // رفريش بعد الإلغاء
+      await loadOrders(_token!, _captainId!);
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
@@ -99,30 +146,22 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> completeOrder(String orderId, String token) async {
     try {
       await _ordersService.completeOrder(orderId, token);
-      await loadOrders(token); // رفريش بعد التسليم
+      await loadOrders(_token!, _captainId!);
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
 
-  // Future<void> fetchLocalOrders() async {
-  //   emit(state.copyWith(isLoading: true, errorMessage: null));
+  // ─── Cleanup ──────────────────────────────────────────────────
 
-  //   try {
-  //     final data = await _ordersService.getOrders();
-  //     final ordersJson = data['orders'] as List;
-
-  //     final orders = ordersJson.map<Order>((e) => Order.fromJson(e)).toList();
-
-  //     emit(state.copyWith(orders: orders, isLoading: false));
-  //   } catch (e) {
-  //     emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
-  //   }
-  // }
-
-  void _showNewOrderNotification() {
-    NotificationService.showNotification(title: 'طلب جديد 🚚');
+  @override
+  Future<void> close() async {
+    await _wsSubscription?.cancel();
+    await _wsService.disconnect();
+    return super.close();
   }
+
+  // ─── Getters ──────────────────────────────────────────────────
 
   List<Order> get pendingOrders =>
       state.orders.where((o) => _pendingStatuses.contains(o.status)).toList();

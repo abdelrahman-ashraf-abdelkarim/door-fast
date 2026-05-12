@@ -24,21 +24,27 @@ class OrdersService {
 
   // fake orders for testing
   Future<Map<String, dynamic>> getOrders() async {
-    final response =
-        await rootBundle.loadString('assets/json/orders.json');
+    final response = await rootBundle.loadString('assets/json/orders.json');
 
     return jsonDecode(response);
   }
 
   // جلب الطلبات الجديدة
   Future<List<Order>> fetchOrders(String token) async {
-    final data = await _api.get(
-      url: '${AppConstants.baseUrl}/orders/new',
-      token: token,
-    );
-    return (data['orders'] as List)
-        .map((json) => Order.fromJson(json))
-        .toList();
+    print('📡 Calling: ${AppConstants.baseUrl}/orders/new');
+    try {
+      final data = await _api.get(
+        url: '${AppConstants.baseUrl}/orders/new',
+        token: token,
+      );
+      print('✅ Response: $data');
+      return (data['orders'] as List)
+          .map((json) => Order.fromJson(json))
+          .toList();
+    } catch (e) {
+      print('❌ Error: $e');
+      rethrow;
+    }
   }
 
   // قبول طلب
@@ -51,23 +57,24 @@ class OrdersService {
   }
 
   Future<List<Order>> fetchReceivedOrders(String token) async {
-  final data = await _api.get(
-    url: '${AppConstants.baseUrl}/orders/received',
-    token: token,
-  );
-  return (data['orders'] as List)
-      .map((json) => Order.fromJson(json))
-      .toList();
-}
-Future<List<Order>> fetchDeliveredOrders(String token) async {
-  final data = await _api.get(
-    url: '${AppConstants.baseUrl}/orders/delivered',
-    token: token,
-  );
-  return (data['orders'] as List)
-      .map((json) => Order.fromJson(json))
-      .toList();
-}
+    final data = await _api.get(
+      url: '${AppConstants.baseUrl}/orders/received',
+      token: token,
+    );
+    return (data['orders'] as List)
+        .map((json) => Order.fromJson(json))
+        .toList();
+  }
+
+  Future<List<Order>> fetchDeliveredOrders(String token) async {
+    final data = await _api.get(
+      url: '${AppConstants.baseUrl}/orders/delivered',
+      token: token,
+    );
+    return (data['orders'] as List)
+        .map((json) => Order.fromJson(json))
+        .toList();
+  }
 
   // تسليم طلب
   Future<void> completeOrder(String orderId, String token) async {

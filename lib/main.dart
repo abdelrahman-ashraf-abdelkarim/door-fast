@@ -24,7 +24,7 @@ void main() async {
   runApp(const CaptainApp());
 }
 
-class CaptainApp extends StatelessWidget {
+class CaptainApp extends StatelessWidget {  
   const CaptainApp({super.key});
 
   @override

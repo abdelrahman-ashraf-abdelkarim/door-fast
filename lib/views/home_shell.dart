@@ -30,10 +30,13 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
-    // context.read<OrdersCubit>().fetchLocalOrders();
-    context.read<OrdersCubit>().loadOrders(token);
-    
+    final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+    final token = authState.token;
+    final captainId = authState.user.id;
+
+    print('🔑 Token: $token');
+  print('👤 CaptainId: $captainId');
+    context.read<OrdersCubit>().loadOrders(token, captainId);
   }
 
   @override
