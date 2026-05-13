@@ -20,7 +20,8 @@ class OrderNotFoundException implements Exception {
 }
 
 class OrdersService {
-  final Api _api = Api();
+  final Api _api;
+  OrdersService({required Api api}) : _api = api;
 
   // fake orders for testing
   Future<Map<String, dynamic>> getOrders() async {

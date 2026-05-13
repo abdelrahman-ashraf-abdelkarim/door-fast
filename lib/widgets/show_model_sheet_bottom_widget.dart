@@ -30,6 +30,18 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
     }
   }
 
+  Future<void> _openMapLink(String? url) async {
+    if (url == null || url.trim().isEmpty) return;
+
+    final uri = Uri.parse(url);
+
+    if (!await canLaunchUrl(uri)) {
+      throw Exception('Invalid map url');
+    }
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   final OrderContact? contact;
   String get contactPhone => contact?.phoneOne ?? '';
   String get contactPhoneTwo => contact?.phoneTwo ?? '';
@@ -185,10 +197,12 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff128C7E),
+                  backgroundColor: const Color(0xFFFF9800),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  _openMapLink(contactAddress);
+                },
                 icon: const FaIcon(
                   FontAwesomeIcons.mapLocation,
                   color: Colors.white,

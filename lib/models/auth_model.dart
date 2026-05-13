@@ -7,9 +7,21 @@ class AuthModel {
   final String phone;
   final CaptainStatus status;
 
-  const AuthModel({required this.id, required this.name, required this.code, required this.phone, required this.status});
+  const AuthModel({
+    required this.id,
+    required this.name,
+    required this.code,
+    required this.phone,
+    required this.status,
+  });
 
-  AuthModel copyWith({String? id, String? name, String? code, String? phone, CaptainStatus? status}) {
+  AuthModel copyWith({
+    String? id,
+    String? name,
+    String? code,
+    String? phone,
+    CaptainStatus? status,
+  }) {
     return AuthModel(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -19,22 +31,29 @@ class AuthModel {
     );
   }
 
- factory AuthModel.fromJson(Map<String, dynamic> json) {
-  final user = json['user'];
+  factory AuthModel.fromJson(Map<String, dynamic> json) {
+    final user = json['user'];
 
-  return AuthModel(
-    id: user['id'].toString(),
-    name: user['name'],
-    code: user['code'],
-    phone: user['phone'],
-    status: CaptainStatus.active, // default مؤقت
-  );
-}
+    return AuthModel(
+      id: user['id'].toString(),
+      name: user['name'],
+      code: user['code'],
+      phone: user['phone'],
+      status: user['status'] == 'active'
+          ? CaptainStatus.active
+          : CaptainStatus.nonActive, // default مؤقت
+    );
+  }
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name, 'code': code, 'phone': phone, 'status': status.name};
+    return {
+      'id': id,
+      'name': name,
+      'code': code,
+      'phone': phone,
+      'status': status.name,
+    };
   }
 }
-
 
 class AuthResponse {
   final bool success;
@@ -56,7 +75,9 @@ class AuthResponse {
         name: json['user']['name'],
         code: json['user']['code'],
         phone: json['user']['phone'],
-        status: CaptainStatus.active,
+        status: json['user']['status'] == 'active'
+            ? CaptainStatus.active
+            : CaptainStatus.active,
       ),
     );
   }

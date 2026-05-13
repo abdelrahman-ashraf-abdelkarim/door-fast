@@ -36,6 +36,22 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
       emit(state.copyWith(clearUser: true));
     }
   }
+  // أضف method جديدة تستقبل الـ event من WebSocket
+void onShiftActivated() {
+  if (state.user == null) return;
+
+  final updatedUser = state.user!.copyWith(status: CaptainStatus.active);
+  emit(state.copyWith(user: updatedUser));
+  startShift();
+}
+
+void onShiftDeactivated() {
+  if (state.user == null) return;
+
+  final updatedUser = state.user!.copyWith(status: CaptainStatus.nonActive);
+  emit(state.copyWith(user: updatedUser));
+  endShift();
+}
 
   void startShift() {
     if (state.user?.status != CaptainStatus.active) return;

@@ -12,6 +12,12 @@ class AuthCubit extends HydratedCubit<AuthState> {
   try {
     final response = await authapi.login(username, password);
     // احفظ التوكن
+
+    if (response.user.status != CaptainStatus.active) {
+      emit(const AuthError('حسابك غير مفعّل، تواصل مع الإدارة'));
+      return;
+    }
+    
     emit(AuthAuthenticated(response.user, token: response.token));
   } catch (e) {
     emit(AuthError(e.toString()));
@@ -35,7 +41,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
       AuthModel.fromJson({'user': json['user']}),
       token: json['token'],
     );
-  }
+  } 
 
   @override
   Map<String, dynamic>? toJson(AuthState state) {

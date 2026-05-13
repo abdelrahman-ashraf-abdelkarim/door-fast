@@ -48,6 +48,8 @@ class AppConstants {
   static const String baseUrl = "http://192.168.1.14:8000/api/delivery";
   static const String reverbAppKey = '8cbbd9cb36e28664def7'; // نفس الـ .env
   static const String wsUrl = 'ws://192.168.1.14:8000';
-  static const String apiKey = '8cbbd9cb36e28664def7'; // port Reverb مش Laravel
+  static const String apiKey = '8cbbd9cb36e28664def7';
+  static const String reverbHost = '192.168.1.14';
+  static const int reverbPort = 8000; // port Reverb مش Laravel
   static const String cluster = 'mt1'; // port Reverb مش Laravel
 }

@@ -1,6 +1,7 @@
 // lib/cubits/order_cubit/order_cubit.dart
 import 'dart:async';
 
+import 'package:captain_app/api/api.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
@@ -10,6 +11,7 @@ import 'package:captain_app/services/web_socket_service.dart';
 
 class OrdersCubit extends Cubit<OrdersState> {
   final OrdersService _ordersService;
+  final Api api;
   final WebSocketService _wsService = WebSocketService();
   StreamSubscription? _wsSubscription;
 
@@ -17,8 +19,9 @@ class OrdersCubit extends Cubit<OrdersState> {
   String? _captainId;
   bool _wsConnected = false;
 
-  OrdersCubit({OrdersService? ordersService})
-    : _ordersService = ordersService ?? OrdersService(),
+  OrdersCubit({OrdersService? ordersService, required Api api})
+    : _ordersService = ordersService ?? OrdersService(api: api),
+      api = api,
       super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
@@ -52,24 +55,21 @@ class OrdersCubit extends Cubit<OrdersState> {
   void _connectWebSocket(String token, String captainId) {
     _wsService.connect(token, captainId);
 
-    _wsSubscription ??= _wsService.stream.listen((payload) {
-      // payload = { order_id, status, order_number, delivery_id }
-      final orderId = payload['order_id']?.toString();
-      final status = payload['status']?.toString();
+    _wsSubscription = _wsService.stream.listen((data) {
+      final event = data['event'];
 
-      if (orderId == null) return;
-
-      final existingOrder = state.orders.any((o) => o.id == orderId);
-
-      if (!existingOrder) {
-        // ✅ أوردر جديد → جيب بياناته الكاملة من الـ API
-        _fetchAndAddNewOrder(orderId);
-      } else {
-        // ✅ أوردر موجود تغيّر status → جيب بياناته المحدّثة
-        _fetchAndUpdateOrder(orderId, status);
+      if (event == 'new_order') {
+        final order = Order.fromJson(data['order']);
+        _fetchAndAddNewOrder(order.id);
+      } else if (event == 'order_updated') {
+        final order = Order.fromJson(data['order']);
+        _fetchAndUpdateOrder(order.id);
       }
+      // shift events هتتعالج في ShiftCubit مباشرة 👇
     });
   }
+
+  Stream<Map<String, dynamic>> get wsStream => _wsService.stream;
 
   Future<void> _fetchAndAddNewOrder(String orderId) async {
     if (_token == null) return;
@@ -90,7 +90,7 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
-  Future<void> _fetchAndUpdateOrder(String orderId, String? status) async {
+  Future<void> _fetchAndUpdateOrder(String orderId) async {
     if (_token == null) return;
     try {
       // جيب القوائم الثلاث ودوّر على الأوردر فيهم

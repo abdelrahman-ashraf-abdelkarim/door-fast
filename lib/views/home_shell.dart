@@ -1,9 +1,11 @@
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
+import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 // import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
+import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/views/my_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,56 +32,80 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    final authState = context.read<AuthCubit>().state as AuthAuthenticated;
+
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! AuthAuthenticated) return;
+
     final token = authState.token;
     final captainId = authState.user.id;
 
     print('🔑 Token: $token');
-  print('👤 CaptainId: $captainId');
+    print('👤 CaptainId: $captainId');
     context.read<OrdersCubit>().loadOrders(token, captainId);
+    context.read<OrdersCubit>().wsStream.listen((data) {
+      final event = data['event'];
+      final shiftCubit = context.read<ShiftCubit>();
+
+      if (event == 'shift_activated') {
+        shiftCubit.onShiftActivated();
+      } else if (event == 'shift_deactivated') {
+        shiftCubit.onShiftDeactivated();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: IndexedStack(index: _currentIndex, children: _screens),
-        bottomNavigationBar: SafeArea(
-          top: false,
-          child: Material(
-            elevation: 12,
-            color: Colors.white,
-            child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
-              selectedItemColor: Colors.deepOrangeAccent,
-              unselectedItemColor: Colors.grey,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard_outlined),
-                  activeIcon: Icon(Icons.dashboard),
-                  label: 'الرئيسية',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.receipt_long_outlined),
-                  activeIcon: Icon(Icons.receipt_long),
-                  label: 'الطلبات',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_balance_wallet_outlined),
-                  activeIcon: Icon(Icons.account_balance_wallet),
-                  label: 'كشف حسابى',
-                ),
-              ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthUnauthenticated) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (route) => false,
+          );
+        }
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: IndexedStack(index: _currentIndex, children: _screens),
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: Material(
+              elevation: 12,
+              color: Colors.white,
+              child: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.deepOrangeAccent,
+                unselectedItemColor: Colors.grey,
+                showSelectedLabels: true,
+                showUnselectedLabels: true,
+                landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.dashboard_outlined),
+                    activeIcon: Icon(Icons.dashboard),
+                    label: 'الرئيسية',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.receipt_long_outlined),
+                    activeIcon: Icon(Icons.receipt_long),
+                    label: 'الطلبات',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.account_balance_wallet_outlined),
+                    activeIcon: Icon(Icons.account_balance_wallet),
+                    label: 'كشف حسابى',
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -158,7 +158,7 @@ class Order {
       phoneOne: sendTo?['phone'] ?? client['phone'],
       phoneTwo: sendTo?['phone2'] ?? client['phone2'],
       address: sendTo?['address'] ?? client['address'] ?? '',
-      linkAddress: sendTo['delivery_link'] ?? client['delivery_link'] ?? '',
+      linkAddress: sendTo?['delivery_link'] ?? client['delivery_link'] ?? '',
     );
 
     /// 👇 المرسل موجود بس في حالة person-to-person

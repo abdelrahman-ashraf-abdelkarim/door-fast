@@ -5,94 +5,110 @@ import 'package:captain_app/core/constants.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
 class WebSocketService {
-  // ✅ Singleton
   WebSocketService._internal();
   static final WebSocketService _instance = WebSocketService._internal();
   factory WebSocketService() => _instance;
 
-  final PusherChannelsFlutter _pusher = PusherChannelsFlutter.getInstance();
-  StreamController<Map<String, dynamic>>? _controller;
+  static final PusherChannelsFlutter _pusher =
+      PusherChannelsFlutter.getInstance();
+  static bool _initialized = false;
 
-  Stream<Map<String, dynamic>> get stream => _controller!.stream;
+  final StreamController<Map<String, dynamic>> _controller =
+      StreamController<Map<String, dynamic>>.broadcast();
 
-  bool _isConnected = false;
-  bool _isInitialized = false;
+  Stream<Map<String, dynamic>> get stream => _controller.stream;
+
   String? _token;
+  String? _captainId;
 
   // ─── Public API ───────────────────────────────────────────────
 
-  Future<void> connect(String token, [String? captainId]) async {
-    if (_isInitialized && _isConnected) return;
+  Future<void> connect(String token, String captainId) async {
+    if (_initialized) return;
+    _initialized = true;
     _token = token;
-    _controller ??= StreamController<Map<String, dynamic>>.broadcast();
-    await _initConnection();
+    _captainId = captainId;
+    await _init();
   }
 
   Future<void> disconnect() async {
-    _isInitialized = false;
-    _isConnected = false;
-    await _pusher.unsubscribe(channelName: 'orders');
-    await _pusher.disconnect();
-    _controller?.close();
-    _controller = null;
+    _initialized = false;
     _token = null;
+    _captainId = null;
+    try {
+      await _pusher.unsubscribe(channelName: 'orders');
+      await _pusher.disconnect();
+    } catch (_) {}
   }
-
-  bool get isConnected => _isConnected;
 
   // ─── Internal ─────────────────────────────────────────────────
 
-  Future<void> _initConnection() async {
-    if (_isInitialized) return;
-      _isInitialized = true;
-
+  Future<void> _init() async {
     try {
       await _pusher.init(
         apiKey: AppConstants.apiKey,
         cluster: AppConstants.cluster,
 
         onConnectionStateChange: (currentState, previousState) {
-          _isConnected = currentState == 'CONNECTED';
+          print('🔌 Pusher: $previousState → $currentState');
+          if (currentState == 'DISCONNECTED' && _token != null) {
+            Future.delayed(const Duration(seconds: 5), () => _pusher.connect());
+          }
         },
 
         onError: (message, code, error) {
-          _isConnected = false;
-          _isInitialized = false;
-          _scheduleReconnect();
+          print('❌ Pusher Error: $message');
+          _initialized = false;
+          Future.delayed(const Duration(seconds: 5), () {
+            if (_token != null) _init();
+          });
         },
       );
 
-      await _pusher.subscribe(channelName: 'orders', onEvent: _onEvent);
+      // ─── Channel الأوردرات العام ───────────────────────────
+      await _pusher.subscribe(
+        channelName: 'orders',
+        onEvent: (dynamic event) {
+          if (event is PusherEvent) {
+            print('📨 orders → ${event.eventName}: ${event.data}');
+            _handleEvent(event);
+          }
+        },
+      );
 
       await _pusher.connect();
-    } catch (_) {
-      _isConnected = false;
-      _isInitialized = false;
-      _scheduleReconnect();
+      print('✅ Pusher connecting...');
+    } catch (e) {
+      print('❌ Pusher Init Error: $e');
+      _initialized = false;
     }
   }
 
-  void _onEvent(PusherEvent event) {
-    if (event.eventName != 'App\\Events\\OrderStatusUpdated') return;
-
+  void _handleEvent(PusherEvent event) {
     try {
-      final raw = jsonDecode(event.data ?? '{}') as Map<String, dynamic>;
+      final raw = _decode(event.data);
 
-      // السيرفر بيبعت جوه 'message':
-      // { order_id, status, order_number, delivery_id }
-      final payload = raw['message'] is Map
-          ? raw['message'] as Map<String, dynamic>
-          : raw;
+      switch (event.eventName) {
+        case 'App\\Events\\NewOrderEvent':
+          _controller.add({'event': 'new_order', 'order': raw['order'] ?? raw});
+          break;
 
-      _controller?.add(payload); // ✅ نبعت الـ payload زي ما هو للـ cubit
-    } catch (_) {
-      // ignore
+        case 'App\\Events\\OrderStatusUpdated':
+          _controller.add({
+            'event': 'order_updated',
+            'order': raw['order'] ?? raw['message'] ?? raw,
+          });
+          break;
+      }
+    } catch (e) {
+      print('❌ Parse Error: $e');
     }
   }
 
-  void _scheduleReconnect() {
-    Future.delayed(const Duration(seconds: 5), () {
-      if (_token != null) _initConnection();
-    });
+  Map<String, dynamic> _decode(dynamic data) {
+    if (data == null) return {};
+    if (data is Map<String, dynamic>) return data;
+    if (data is String) return jsonDecode(data) as Map<String, dynamic>;
+    return {};
   }
 }

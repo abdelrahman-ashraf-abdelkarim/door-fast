@@ -1,3 +1,4 @@
+import 'package:captain_app/api/api.dart';
 import 'package:captain_app/core/app_navigation.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
@@ -24,18 +25,19 @@ void main() async {
   runApp(const CaptainApp());
 }
 
-class CaptainApp extends StatelessWidget {  
+class CaptainApp extends StatelessWidget {
   const CaptainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = AuthCubit();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider.value(value: authCubit,),
         BlocProvider<ShiftCubit>(
           create: (context) => ShiftCubit(context.read<AuthCubit>()),
         ),
-        BlocProvider<OrdersCubit>(create: (context) => OrdersCubit()),
+        BlocProvider<OrdersCubit>(create: (context) => OrdersCubit(api: Api(authCubit))),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
