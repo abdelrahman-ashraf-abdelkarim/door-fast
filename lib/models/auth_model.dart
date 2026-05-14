@@ -6,6 +6,7 @@ class AuthModel {
   final String code;
   final String phone;
   final CaptainStatus status;
+  final DateTime? loginAt;
 
   const AuthModel({
     required this.id,
@@ -13,6 +14,7 @@ class AuthModel {
     required this.code,
     required this.phone,
     required this.status,
+    this.loginAt,
   });
 
   AuthModel copyWith({
@@ -21,6 +23,7 @@ class AuthModel {
     String? code,
     String? phone,
     CaptainStatus? status,
+    DateTime? loginAt,
   }) {
     return AuthModel(
       id: id ?? this.id,
@@ -28,11 +31,12 @@ class AuthModel {
       code: code ?? this.code,
       phone: phone ?? this.phone,
       status: status ?? this.status,
+      loginAt: loginAt ?? this.loginAt,
     );
   }
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
-    final user = json['user'];
+    final user = json.containsKey('user') ? json['user'] : json;
 
     return AuthModel(
       id: user['id'].toString(),
@@ -41,7 +45,10 @@ class AuthModel {
       phone: user['phone'],
       status: user['status'] == 'active'
           ? CaptainStatus.active
-          : CaptainStatus.nonActive, // default مؤقت
+          : CaptainStatus.nonActive,
+      loginAt: user['login_at'] != null
+          ? DateTime.tryParse(user['login_at'])
+          : null,
     );
   }
   Map<String, dynamic> toJson() {
@@ -51,6 +58,7 @@ class AuthModel {
       'code': code,
       'phone': phone,
       'status': status.name,
+      'login_at': loginAt?.toIso8601String(),
     };
   }
 }
@@ -78,6 +86,9 @@ class AuthResponse {
         status: json['user']['status'] == 'active'
             ? CaptainStatus.active
             : CaptainStatus.active,
+        loginAt: json['user']['login_at'] != null
+            ? DateTime.tryParse(json['user']['login_at'])
+            : null,
       ),
     );
   }

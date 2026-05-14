@@ -35,7 +35,7 @@ class TransactionCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// 🔸 Header
           Row(

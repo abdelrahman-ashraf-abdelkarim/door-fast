@@ -57,16 +57,32 @@ class OrdersCubit extends Cubit<OrdersState> {
 
     _wsSubscription = _wsService.stream.listen((data) {
       final event = data['event'];
+      final rawId = data['order_id'];
+
+      if (rawId == null) return;
+
+      final orderId = rawId.toString();
 
       if (event == 'new_order') {
-        final order = Order.fromJson(data['order']);
-        _fetchAndAddNewOrder(order.id);
+        _fetchAndAddNewOrder(orderId);
       } else if (event == 'order_updated') {
-        final order = Order.fromJson(data['order']);
-        _fetchAndUpdateOrder(order.id);
+        final status = data['status']?.toString();
+        final deliveryId = data['delivery_id']?.toString();
+        if (status == 'cancelled' ||
+            (status == 'received' && deliveryId != _captainId)) {
+          _removeOrder(orderId);
+        } else {
+          _fetchAndUpdateOrder(orderId);
+        }
+      } else if (event == 'order_cancelled') {
+        _removeOrder(orderId);
       }
-      // shift events هتتعالج في ShiftCubit مباشرة 👇
     });
+  }
+
+  void _removeOrder(String orderId) {
+    final updatedList = state.orders.where((o) => o.id != orderId).toList();
+    emit(state.copyWith(orders: updatedList));
   }
 
   Stream<Map<String, dynamic>> get wsStream => _wsService.stream;
@@ -74,43 +90,35 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> _fetchAndAddNewOrder(String orderId) async {
     if (_token == null) return;
     try {
-      // نجيب كل الـ pending orders واخد منها اللي id بتاعه orderId
-      final freshOrders = await _ordersService.fetchOrders(_token!);
-      final newOrder = freshOrders.where((o) => o.id == orderId).firstOrNull;
-
-      if (newOrder == null) return;
-
-      // تأكد إنه مش موجود عندنا أصلاً
       if (state.orders.any((o) => o.id == orderId)) return;
-
+      final newOrder = await _ordersService.fetchOrderById(orderId, _token!);
       emit(state.copyWith(orders: [newOrder, ...state.orders]));
-      NotificationService.showNotification(title: 'طلب جديد 🚚');
-    } catch (_) {
-      // لو فشل الـ fetch، تجاهل
-    }
+      NotificationService.showNotification(title: 'طلب جديد ', body: "");
+    } catch (_) {}
   }
 
   Future<void> _fetchAndUpdateOrder(String orderId) async {
     if (_token == null) return;
     try {
-      // جيب القوائم الثلاث ودوّر على الأوردر فيهم
-      final results = await Future.wait([
-        _ordersService.fetchOrders(_token!),
-        _ordersService.fetchReceivedOrders(_token!),
-        _ordersService.fetchDeliveredOrders(_token!),
-      ]);
-      final allFresh = [...results[0], ...results[1], ...results[2]];
-      final updated = allFresh.where((o) => o.id == orderId).firstOrNull;
+      final updated = await _ordersService.fetchOrderById(orderId, _token!);
+      final exists = state.orders.any((o) => o.id == orderId);
 
-      if (updated == null) return;
-
-      final updatedList = state.orders.map((o) {
-        return o.id == orderId ? updated : o;
-      }).toList();
-
-      emit(state.copyWith(orders: updatedList));
-    } catch (_) {
-      // ignore
+      if (!exists) {
+        emit(state.copyWith(orders: [updated, ...state.orders]));
+        NotificationService.showNotification(
+          title: 'طلب جديد ',
+          body: 'رقم الطلب: ${updated.orderNumber}',
+        );
+      } else {
+        final updatedList = state.orders.map((o) {
+          return o.id == orderId ? updated : o;
+        }).toList();
+        emit(state.copyWith(orders: updatedList));
+      }
+    } on OrderNotFoundException {
+      _removeOrder(orderId);
+    } catch (e) {
+      print('❌ _fetchAndUpdateOrder error: $e');
     }
   }
 

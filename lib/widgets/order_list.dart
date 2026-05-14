@@ -7,14 +7,24 @@ import 'package:captain_app/widgets/order_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class OrdersList extends StatelessWidget {
+class OrdersList extends StatefulWidget {
   final OrderStatusFilter status;
   final double paddingValue;
 
   const OrdersList({super.key, this.paddingValue = 12, required this.status});
 
   @override
+  State<OrdersList> createState() => _OrdersListState();
+}
+
+class _OrdersListState extends State<OrdersList>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
     return BlocBuilder<OrdersCubit, OrdersState>(
       builder: (context, state) {
@@ -25,7 +35,7 @@ class OrdersList extends StatelessWidget {
         }
 
         final List<Order> orders;
-        switch (status) {
+        switch (widget.status) {
           case OrderStatusFilter.waiting:
           case OrderStatusFilter.newOrder:
             orders = cubit.pendingOrders;
@@ -45,12 +55,16 @@ class OrdersList extends StatelessWidget {
         }
 
         return ListView.builder(
-          padding: EdgeInsets.all(paddingValue),
+          padding: EdgeInsets.all(widget.paddingValue),
           itemCount: orders.length,
           // reverse: true,
           itemBuilder: (context, index) {
             final order = orders[index];
-            return OrderCard(itemsCount: order.totalItemsCount, order: order, token: token);
+            return OrderCard(
+              itemsCount: order.totalItemsCount,
+              order: order,
+              token: token,
+            );
           },
         );
       },

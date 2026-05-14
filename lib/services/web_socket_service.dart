@@ -90,14 +90,35 @@ class WebSocketService {
 
       switch (event.eventName) {
         case 'App\\Events\\NewOrderEvent':
-          _controller.add({'event': 'new_order', 'order': raw['order'] ?? raw});
+          final message = raw['order'] ?? raw;
+          final orderId =
+              message['id']?.toString() ?? message['order_id']?.toString();
+          if (orderId != null) {
+            _controller.add({'event': 'new_order', 'order': orderId});
+          }
           break;
 
         case 'App\\Events\\OrderStatusUpdated':
-          _controller.add({
-            'event': 'order_updated',
-            'order': raw['order'] ?? raw['message'] ?? raw,
-          });
+          final message = raw['message'] ?? raw;
+          final orderId = (message['order_id'] ?? message['id'])?.toString();
+          final status = message['status']?.toString();
+          final deliveryId = message['delivery_id']?.toString();
+
+          if (orderId != null) {
+            _controller.add({
+              'event': 'order_updated',
+              'order_id': orderId,
+              'status': status,
+              'delivery_id': deliveryId
+            });
+          }
+          break;
+
+        case 'order.cancelled': // ← أضف الـ case ده
+          final orderId = raw['order_id']?.toString();
+          if (orderId != null) {
+            _controller.add({'event': 'order_cancelled', 'order_id': orderId});
+          }
           break;
       }
     } catch (e) {

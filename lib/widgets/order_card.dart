@@ -32,8 +32,7 @@ class OrderCard extends StatelessWidget {
         title: 'تأكيد القبول',
         message: 'هل أنت متأكد من قبول هذا الطلب؟',
         onConfirm: (_) {
-          context.read<OrdersCubit>().acceptOrder(order.id, token);
-          Navigator.pop(context); // إغلاق الديالوج
+          context.read<OrdersCubit>().acceptOrder(order.id, token);// إغلاق الديالوج
         },
         colorContainer: AppColors.buttonOrderDialog,
         buttonText: 'تأكيد القبول',

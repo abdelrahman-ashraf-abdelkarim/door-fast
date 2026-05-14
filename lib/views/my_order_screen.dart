@@ -15,7 +15,7 @@ class MyOrderScreen extends StatelessWidget {
           centerTitle: true,
           bottom: const TabBar(
             tabs: [
-              Tab(text: "طلبات مقبلة"),
+              Tab(text: "طلبات جديدة"),
               Tab(text: "طلبات مقبولة"),
               Tab(text: "تم التوصيل"),
             ],

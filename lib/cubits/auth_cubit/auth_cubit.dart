@@ -17,7 +17,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
       emit(const AuthError('حسابك غير مفعّل، تواصل مع الإدارة'));
       return;
     }
-    
+
     emit(AuthAuthenticated(response.user, token: response.token));
   } catch (e) {
     emit(AuthError(e.toString()));
@@ -31,14 +31,11 @@ class AuthCubit extends HydratedCubit<AuthState> {
 
   @override
   AuthState? fromJson(Map<String, dynamic> json) {
-    // final stateType = json['type'] as String?;
+    
     if (json['type'] != 'authenticated') return AuthUnauthenticated();
 
-    // final userJson = json['user'];
-    // if (userJson is! Map) return AuthUnauthenticated();
-
     return AuthAuthenticated(
-      AuthModel.fromJson({'user': json['user']}),
+      AuthModel.fromJson(json['user']),
       token: json['token'],
     );
   } 

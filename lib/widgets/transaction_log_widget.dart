@@ -42,39 +42,43 @@ class TransactionLogWidget extends StatelessWidget {
               child: FaIcon(icon, color: foregroundIconColor, size: 32),
             ),
             const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Text(
-                      day,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w100,
-                        color: AppColors.textSecondary,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 2),
+                  Wrap(
+                    spacing: 4,
+                    children: [
+                      Text(
+                        day,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w100,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    Text(
-                      month,
-                      style: const TextStyle(color: AppColors.textSecondary),
-                    ),
-                    Text(
-                      yearAndHour,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w100,
-                        color: AppColors.textSecondary,
+                      Text(
+                        month,
+                        style: const TextStyle(color: AppColors.textSecondary),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      Text(
+                        yearAndHour,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w100,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const Spacer(),
             Text(
               price,
               style: TextStyle(

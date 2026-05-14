@@ -1,11 +1,13 @@
+
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/format_arabic_date_for_dashboard.dart';
 import 'package:captain_app/core/time_now.dart';
-import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
-import 'package:captain_app/cubits/order_cubit/order_state.dart';
+import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
+import 'package:captain_app/cubits/dashboard_cubit/dashboard_state.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:captain_app/models/auth_model.dart';
+import 'package:captain_app/models/dashboard_model.dart';
 import 'package:captain_app/widgets/app_bar.dart';
 import 'package:captain_app/widgets/stat_card.dart';
 import 'package:captain_app/widgets/work_time_widget.dart';
@@ -18,26 +20,31 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ShiftCubit, ShiftState>(
-      builder: (context, state) {
-        final isOnline = state.user?.status == CaptainStatus.active;
+      builder: (context, shiftState) {
+        final isOnline = shiftState.user?.status == CaptainStatus.active;
 
         return Scaffold(
           appBar: AppBar(
             title: AppBarWidget(
               isOnline: isOnline,
-              userName: state.user?.name ?? 'كابتن',
+              userName: shiftState.user?.name ?? 'كابتن',
             ),
+            scrolledUnderElevation: 0,
             backgroundColor: AppColors.screenBackground,
           ),
-          body: BlocBuilder<OrdersCubit, OrdersState>(
-            builder: (context, orderState) {
-              final ordersCubit = context.read<OrdersCubit>();
+          body: BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, dashState) {
+              if (!isOnline) return const _OfflineMessage();
 
-              if (!isOnline) {
-                return const _OfflineMessage();
+              if (dashState.isLoading && dashState.data == null) {
+                return const Center(child: CircularProgressIndicator());
               }
 
-              return _DashboardContent(ordersCubit: ordersCubit);
+              if (dashState.data == null) {
+                return const Center(child: Text('تعذر تحميل البيانات'));
+              }
+
+              return _DashboardContent(data: dashState.data!);
             },
           ),
         );
@@ -45,6 +52,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
+
+// ─── Offline ──────────────────────────────────────────────────
 
 class _OfflineMessage extends StatelessWidget {
   const _OfflineMessage();
@@ -64,10 +73,12 @@ class _OfflineMessage extends StatelessWidget {
   }
 }
 
-class _DashboardContent extends StatelessWidget {
-  const _DashboardContent({required this.ordersCubit});
+// ─── Content ──────────────────────────────────────────────────
 
-  final OrdersCubit ordersCubit;
+class _DashboardContent extends StatelessWidget {
+  const _DashboardContent({required this.data});
+
+  final DashboardData data;
 
   @override
   Widget build(BuildContext context) {
@@ -86,23 +97,23 @@ class _DashboardContent extends StatelessWidget {
             style: TextStyle(fontSize: 18, color: Colors.grey[600]),
           ),
           const SizedBox(height: 20),
-          _DeliveryEarningsCard(
-            deliveryEarnings: ordersCubit.totalDeliveryEarnings,
-          ),
+          _DeliveryEarningsCard(feesToday: data.feesToday),
           const SizedBox(height: 20),
-          _StatsGrid(ordersCubit: ordersCubit),
+          _StatsGrid(data: data),
           const SizedBox(height: 20),
-          _CancelledOrdersCard(cancelledCount: ordersCubit.cancelledCount),
+          _CancelledOrdersCard(cancelledCount: data.cancelledToday),
         ],
       ),
     );
   }
 }
 
-class _DeliveryEarningsCard extends StatelessWidget {
-  const _DeliveryEarningsCard({required this.deliveryEarnings});
+// ─── Earnings Card ────────────────────────────────────────────
 
-  final double deliveryEarnings;
+class _DeliveryEarningsCard extends StatelessWidget {
+  const _DeliveryEarningsCard({required this.feesToday});
+
+  final double feesToday;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +123,7 @@ class _DeliveryEarningsCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white70,
+        border: Border(bottom: BorderSide(width: 4, color: Colors.teal)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -119,27 +131,20 @@ class _DeliveryEarningsCard extends StatelessWidget {
         children: [
           const Text(
             'خدمة التوصيل',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: Colors.teal,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
           ),
-          // const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                ' ${deliveryEarnings.toString()} ',
+                ' ${feesToday.toStringAsFixed(0)} ',
                 style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
+                  color: Colors.teal,
                 ),
               ),
-              Text(
-                'ج',
-                style: TextStyle(fontSize: 22, color: Colors.grey[600]),
-              ),
+              Text('ج', style: TextStyle(fontSize: 22, color: Colors.teal)),
             ],
           ),
         ],
@@ -148,10 +153,12 @@ class _DeliveryEarningsCard extends StatelessWidget {
   }
 }
 
-class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.ordersCubit});
+// ─── Stats Grid ───────────────────────────────────────────────
 
-  final OrdersCubit ordersCubit;
+class _StatsGrid extends StatelessWidget {
+  const _StatsGrid({required this.data});
+
+  final DashboardData data;
 
   @override
   Widget build(BuildContext context) {
@@ -166,55 +173,55 @@ class _StatsGrid extends StatelessWidget {
         const StatCard(
           title: 'بداية الوردية',
           valueWidget: StartShiftTimeWidget(),
+          color: Colors.black,
           icon: Icons.access_time,
         ),
         const StatCard(
           title: 'مدة العمل',
           valueWidget: WorkTimerWidget(),
+          color: Colors.black,
           icon: Icons.timer_outlined,
         ),
-
-        /// end task
         StatCard(
           title: 'طلبات مكتمله',
-          value: ordersCubit.deliveredCount.toString(),
+          value: data.deliveredToday.toString(),
           icon: Icons.check_circle,
           color: Colors.green,
         ),
         StatCard(
-          title: 'طلبات معلقة',
-          value: ordersCubit.pendingCount.toString(),
+          title: 'طلبات مقبولة',
+          value: data.activeOrders.toString(),
           icon: Icons.add_circle,
           color: Colors.blue,
         ),
         StatCard(
-          title: 'اجمالى التحصيل اليومى',
-          value: "${ordersCubit.totalDeliveryEarnings.toStringAsFixed(0)} ج",
-          // icon: Icons.local_shipping,
+          title: ' التحصيل اليومى',
+          value: '${data.feesToday.toStringAsFixed(0)} ج',
+          icon: Icons.monetization_on_outlined,
           color: Colors.orange,
         ),
         const StatCard(
           title: 'إجمالي الخصومات',
-          value: '10 ج',
+          value: '0 ج', // مش موجود في الـ API حالياً
           icon: Icons.money_off,
           color: Colors.red,
         ),
-        const StatCard(
+        StatCard(
           title: 'الشريحة المحققة',
-          value: 'الشريحة 1',
-          isImportant: true,
+          value: 'الشريحة ${data.currentTier}',
           color: Colors.deepPurpleAccent,
         ),
-        const StatCard(
+        StatCard(
           title: 'إجمالي الأرباح',
-          value: '10 ج',
-          isImportant: true,
+          value: '${data.profitToday.toStringAsFixed(0)} ج',
           color: Colors.deepPurpleAccent,
         ),
       ],
     );
   }
 }
+
+// ─── Cancelled Card ───────────────────────────────────────────
 
 class _CancelledOrdersCard extends StatelessWidget {
   const _CancelledOrdersCard({required this.cancelledCount});

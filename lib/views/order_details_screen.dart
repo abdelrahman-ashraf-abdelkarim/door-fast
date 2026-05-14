@@ -126,11 +126,12 @@ class OrderDetailsScreen extends StatelessWidget {
                             title: 'سبب الرفض',
                             message: 'لماذا تريد رفض هذا الطلب؟',
                             isCancelled: true,
+                            colorContainer: Colors.red[800],
                             onConfirm: (reason) {
                               context.read<OrdersCubit>().cancelOrder(
                                 order.id,
-                                token,
                                 reason ?? '',
+                                token,
                               );
                               Navigator.pop(context);
                             },

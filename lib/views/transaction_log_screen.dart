@@ -1,51 +1,143 @@
-import 'package:captain_app/models/transaction_model.dart';
+import 'package:captain_app/core/constants.dart';
+import 'package:captain_app/core/format_date_for_account.dart';
+import 'package:captain_app/cubits/wallet_cubit/wallet_cubit.dart';
+import 'package:captain_app/cubits/wallet_cubit/wallet_state.dart';
+import 'package:captain_app/widgets/data_filter_card.dart';
 import 'package:captain_app/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TransactionLogScreen extends StatelessWidget {
   const TransactionLogScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('سجل العمليات المالية'),
-        centerTitle: true,
-      ),
-      body: ListView.builder(
-        itemCount: transactionLogData.length,
-        itemBuilder: (context, index) {
-          final item = transactionLogData[index];
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('سجل العمليات المالية'),
+          centerTitle: true,
+        ),
+        body: BlocBuilder<WalletCubit, WalletState>(
+          builder: (context, state) {
+            return CustomScrollView(
+              slivers: [
+                // ─── فلتر التاريخ ──────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Card(
+                      color: AppColors.cardBackground,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "تصفيه حسب التاريخ",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.calendar_today_outlined,
+                                  color:
+                                      AppColors.customerIconPrimaryForeground,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            const Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "من",
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    "إلى",
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            DateFilterCard(
+                              onFilter: (from, to) {
+                                context.read<WalletCubit>().filterByDate(from, to);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
-          return TransactionCard(
-            id: item.id,
-            date: item.date,
-            note: item.note,
-            debit: item.debit,
-            credit: item.credit,
-            balance: item.balance,
-          );
-        },
+                // ─── Loading ────────────────────────────────────
+                if (state is WalletLoading)
+                  const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+
+                // ─── Error ──────────────────────────────────────
+                else if (state is WalletError)
+                  SliverFillRemaining(
+                    child: Center(child: Text(state.message)),
+                  )
+
+                // ─── قايمة العمليات ─────────────────────────────
+                else if (state is WalletLoaded) ...[
+                  if (state.filteredTransactions.isEmpty)
+                    const SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          'لا توجد عمليات',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = state.filteredTransactions[index];
+                          return TransactionCard(
+                            id: item.id,
+                            date: formatDate(item.createdAt),
+                            note: item.description,
+                            debit: item.debit,
+                            credit: item.credit,
+                            balance: item.balance,
+                          );
+                        },
+                        childCount: state.filteredTransactions.length,
+                      ),
+                    ),
+                ],
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 }
-
-final List<TransactionModel> transactionLogData = [
-  TransactionModel(
-    id: 1025,
-    date: "24 أكتوبر 2023 . 09:00ص",
-    note: "طلب رقم 556",
-    debit: null,
-    credit: 200,
-    balance: 1200,
-  ),
-  TransactionModel(
-    id: 1026,
-    date: "25 أكتوبر 2023 . 10:30ص",
-    note: "سحب رصيد",
-    debit: 150,
-    credit: null,
-    balance: 1050,
-  ),
-];

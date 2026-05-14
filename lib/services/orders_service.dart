@@ -57,6 +57,29 @@ class OrdersService {
     );
   }
 
+  Future<Order> fetchOrderById(String orderId, String token) async {
+    try {
+      final data = await _api.get(
+        url: '${AppConstants.baseUrl}/orders/$orderId',
+        token: token,
+      );
+      print('📦 fetchOrderById response: $data');
+      if (data == null || data['success'] == false) {
+        throw OrderNotFoundException(orderId);
+      }
+      return Order.fromJson(data['order']);
+    } on OrderNotFoundException {
+      print('🚫 OrderNotFoundException thrown');
+      rethrow; // ← خلّيه يعدي للـ cubit
+    } on Exception catch (e) {
+      print('⚠️ Exception: ${e.toString()}');
+      if (e.toString().contains('404')) {
+        throw OrderNotFoundException(orderId); // ← 404 = مش موجود
+      }
+      rethrow;
+    }
+  }
+
   Future<List<Order>> fetchReceivedOrders(String token) async {
     final data = await _api.get(
       url: '${AppConstants.baseUrl}/orders/received',

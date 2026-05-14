@@ -8,26 +8,23 @@ class StatCard extends StatelessWidget {
     this.icon,
     this.color,
     this.valueWidget,
-    this.isImportant = false,
   });
   final String title;
   final String? value;
   final Widget? valueWidget;
   final IconData? icon;
   final Color? color;
-  final bool isImportant;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 120,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        // color: Colors.white,
-        gradient: LinearGradient(colors: [Color(0XFFFAF7FF), Colors.white]),
+        color: Colors.white,
+        // gradient: LinearGradient(colors: [Color(0XFFFAF7FF), Colors.white]),
         borderRadius: BorderRadius.circular(16),
-        border: isImportant
-            ? Border(right: BorderSide(color: color ?? Colors.white, width: 4))
-            : null,
+        border: Border(right: BorderSide(color: color ?? Colors.white, width: 4))
       ),
 
       child: Column(

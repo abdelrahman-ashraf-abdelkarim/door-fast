@@ -1,5 +1,6 @@
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 // import 'package:captain_app/services/notification_service.dart';
@@ -42,6 +43,7 @@ class _HomeShellState extends State<HomeShell> {
     print('🔑 Token: $token');
     print('👤 CaptainId: $captainId');
     context.read<OrdersCubit>().loadOrders(token, captainId);
+    context.read<DashboardCubit>().loadDashboard(token);
     context.read<OrdersCubit>().wsStream.listen((data) {
       final event = data['event'];
       final shiftCubit = context.read<ShiftCubit>();
