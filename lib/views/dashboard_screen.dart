@@ -1,4 +1,3 @@
-
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/format_arabic_date_for_dashboard.dart';
 import 'package:captain_app/core/time_now.dart';
@@ -208,7 +207,9 @@ class _StatsGrid extends StatelessWidget {
         ),
         StatCard(
           title: 'الشريحة المحققة',
-          value: 'الشريحة ${data.currentTier}',
+          value: data.currentTier != 0
+              ? 'الشريحة ${data.currentTier}'
+              : '__ لا يوجد',
           color: Colors.deepPurpleAccent,
         ),
         StatCard(

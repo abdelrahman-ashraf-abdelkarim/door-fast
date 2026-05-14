@@ -7,44 +7,20 @@ import 'invoice_state.dart';
 class InvoiceCubit extends Cubit<InvoiceState> {
   InvoiceCubit() : super(InvoiceInitial());
 
-  Future<void> shareFakeInvoice(String orderId) async {
-    try {
-      emit(InvoiceLoading());
-
-      // ⏳ simulate API
-      await Future.delayed(const Duration(seconds: 1));
-
-      final file = await PdfService.loadFakePdf(orderId);
-
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          text: "فاتورة الطلب رقم $orderId",
-        ),
-      );
-
-      emit(InvoiceSuccess());
-    } catch (e) {
-      emit(InvoiceError("فشل تحميل الفاتورة"));
-    }
-  }
-
   Future<void> downloadAndShare({
     required String url,
     required String orderId,
+    required String token,
     required String customerPhone,
   }) async {
     try {
       emit(InvoiceLoading());
 
-      // Download and persist on captain device (cached by orderId).
-      // final file = await PdfService.downloadInvoicePdf(
-      //   url: url,
-      //   orderId: orderId,
-      // );
+      
       final file = await PdfService.getInvoicePdf(
         orderId: orderId,
-        url: url, // optional لو fake
+        url: url,
+        token: token
       );
 
       final message = "فاتورة الطلب رقم $orderId";
@@ -74,7 +50,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     final digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.isEmpty) return null;
     if (digitsOnly.startsWith('01') && digitsOnly.length == 11) {
-      return digitsOnly;
+      return "2$digitsOnly";
     }
     // keep it as-is and let the backend/team decide format consistency.
     return digitsOnly;

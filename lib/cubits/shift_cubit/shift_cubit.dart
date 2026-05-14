@@ -14,68 +14,68 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
 
   ShiftCubit(this.authCubit, this.shiftService) : super(ShiftState.initial()) {
     _resumeTimerIfNeeded();
-
-    Future.microtask(() {
-      _onAuthChanged(authCubit.state);
-    });
-
+    Future.microtask(() => _onAuthChanged(authCubit.state));
     authSubscription = authCubit.stream.listen(_onAuthChanged);
   }
 
   void _onAuthChanged(AuthState authState) {
     if (authState is AuthAuthenticated) {
-      final user = authState.user;
-
+      final user = authState.user.copyWith(status: CaptainStatus.active);
       emit(state.copyWith(user: user));
-
-      if (user.status == CaptainStatus.active) {
-        startShift();
-      } else {
-        endShift();
-      }
+      startShift();
     } else if (authState is AuthUnauthenticated) {
       endShift();
       emit(state.copyWith(clearUser: true));
     }
   }
 
-  // أضف method جديدة تستقبل الـ event من WebSocket
   void onShiftActivated() {
     if (state.user == null) return;
-
     final updatedUser = state.user!.copyWith(status: CaptainStatus.active);
     emit(state.copyWith(user: updatedUser));
     startShift();
-    
   }
 
   void onShiftDeactivated() {
     if (state.user == null) return;
-
     final updatedUser = state.user!.copyWith(status: CaptainStatus.nonActive);
     emit(state.copyWith(user: updatedUser));
     endShift();
   }
 
   Future<void> startShift() async {
-    if (state.user?.status != CaptainStatus.active) return;
+    print('🔍 startShift called, user status: ${state.user?.status}');
+    print('🔍 startTime: ${state.startTime}');
+    if (state.user?.status != CaptainStatus.active) {
+      print('⛔ blocked by status guard');
+      return;
+    }
 
-    DateTime start;
     try {
       final authState = authCubit.state;
       if (authState is AuthAuthenticated) {
-        final fetched = await shiftService.fetchShiftStartTime(authState.token);
-        start = fetched ?? state.user?.loginAt ?? DateTime.now();
-      } else {
-        start = state.user?.loginAt ?? DateTime.now();
+        final result = await shiftService.fetchShiftTimes(authState.token);
+
+        // ← لو الوردية مش نشطة في الـ API، اعتبره offline
+        if (!result.hasActiveShift) {
+          final updatedUser = state.user!.copyWith(
+            status: CaptainStatus.nonActive,
+          );
+          emit(state.copyWith(user: updatedUser));
+          endShift();
+          return;
+        }
+
+        final start =
+            result.shiftStart ?? state.user?.loginAt ?? DateTime.now();
+        emit(state.copyWith(startTime: start, duration: Duration.zero));
+        _startTimer(start);
       }
-    } catch (e) {
-      start = state.user?.loginAt ?? DateTime.now();
+    } catch (_) {
+      final start = state.user?.loginAt ?? DateTime.now();
+      emit(state.copyWith(startTime: start, duration: Duration.zero));
+      _startTimer(start);
     }
-
-    emit(state.copyWith(startTime: start, duration: Duration.zero));
-
-    _startTimer(start);
   }
 
   void _startTimer(DateTime start) {
@@ -89,7 +89,6 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
   void _resumeTimerIfNeeded() {
     final start = state.startTime;
     if (start == null) return;
-
     emit(state.copyWith(duration: DateTime.now().difference(start)));
     _startTimer(start);
   }
@@ -100,14 +99,10 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
   }
 
   @override
-  ShiftState? fromJson(Map<String, dynamic> json) {
-    return ShiftState.fromJson(json);
-  }
+  ShiftState? fromJson(Map<String, dynamic> json) => ShiftState.fromJson(json);
 
   @override
-  Map<String, dynamic>? toJson(ShiftState state) {
-    return state.toJson();
-  }
+  Map<String, dynamic>? toJson(ShiftState state) => state.toJson();
 
   @override
   Future<void> close() {

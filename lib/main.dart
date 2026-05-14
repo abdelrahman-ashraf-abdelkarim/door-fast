@@ -41,8 +41,11 @@ class CaptainApp extends StatelessWidget {
           create: (context) =>
               ShiftCubit(context.read<AuthCubit>(), ShiftService(api: api)),
         ),
-        BlocProvider<OrdersCubit>(create: (context) => OrdersCubit(api: api)),
-        BlocProvider(create: (_) => DashboardCubit()),
+        BlocProvider<OrdersCubit>(
+          create: (context) =>
+              OrdersCubit(api: api, shiftCubit: context.read<ShiftCubit>()),
+        ),
+        BlocProvider(create: (_) => DashboardCubit(api: api)),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

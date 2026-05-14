@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
+import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/orders_service.dart';
@@ -12,6 +13,7 @@ import 'package:captain_app/services/web_socket_service.dart';
 class OrdersCubit extends Cubit<OrdersState> {
   final OrdersService _ordersService;
   final Api api;
+  final ShiftCubit shiftCubit;
   final WebSocketService _wsService = WebSocketService();
   StreamSubscription? _wsSubscription;
 
@@ -19,10 +21,13 @@ class OrdersCubit extends Cubit<OrdersState> {
   String? _captainId;
   bool _wsConnected = false;
 
-  OrdersCubit({OrdersService? ordersService, required Api api})
-    : _ordersService = ordersService ?? OrdersService(api: api),
-      api = api,
-      super(const OrdersState(orders: []));
+  OrdersCubit({
+    OrdersService? ordersService,
+    required Api api,
+    required this.shiftCubit,
+  }) : _ordersService = ordersService ?? OrdersService(api: api),
+       api = api,
+       super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
 
@@ -43,7 +48,7 @@ class OrdersCubit extends Cubit<OrdersState> {
 
       if (!_wsConnected) {
         _wsConnected = true;
-        _connectWebSocket(token, captainId);
+        await _connectWebSocket(token, captainId);
       }
     } catch (error) {
       emit(state.copyWith(isLoading: false, errorMessage: error.toString()));
@@ -52,11 +57,24 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   // ─── Pusher ───────────────────────────────────────────────────
 
-  void _connectWebSocket(String token, String captainId) {
-    _wsService.connect(token, captainId);
-
+  Future<void> _connectWebSocket(String token, String captainId) async {
+    await _wsService.connect(token, captainId);
+    
+    await _wsSubscription?.cancel();
     _wsSubscription = _wsService.stream.listen((data) {
+      print('📨 cubit received: $data');
       final event = data['event'];
+
+      if (event == 'shift_activated') {
+        shiftCubit.onShiftActivated();
+        print("✅ Status shift: shift_activated");
+        return;
+      }
+      if (event == 'shift_deactivated') {
+        shiftCubit.onShiftDeactivated();
+        print("❌ Status shift: shift_activated");
+        return;
+      }
       final rawId = data['order_id'];
 
       if (rawId == null) return;

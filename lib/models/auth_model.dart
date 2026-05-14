@@ -43,7 +43,7 @@ class AuthModel {
       name: user['name'],
       code: user['code'],
       phone: user['phone'],
-      status: user['status'] == 'active'
+      status: user['status'] == 'has_active_shift'
           ? CaptainStatus.active
           : CaptainStatus.nonActive,
       loginAt: user['login_at'] != null
@@ -83,7 +83,7 @@ class AuthResponse {
         name: json['user']['name'],
         code: json['user']['code'],
         phone: json['user']['phone'],
-        status: json['user']['status'] == 'active'
+        status: json['user']['status'] == 'has_active_shift'
             ? CaptainStatus.active
             : CaptainStatus.active,
         loginAt: json['user']['login_at'] != null

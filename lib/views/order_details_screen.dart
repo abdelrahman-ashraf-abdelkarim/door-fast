@@ -170,9 +170,10 @@ class OrderDetailsScreen extends StatelessWidget {
                         onTap: () {
                           context.read<InvoiceCubit>().downloadAndShare(
                             // url: "https://yourapi.com/invoice/${order.id}",
-                            url: "assets/pdfs/Invoice_ORD-ORD-000105.pdf",
+                            url: AppConstants.invoiceUrl(order.id),
                             orderId: order.id,
                             customerPhone: order.receiverPhoneOne,
+                            token: token,
                           );
                         },
                         child: ContainerButtonWidget(

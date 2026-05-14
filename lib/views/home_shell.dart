@@ -3,7 +3,8 @@ import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
-// import 'package:captain_app/services/notification_service.dart';
+import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
+import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
 import 'package:captain_app/views/login_screen.dart';
@@ -13,7 +14,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, this.initialIndex = 0});
-
   final int initialIndex;
 
   @override
@@ -42,12 +42,14 @@ class _HomeShellState extends State<HomeShell> {
 
     print('🔑 Token: $token');
     print('👤 CaptainId: $captainId');
+
     context.read<OrdersCubit>().loadOrders(token, captainId);
     context.read<DashboardCubit>().loadDashboard(token);
+
     context.read<OrdersCubit>().wsStream.listen((data) {
+      print('📡 HomeShell stream: $data');
       final event = data['event'];
       final shiftCubit = context.read<ShiftCubit>();
-
       if (event == 'shift_activated') {
         shiftCubit.onShiftActivated();
       } else if (event == 'shift_deactivated') {
@@ -70,7 +72,18 @@ class _HomeShellState extends State<HomeShell> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: IndexedStack(index: _currentIndex, children: _screens),
+          body: BlocBuilder<ShiftCubit, ShiftState>(
+            builder: (context, shiftState) {
+              final isOnline = shiftState.user?.status == CaptainStatus.active;
+
+              // ← لو مش نشط، اعرض رسالة في كل الصفحات
+              if (!isOnline) {
+                return const _OfflineMessage();
+              }
+
+              return IndexedStack(index: _currentIndex, children: _screens);
+            },
+          ),
           bottomNavigationBar: SafeArea(
             top: false,
             child: Material(
@@ -85,11 +98,7 @@ class _HomeShellState extends State<HomeShell> {
                 showSelectedLabels: true,
                 showUnselectedLabels: true,
                 landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
-                onTap: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
+                onTap: (index) => setState(() => _currentIndex = index),
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.dashboard_outlined),
@@ -110,6 +119,24 @@ class _HomeShellState extends State<HomeShell> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OfflineMessage extends StatelessWidget {
+  const _OfflineMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'انت غير نشط حاليا',
+        style: TextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+          color: Color(0xffbe2c2d),
         ),
       ),
     );

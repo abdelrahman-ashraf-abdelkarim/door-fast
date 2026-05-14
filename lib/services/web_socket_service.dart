@@ -33,10 +33,14 @@ class WebSocketService {
 
   Future<void> disconnect() async {
     _initialized = false;
+    final captainId = _captainId;
     _token = null;
     _captainId = null;
     try {
       await _pusher.unsubscribe(channelName: 'orders');
+      if (captainId != null) {
+        await _pusher.unsubscribe(channelName: 'delivery.$captainId');
+      }
       await _pusher.disconnect();
     } catch (_) {}
   }
@@ -48,6 +52,15 @@ class WebSocketService {
       await _pusher.init(
         apiKey: AppConstants.apiKey,
         cluster: AppConstants.cluster,
+
+        onEvent: (dynamic event) {
+          if (event is PusherEvent) {
+            print(
+              '🌐 Global: ${event.channelName} → ${event.eventName}: ${event.data}',
+            );
+            _handleEvent(event);
+          }
+        },
 
         onConnectionStateChange: (currentState, previousState) {
           print('🔌 Pusher: $previousState → $currentState');
@@ -76,6 +89,21 @@ class WebSocketService {
         },
       );
 
+      // ─── Channel الشيفت الخاص بالمندوب ────────────────────
+      if (_captainId != null) {
+        await _pusher.subscribe(
+          channelName: 'delivery.$_captainId',
+          onEvent: (dynamic event) {
+            if (event is PusherEvent) {
+              print(
+                '📨 delivery.$_captainId → ${event.eventName}: ${event.data}',
+              );
+              _handleEvent(event);
+            }
+          },
+        );
+      }
+
       await _pusher.connect();
       print('✅ Pusher connecting...');
     } catch (e) {
@@ -85,6 +113,11 @@ class WebSocketService {
   }
 
   void _handleEvent(PusherEvent event) {
+    print(
+      '🎯 ALL events: channel=${event.channelName} event=${event.eventName} data=${event.data}',
+    );
+    // باقي الكود
+    print('🎯 event received: ${event.eventName}');
     try {
       final raw = _decode(event.data);
 
@@ -94,7 +127,7 @@ class WebSocketService {
           final orderId =
               message['id']?.toString() ?? message['order_id']?.toString();
           if (orderId != null) {
-            _controller.add({'event': 'new_order', 'order': orderId});
+            _controller.add({'event': 'new_order', 'order_id': orderId});
           }
           break;
 
@@ -103,21 +136,31 @@ class WebSocketService {
           final orderId = (message['order_id'] ?? message['id'])?.toString();
           final status = message['status']?.toString();
           final deliveryId = message['delivery_id']?.toString();
-
           if (orderId != null) {
             _controller.add({
               'event': 'order_updated',
               'order_id': orderId,
               'status': status,
-              'delivery_id': deliveryId
+              'delivery_id': deliveryId,
             });
           }
           break;
 
-        case 'order.cancelled': // ← أضف الـ case ده
+        case 'order.cancelled':
           final orderId = raw['order_id']?.toString();
           if (orderId != null) {
             _controller.add({'event': 'order_cancelled', 'order_id': orderId});
+          }
+          break;
+
+        // ─── أحداث الشيفت ─────────────────────────────────
+        case 'shift.updated':
+          print('🔄 shift.updated received: $raw');
+          final status = raw['status']?.toString();
+          if (status == 'started') {
+            _controller.add({'event': 'shift_activated'});
+          } else if (status == 'ended') {
+            _controller.add({'event': 'shift_deactivated'});
           }
           break;
       }
