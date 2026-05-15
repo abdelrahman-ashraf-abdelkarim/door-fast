@@ -19,6 +19,28 @@ class WalletModel {
     required this.total,
   });
 
+  // ─── copyWith ─────────────────────────────────────────────────────────────
+  WalletModel copyWith({
+    double? currentBalance,
+    double? totalDebit,
+    double? totalCredit,
+    List<TransactionModel>? transactions,
+    int? currentPage,
+    int? lastPage,
+    int? total,
+  }) {
+    return WalletModel(
+      currentBalance: currentBalance ?? this.currentBalance,
+      totalDebit: totalDebit ?? this.totalDebit,
+      totalCredit: totalCredit ?? this.totalCredit,
+      transactions: transactions ?? this.transactions,
+      currentPage: currentPage ?? this.currentPage,
+      lastPage: lastPage ?? this.lastPage,
+      total: total ?? this.total,
+    );
+  }
+
+  // ─── fromJson ─────────────────────────────────────────────────────────────
   factory WalletModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
     final paginated = data['transactions'];

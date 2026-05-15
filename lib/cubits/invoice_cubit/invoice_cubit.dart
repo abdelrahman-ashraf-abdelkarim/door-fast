@@ -9,7 +9,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
   Future<void> downloadAndShare({
     required String url,
-    required String orderId,
+    required String orderNumber,
     required String token,
     required String customerPhone,
   }) async {
@@ -18,12 +18,12 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
       
       final file = await PdfService.getInvoicePdf(
-        orderId: orderId,
+        orderNumber: orderNumber,
         url: url,
         token: token
       );
 
-      final message = "فاتورة الطلب رقم $orderId";
+      final message = "فاتورة الطلب رقم $orderNumber";
 
       // Share the PDF file (user can choose WhatsApp, SMS, etc.)
       await SharePlus.instance.share(

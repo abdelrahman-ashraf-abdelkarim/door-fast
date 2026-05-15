@@ -21,7 +21,7 @@ class WebSocketService {
   String? _token;
   String? _captainId;
 
-  // ─── Public API ───────────────────────────────────────────────
+  // ─── Public API ───────────────────────────────────────────────────────────
 
   Future<void> connect(String token, String captainId) async {
     if (_initialized) return;
@@ -39,13 +39,14 @@ class WebSocketService {
     try {
       await _pusher.unsubscribe(channelName: 'orders');
       if (captainId != null) {
+        // delivery.$captainId يغطي أحداث الشيفت والمحفظة معاً
         await _pusher.unsubscribe(channelName: 'delivery.$captainId');
       }
       await _pusher.disconnect();
     } catch (_) {}
   }
 
-  // ─── Internal ─────────────────────────────────────────────────
+  // ─── Internal ─────────────────────────────────────────────────────────────
 
   Future<void> _init() async {
     try {
@@ -78,7 +79,7 @@ class WebSocketService {
         },
       );
 
-      // ─── Channel الأوردرات العام ───────────────────────────
+      // ─── Channel الأوردرات العام ──────────────────────────────────────────
       await _pusher.subscribe(
         channelName: 'orders',
         onEvent: (dynamic event) {
@@ -89,7 +90,8 @@ class WebSocketService {
         },
       );
 
-      // ─── Channel الشيفت الخاص بالمندوب ────────────────────
+      // ─── Channel الشيفت والمحفظة — نفس الـ channel ──────────────────────
+      // Backend يبرودكاست الاتنين على delivery.$captainId
       if (_captainId != null) {
         await _pusher.subscribe(
           channelName: 'delivery.$_captainId',
@@ -116,12 +118,11 @@ class WebSocketService {
     print(
       '🎯 ALL events: channel=${event.channelName} event=${event.eventName} data=${event.data}',
     );
-    // باقي الكود
-    print('🎯 event received: ${event.eventName}');
     try {
       final raw = _decode(event.data);
 
       switch (event.eventName) {
+        // ─── أحداث الأوردرات ──────────────────────────────────────────────
         case 'App\\Events\\NewOrderEvent':
           final message = raw['order'] ?? raw;
           final orderId =
@@ -153,7 +154,7 @@ class WebSocketService {
           }
           break;
 
-        // ─── أحداث الشيفت ─────────────────────────────────
+        // ─── أحداث الشيفت ─────────────────────────────────────────────────
         case 'shift.updated':
           print('🔄 shift.updated received: $raw');
           final status = raw['status']?.toString();
@@ -162,6 +163,26 @@ class WebSocketService {
           } else if (status == 'ended') {
             _controller.add({'event': 'shift_deactivated'});
           }
+          break;
+
+        // ─── أحداث المحفظة ────────────────────────────────────────────────
+        // broadcastAs() في Backend = 'wallet.updated'
+        // البيانات: { user_id, balance, amount, type, direction }
+        case 'wallet.updated':
+          final balance = raw['balance'];
+          final amount = raw['amount'];
+          final type = raw['type'];
+          final dir = raw['direction'];
+          print(
+            '💰 wallet.updated received — balance: $balance, amount: $amount, type: $type, direction: $dir',
+          );
+          _controller.add({
+            'event': 'wallet_updated',
+            'balance': balance?.toString(),
+            'amount': amount?.toString(),
+            'type': type?.toString(),
+            'direction': dir?.toString(),
+          });
           break;
       }
     } catch (e) {

@@ -1,7 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/format_date_for_account.dart';
-import 'package:captain_app/cubits/wallet_cubit/wallet_cubit.dart';
-import 'package:captain_app/cubits/wallet_cubit/wallet_state.dart';
+import 'package:captain_app/cubits/account_statement_cubit/account_statement_cubit.dart';
+import 'package:captain_app/cubits/account_statement_cubit/account_statement_state.dart';
 import 'package:captain_app/widgets/data_filter_card.dart';
 import 'package:captain_app/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +19,11 @@ class TransactionLogScreen extends StatelessWidget {
           title: const Text('سجل العمليات المالية'),
           centerTitle: true,
         ),
-        body: BlocBuilder<WalletCubit, WalletState>(
+        body: BlocBuilder<AccountStatementCubit, AccountStatementState>(
           builder: (context, state) {
             return CustomScrollView(
               slivers: [
-                // ─── فلتر التاريخ ──────────────────────────────
+                // ─── فلتر التاريخ ──────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -82,7 +82,9 @@ class TransactionLogScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             DateFilterCard(
                               onFilter: (from, to) {
-                                context.read<WalletCubit>().filterByDate(from, to);
+                                context
+                                    .read<AccountStatementCubit>()
+                                    .filterByDate(from, to);
                               },
                             ),
                           ],
@@ -92,21 +94,17 @@ class TransactionLogScreen extends StatelessWidget {
                   ),
                 ),
 
-                // ─── Loading ────────────────────────────────────
-                if (state is WalletLoading)
+                // ─── Loading ───────────────────────────────────────────────
+                if (state is AccountStatementLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
                   )
-
-                // ─── Error ──────────────────────────────────────
-                else if (state is WalletError)
-                  SliverFillRemaining(
-                    child: Center(child: Text(state.message)),
-                  )
-
-                // ─── قايمة العمليات ─────────────────────────────
-                else if (state is WalletLoaded) ...[
-                  if (state.filteredTransactions.isEmpty)
+                // ─── Error ─────────────────────────────────────────────────
+                else if (state is AccountStatementError)
+                  SliverFillRemaining(child: Center(child: Text(state.message)))
+                // ─── قائمة العمليات ────────────────────────────────────────
+                else if (state is AccountStatementLoaded) ...[
+                  if (state.displayedTransactions.isEmpty)
                     const SliverFillRemaining(
                       child: Center(
                         child: Text(
@@ -117,20 +115,17 @@ class TransactionLogScreen extends StatelessWidget {
                     )
                   else
                     SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final item = state.filteredTransactions[index];
-                          return TransactionCard(
-                            id: item.id,
-                            date: formatDate(item.createdAt),
-                            note: item.description,
-                            debit: item.debit,
-                            credit: item.credit,
-                            balance: item.balance,
-                          );
-                        },
-                        childCount: state.filteredTransactions.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final item = state.displayedTransactions[index];
+                        return TransactionCard(
+                          logId: item.logId,
+                          date: formatDate(item.createdAt),
+                          note: item.description,
+                          debit: item.debit,
+                          credit: item.credit,
+                          balance: item.balance,
+                        );
+                      }, childCount: state.displayedTransactions.length),
                     ),
                 ],
               ],

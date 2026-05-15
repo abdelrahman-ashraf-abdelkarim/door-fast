@@ -169,9 +169,8 @@ class OrderDetailsScreen extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           context.read<InvoiceCubit>().downloadAndShare(
-                            // url: "https://yourapi.com/invoice/${order.id}",
                             url: AppConstants.invoiceUrl(order.id),
-                            orderId: order.id,
+                            orderNumber: order.orderNumber,
                             customerPhone: order.receiverPhoneOne,
                             token: token,
                           );

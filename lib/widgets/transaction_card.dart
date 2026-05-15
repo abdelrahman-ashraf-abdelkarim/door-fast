@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class TransactionCard extends StatelessWidget {
-  final int id;
+  // final int id;
+  final int logId;
   final String date;
   final String note;
   final double? debit;
@@ -10,12 +11,12 @@ class TransactionCard extends StatelessWidget {
 
   const TransactionCard({
     super.key,
-    required this.id,
+    // required this.id,
     required this.date,
     required this.note,
     this.debit,
     this.credit,
-    required this.balance,
+    required this.balance, required this.logId,
   });
 
   @override
@@ -42,7 +43,7 @@ class TransactionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "#$id",
+                "$logId",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

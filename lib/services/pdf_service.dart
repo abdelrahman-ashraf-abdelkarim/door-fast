@@ -5,11 +5,15 @@ import 'package:path_provider/path_provider.dart';
 class PdfService {
   /// 📥 Main entry point
   static Future<File> getInvoicePdf({
-    required String orderId,
+    required String orderNumber,
     required String url,
     required String token,
   }) async {
-    return _downloadInvoicePdf(url: url, orderId: orderId, token: token);
+    return _downloadInvoicePdf(
+      url: url,
+      orderNumber: orderNumber,
+      token: token,
+    );
   }
 
   // ==========================
@@ -17,7 +21,7 @@ class PdfService {
   // ==========================
   static Future<File> _downloadInvoicePdf({
     required String url,
-    required String orderId,
+    required String orderNumber,
     required String token,
   }) async {
     final dir = await getApplicationDocumentsDirectory();
@@ -27,7 +31,8 @@ class PdfService {
       await invoicesDir.create(recursive: true);
     }
 
-    final filePath = "${invoicesDir.path}/invoice_$orderId.pdf";
+    // final filePath = "${invoicesDir.path}/invoice_$orderId.pdf";
+    final filePath = "${invoicesDir.path}/$orderNumber.pdf";
     final file = File(filePath);
 
     // ✅ cache
@@ -37,8 +42,9 @@ class PdfService {
       url,
       options: Options(
         responseType: ResponseType.bytes,
-        headers: {'Accept': 'application/pdf',
-        'Authorization': 'Bearer $token'
+        headers: {
+          'Accept': 'application/pdf',
+          'Authorization': 'Bearer $token',
         },
       ),
     );

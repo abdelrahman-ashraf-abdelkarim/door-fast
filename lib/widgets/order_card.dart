@@ -25,6 +25,10 @@ class OrderCard extends StatelessWidget {
         order.status == OrderStatus.waiting;
   }
 
+  bool get _isDeliveredOrder {
+    return order.status == OrderStatus.delivered;
+  }
+
   void _handleTap(BuildContext context) {
     if (_isPendingOrder) {
       showConfirmationDialog(
@@ -32,7 +36,10 @@ class OrderCard extends StatelessWidget {
         title: 'تأكيد القبول',
         message: 'هل أنت متأكد من قبول هذا الطلب؟',
         onConfirm: (_) {
-          context.read<OrdersCubit>().acceptOrder(order.id, token);// إغلاق الديالوج
+          context.read<OrdersCubit>().acceptOrder(
+            order.id,
+            token,
+          ); // إغلاق الديالوج
         },
         colorContainer: AppColors.buttonOrderDialog,
         buttonText: 'تأكيد القبول',
@@ -70,23 +77,24 @@ class OrderCard extends StatelessWidget {
                       color: AppColors.pickupMarkerOrange,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      // color: Colors.tealAccent[100],
-                    ),
-                    child: OrderTimerWidget(
-                      order: order,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: AppColors.textSecondary,
+                  if (!_isDeliveredOrder)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        // color: Colors.tealAccent[100],
+                      ),
+                      child: OrderTimerWidget(
+                        order: order,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
 
