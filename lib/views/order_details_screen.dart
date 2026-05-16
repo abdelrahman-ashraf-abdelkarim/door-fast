@@ -1,8 +1,11 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/show_confirmation_dialog.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/invoice_cubit/invoice_cubit.dart';
 import 'package:captain_app/cubits/invoice_cubit/invoice_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
+import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/contact_card.dart';
 import 'package:captain_app/widgets/container_button_widget.dart';
@@ -19,6 +22,14 @@ class OrderDetailsScreen extends StatelessWidget {
     required this.order,
     required this.token,
   });
+
+  String _invoiceUrl(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    final role = authState is AuthAuthenticated
+        ? authState.user.role
+        : DeliveryType.delivery;
+    return AppConstants.invoiceUrl(order.id, role);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +180,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           context.read<InvoiceCubit>().downloadAndShare(
-                            url: AppConstants.invoiceUrl(order.id),
+                            url: _invoiceUrl(context),
                             orderNumber: order.orderNumber,
                             customerPhone: order.receiverPhoneOne,
                             token: token,

@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:captain_app/api/api.dart';
-import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_state.dart';
 import 'package:captain_app/models/dashboard_model.dart';
 import 'package:captain_app/services/web_socket_service.dart';
@@ -22,7 +20,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
       final data = await _api.get(
-        url: '${AppConstants.baseUrl}/dashboard',
+        url: '${_api.baseUrl}/dashboard',
         token: token,
       );
       emit(
@@ -50,7 +48,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     if (_token == null) return;
     try {
       final data = await _api.get(
-        url: '${AppConstants.baseUrl}/dashboard',
+        url: '${_api.baseUrl}/dashboard',
         token: _token!,
       );
       emit(state.copyWith(data: DashboardData.fromJson(data)));

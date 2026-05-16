@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
@@ -29,6 +31,7 @@ class _HomeShellState extends State<HomeShell> {
     AccountStatementScreen(),
   ];
 
+  StreamSubscription? _wsSubscription;
   @override
   void initState() {
     super.initState();
@@ -39,23 +42,30 @@ class _HomeShellState extends State<HomeShell> {
 
     final token = authState.token;
     final captainId = authState.user.id;
+    final role = authState.user.role;
 
     print('🔑 Token: $token');
     print('👤 CaptainId: $captainId');
+    print('🎭 Role: $role');
 
-    context.read<OrdersCubit>().loadOrders(token, captainId);
+    context.read<OrdersCubit>().loadOrders(token, captainId, role: role);
     context.read<DashboardCubit>().loadDashboard(token);
-
-    context.read<OrdersCubit>().wsStream.listen((data) {
+    final shiftCubit = context.read<ShiftCubit>();
+    _wsSubscription = context.read<OrdersCubit>().wsStream.listen((data) async {
+      if (!mounted) return;
       print('📡 HomeShell stream: $data');
       final event = data['event'];
-      final shiftCubit = context.read<ShiftCubit>();
       if (event == 'shift_activated') {
         shiftCubit.onShiftActivated();
       } else if (event == 'shift_deactivated') {
         shiftCubit.onShiftDeactivated();
       }
     });
+  }
+
+  void dispose() {
+    _wsSubscription?.cancel(); // ✅ cancel عند الإغلاق
+    super.dispose();
   }
 
   @override

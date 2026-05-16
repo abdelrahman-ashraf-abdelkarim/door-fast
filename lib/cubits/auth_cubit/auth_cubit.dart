@@ -7,10 +7,10 @@ class AuthCubit extends HydratedCubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
   /// تسجيل الدخول (بيانات تجريبية)
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username, String password, DeliveryType role) async {
     emit(AuthLoading());
     try {
-      final response = await authapi.login(username, password);
+      final response = await authapi.login(username, password, role);
       // احفظ التوكن
 
       if (response.user.status != CaptainStatus.active) {

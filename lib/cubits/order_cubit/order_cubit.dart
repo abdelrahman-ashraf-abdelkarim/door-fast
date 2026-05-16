@@ -1,9 +1,9 @@
-// lib/cubits/order_cubit/order_cubit.dart
 import 'dart:async';
 
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
+import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/orders_service.dart';
@@ -20,6 +20,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   String? _token;
   String? _captainId;
   bool _wsConnected = false;
+  DeliveryType _role = DeliveryType.delivery;
 
   OrdersCubit({
     OrdersService? ordersService,
@@ -31,11 +32,19 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
 
+  bool get _isReserve => _role == DeliveryType.reserve;
+
   // ─── Load ─────────────────────────────────────────────────────
 
-  Future<void> loadOrders(String token, String captainId) async {
+  Future<void> loadOrders(
+    String token,
+    String captainId, {
+    DeliveryType role = DeliveryType.delivery,
+  }) async {
     _token = token;
     _captainId = captainId;
+    _role = role;
+
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
       final results = await Future.wait([
@@ -55,11 +64,11 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
-  // ─── Pusher ───────────────────────────────────────────────────
+  // ─── WebSocket ────────────────────────────────────────────────
 
   Future<void> _connectWebSocket(String token, String captainId) async {
     await _wsService.connect(token, captainId);
-    
+
     await _wsSubscription?.cancel();
     _wsSubscription = _wsService.stream.listen((data) {
       print('📨 cubit received: $data');
@@ -67,25 +76,26 @@ class OrdersCubit extends Cubit<OrdersState> {
 
       if (event == 'shift_activated') {
         shiftCubit.onShiftActivated();
-        print("✅ Status shift: shift_activated");
         return;
       }
       if (event == 'shift_deactivated') {
         shiftCubit.onShiftDeactivated();
-        print("❌ Status shift: shift_activated");
         return;
       }
+
       final rawId = data['order_id'];
-
       if (rawId == null) return;
-
       final orderId = rawId.toString();
 
-      if (event == 'new_order') {
+      if (event == 'reserve_new_order') {
+        // ✅ event خاص بالاحتياطي بعد انتهاء وقت التأخير
+        if (!_isReserve) return;
         _fetchAndAddNewOrder(orderId);
       } else if (event == 'order_updated') {
+        if (_isReserve) return;
         final status = data['status']?.toString();
         final deliveryId = data['delivery_id']?.toString();
+
         if (status == 'cancelled' ||
             (status == 'received' && deliveryId != _captainId)) {
           _removeOrder(orderId);
@@ -98,21 +108,25 @@ class OrdersCubit extends Cubit<OrdersState> {
     });
   }
 
-  void _removeOrder(String orderId) {
-    final updatedList = state.orders.where((o) => o.id != orderId).toList();
-    emit(state.copyWith(orders: updatedList));
-  }
-
-  Stream<Map<String, dynamic>> get wsStream => _wsService.stream;
+  // ─── Fetch Helpers ────────────────────────────────────────────
 
   Future<void> _fetchAndAddNewOrder(String orderId) async {
     if (_token == null) return;
     try {
-      if (state.orders.any((o) => o.id == orderId)) return;
+      print('🔍 fetching order: $orderId');
+      if (state.orders.any((o) => o.id == orderId)) {
+        print('⚠️ order already exists: $orderId');
+        return;
+      }
       final newOrder = await _ordersService.fetchOrderById(orderId, _token!);
       emit(state.copyWith(orders: [newOrder, ...state.orders]));
-      NotificationService.showNotification(title: 'طلب جديد ', body: "");
-    } catch (_) {}
+      NotificationService.showNotification(
+        title: 'طلب جديد',
+        body: 'رقم الطلب: ${newOrder.orderNumber}',
+      );
+    } catch (e) {
+      print('❌ _fetchAndAddNewOrder error: $e');
+    }
   }
 
   Future<void> _fetchAndUpdateOrder(String orderId) async {
@@ -124,7 +138,7 @@ class OrdersCubit extends Cubit<OrdersState> {
       if (!exists) {
         emit(state.copyWith(orders: [updated, ...state.orders]));
         NotificationService.showNotification(
-          title: 'طلب جديد ',
+          title: 'طلب جديد',
           body: 'رقم الطلب: ${updated.orderNumber}',
         );
       } else {
@@ -139,6 +153,13 @@ class OrdersCubit extends Cubit<OrdersState> {
       print('❌ _fetchAndUpdateOrder error: $e');
     }
   }
+
+  void _removeOrder(String orderId) {
+    final updatedList = state.orders.where((o) => o.id != orderId).toList();
+    emit(state.copyWith(orders: updatedList));
+  }
+
+  Stream<Map<String, dynamic>> get wsStream => _wsService.stream;
 
   // ─── Actions ──────────────────────────────────────────────────
 
@@ -163,7 +184,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> cancelOrder(String orderId, String reason, String token) async {
     try {
       await _ordersService.cancelOrder(orderId, reason, token);
-      await loadOrders(_token!, _captainId!);
+      await loadOrders(_token!, _captainId!, role: _role);
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }
@@ -172,7 +193,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> completeOrder(String orderId, String token) async {
     try {
       await _ordersService.completeOrder(orderId, token);
-      await loadOrders(_token!, _captainId!);
+      await loadOrders(_token!, _captainId!, role: _role);
     } catch (error) {
       emit(state.copyWith(errorMessage: error.toString()));
     }

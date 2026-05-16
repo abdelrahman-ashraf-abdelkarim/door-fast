@@ -24,26 +24,30 @@ class StatCard extends StatelessWidget {
         color: Colors.white,
         // gradient: LinearGradient(colors: [Color(0XFFFAF7FF), Colors.white]),
         borderRadius: BorderRadius.circular(16),
-        border: Border(right: BorderSide(color: color ?? Colors.white, width: 4))
+        border: Border(
+          right: BorderSide(color: color ?? Colors.white, width: 4),
+        ),
       ),
 
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (icon != null) Icon(icon, color: color, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w700,
+          Flexible(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (icon != null) Icon(icon, color: color, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           valueWidget ??
               Text(

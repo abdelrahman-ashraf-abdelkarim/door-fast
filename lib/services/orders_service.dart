@@ -1,9 +1,5 @@
-import 'dart:convert';
-
-import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/models/order_model.dart';
-import 'package:flutter/services.dart';
 
 class OrderAlreadyAcceptedException implements Exception {
   const OrderAlreadyAcceptedException(this.orderId);
@@ -23,19 +19,12 @@ class OrdersService {
   final Api _api;
   OrdersService({required Api api}) : _api = api;
 
-  // fake orders for testing
-  Future<Map<String, dynamic>> getOrders() async {
-    final response = await rootBundle.loadString('assets/json/orders.json');
-
-    return jsonDecode(response);
-  }
-
   // جلب الطلبات الجديدة
   Future<List<Order>> fetchOrders(String token) async {
-    print('📡 Calling: ${AppConstants.baseUrl}/orders/new');
+    print('📡 Calling: ${_api.baseUrl}/orders/new');
     try {
       final data = await _api.get(
-        url: '${AppConstants.baseUrl}/orders/new',
+        url: '${_api.baseUrl}/orders/new',
         token: token,
       );
       print('✅ Response: $data');
@@ -51,7 +40,7 @@ class OrdersService {
   // قبول طلب
   Future<void> acceptOrder(String orderId, String token) async {
     await _api.post(
-      url: '${AppConstants.baseUrl}/orders/$orderId/accept',
+      url: '${_api.baseUrl}/orders/$orderId/accept',
       body: {},
       token: token,
     );
@@ -60,7 +49,7 @@ class OrdersService {
   Future<Order> fetchOrderById(String orderId, String token) async {
     try {
       final data = await _api.get(
-        url: '${AppConstants.baseUrl}/orders/$orderId',
+        url: '${_api.baseUrl}/orders/$orderId',
         token: token,
       );
       print('📦 fetchOrderById response: $data');
@@ -82,7 +71,7 @@ class OrdersService {
 
   Future<List<Order>> fetchReceivedOrders(String token) async {
     final data = await _api.get(
-      url: '${AppConstants.baseUrl}/orders/received',
+      url: '${_api.baseUrl}/orders/received',
       token: token,
     );
     return (data['orders'] as List)
@@ -92,7 +81,7 @@ class OrdersService {
 
   Future<List<Order>> fetchDeliveredOrders(String token) async {
     final data = await _api.get(
-      url: '${AppConstants.baseUrl}/orders/delivered',
+      url: '${_api.baseUrl}/orders/delivered',
       token: token,
     );
     return (data['orders'] as List)
@@ -103,7 +92,7 @@ class OrdersService {
   // تسليم طلب
   Future<void> completeOrder(String orderId, String token) async {
     await _api.post(
-      url: '${AppConstants.baseUrl}/orders/$orderId/deliver',
+      url: '${_api.baseUrl}/orders/$orderId/deliver',
       body: {},
       token: token,
     );
@@ -112,7 +101,7 @@ class OrdersService {
   // إلغاء طلب
   Future<void> cancelOrder(String orderId, String reason, String token) async {
     await _api.post(
-      url: '${AppConstants.baseUrl}/orders/$orderId/cancel',
+      url: '${_api.baseUrl}/orders/$orderId/cancel',
       body: {'reason': reason},
       token: token,
     );

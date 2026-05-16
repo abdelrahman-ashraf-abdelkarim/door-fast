@@ -1,17 +1,32 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class Api {
   late final Dio _dio;
+  final AuthCubit _authCubit;
 
-  Api(AuthCubit authCubit) {
+  Api(AuthCubit authCubit) : _authCubit = authCubit {
     _dio = Dio();
     _dio.interceptors.add(TokenInterceptor(authCubit));
   }
 
-  // ─── GET ────────────────────────────────────────────────────────────────────
+  // ─── ✅ baseUrl ديناميكي بناءً على نوع المندوب المسجّل ───────────────────
+  String get baseUrl {
+    final state = _authCubit.state;
+    if (state is AuthAuthenticated) {
+      return AppConstants.getBaseUrl(state.user.role);
+    }
+    // Fallback للـ delivery لو مفيش حد مسجّل دخول
+    return AppConstants.deliveryBaseUrl;
+  }
+
+  /// رابط الفاتورة (مشتق من baseUrl الديناميكي)
+  String invoiceUrl(String orderId) => '$baseUrl/orders/$orderId/invoice';
+
+  // ─── GET ─────────────────────────────────────────────────────────────────
   Future<dynamic> get({required String url, @required String? token}) async {
     try {
       final response = await _dio.get(
@@ -24,7 +39,7 @@ class Api {
     }
   }
 
-  // ─── POST ───────────────────────────────────────────────────────────────────
+  // ─── POST ────────────────────────────────────────────────────────────────
   Future<dynamic> post({
     required String url,
     @required dynamic body,
@@ -42,7 +57,7 @@ class Api {
     }
   }
 
-  // ─── PUT ────────────────────────────────────────────────────────────────────
+  // ─── PUT ─────────────────────────────────────────────────────────────────
   Future<dynamic> put({
     required String url,
     @required dynamic body,
@@ -88,7 +103,6 @@ class TokenInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // أضف التوكن الحالي تلقائياً في كل request
     final state = authCubit.state;
     if (state is AuthAuthenticated) {
       options.headers['Authorization'] = 'Bearer ${state.token}';
@@ -98,14 +112,11 @@ class TokenInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    // لو السيرفر بعت توكن جديد في الـ header → حدّثه تلقائياً
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // ✅ لو السيرفر رجّع 401 → التوكن انتهى صلاحيته أو اتحذف
-    // → اعمل logout تلقائي وودّي المستخدم لشاشة Login
     if (err.response?.statusCode == 401) {
       authCubit.logout();
     }

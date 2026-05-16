@@ -1,5 +1,7 @@
 enum CaptainStatus { active, nonActive }
 
+enum DeliveryType { delivery, reserve }
+
 class AuthModel {
   final String id;
   final String name;
@@ -7,6 +9,7 @@ class AuthModel {
   final String phone;
   final CaptainStatus status;
   final DateTime? loginAt;
+  final DeliveryType role;
 
   const AuthModel({
     required this.id,
@@ -15,6 +18,7 @@ class AuthModel {
     required this.phone,
     required this.status,
     this.loginAt,
+    this.role = DeliveryType.delivery,
   });
 
   AuthModel copyWith({
@@ -24,6 +28,7 @@ class AuthModel {
     String? phone,
     CaptainStatus? status,
     DateTime? loginAt,
+    DeliveryType? role,
   }) {
     return AuthModel(
       id: id ?? this.id,
@@ -32,6 +37,7 @@ class AuthModel {
       phone: phone ?? this.phone,
       status: status ?? this.status,
       loginAt: loginAt ?? this.loginAt,
+      role: role ?? this.role,
     );
   }
 
@@ -49,6 +55,9 @@ class AuthModel {
       loginAt: user['login_at'] != null
           ? DateTime.tryParse(user['login_at'])
           : null,
+      role: (user['role'] as String?) == 'reserve'
+          ? DeliveryType.reserve
+          : DeliveryType.delivery,
     );
   }
   Map<String, dynamic> toJson() {
@@ -59,6 +68,7 @@ class AuthModel {
       'phone': phone,
       'status': status.name,
       'login_at': loginAt?.toIso8601String(),
+      'role': role == DeliveryType.reserve ? 'reserve' : 'delivery',
     };
   }
 }
@@ -74,7 +84,10 @@ class AuthResponse {
     required this.user,
   });
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
+  factory AuthResponse.fromJson(
+    Map<String, dynamic> json, {
+    DeliveryType role = DeliveryType.delivery,
+  }) {
     return AuthResponse(
       success: json['success'],
       token: json['token'],
@@ -89,6 +102,7 @@ class AuthResponse {
         loginAt: json['user']['login_at'] != null
             ? DateTime.tryParse(json['user']['login_at'])
             : null,
+        role: role,
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  // ✅ نوع المندوب — افتراضي: أساسي
+  DeliveryType _selectedRole = DeliveryType.delivery;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -27,9 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
+      // ✅ نمرر الـ role للـ AuthCubit
       context.read<AuthCubit>().login(
         _nameController.text.trim(),
         _passwordController.text.trim(),
+        _selectedRole,
       );
     }
   }
@@ -64,19 +70,19 @@ class _LoginScreenState extends State<LoginScreen> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  // padding: EdgeInsets.only(bottom: keyboardInset),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
                     ),
                     child: Column(
                       children: [
+                        // ─── Header / Logo ─────────────────────────────
                         Container(
                           width: double.infinity,
                           height: screenHeight / 2.8,
                           decoration: BoxDecoration(
-                            color: Color(0xffF9C724),
-                            borderRadius: BorderRadius.only(
+                            color: const Color(0xffF9C724),
+                            borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(45),
                               bottomRight: Radius.circular(45),
                             ),
@@ -94,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+
                         Padding(
                           padding: const EdgeInsets.all(24),
                           child: Form(
@@ -116,10 +123,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: AppColors.textSecondary,
-                                    // fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 40),
+
+                                const SizedBox(height: 28),
+
+                                // ✅ ─── اختيار نوع المندوب ─────────────
+                                _RoleSelector(
+                                  selected: _selectedRole,
+                                  onChanged: (role) =>
+                                      setState(() => _selectedRole = role),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // ─── اسم المستخدم ───────────────────────
                                 TextFormField(
                                   controller: _nameController,
                                   decoration: InputDecoration(
@@ -131,9 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     prefixIcon: const Icon(Icons.person),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: Colors.grey,
-                                      ),
+                                      borderSide:
+                                          const BorderSide(color: Colors.grey),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -149,7 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return null;
                                   },
                                 ),
+
                                 const SizedBox(height: 16),
+
+                                // ─── كلمة المرور ────────────────────────
                                 TextFormField(
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
@@ -164,11 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                             : Icons.visibility,
                                         color: Colors.grey,
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscurePassword = !_obscurePassword;
-                                        });
-                                      },
+                                      onPressed: () => setState(
+                                        () => _obscurePassword =
+                                            !_obscurePassword,
+                                      ),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -190,11 +209,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return null;
                                   },
                                 ),
+
                                 const SizedBox(height: 24),
+
+                                // ─── زر تسجيل الدخول ────────────────────
                                 BlocBuilder<AuthCubit, AuthState>(
                                   builder: (context, state) {
                                     final isLoading = state is AuthLoading;
-
                                     return GestureDetector(
                                       onTap: isLoading ? null : _login,
                                       child: Container(
@@ -202,9 +223,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         height: 50,
                                         decoration: BoxDecoration(
                                           color: const Color(0xffBA282E),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         alignment: Alignment.center,
                                         child: isLoading
@@ -232,6 +252,80 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Widget: اختيار نوع المندوب ─────────────────────────────────────────────
+class _RoleSelector extends StatelessWidget {
+  const _RoleSelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final DeliveryType selected;
+  final ValueChanged<DeliveryType> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFEEEEEE),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          _Tab(
+            label: '🚴 مندوب أساسي',
+            isSelected: selected == DeliveryType.delivery,
+            onTap: () => onChanged(DeliveryType.delivery),
+          ),
+          _Tab(
+            label: '🔄 مندوب احتياطي',
+            isSelected: selected == DeliveryType.reserve,
+            onTap: () => onChanged(DeliveryType.reserve),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tab extends StatelessWidget {
+  const _Tab({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xffBA282E) : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.white : AppColors.textSecondary,
             ),
           ),
         ),

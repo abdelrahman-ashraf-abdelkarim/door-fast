@@ -1,12 +1,15 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/format_arabic_date_for_dashboard.dart';
 import 'package:captain_app/core/time_now.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_state.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/dashboard_model.dart';
+import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/widgets/app_bar.dart';
 import 'package:captain_app/widgets/stat_card.dart';
 import 'package:captain_app/widgets/work_time_widget.dart';
@@ -21,15 +24,33 @@ class DashboardScreen extends StatelessWidget {
     return BlocBuilder<ShiftCubit, ShiftState>(
       builder: (context, shiftState) {
         final isOnline = shiftState.user?.status == CaptainStatus.active;
+        // ✅ نجيب الـ role من الـ AuthCubit
+        final authState = context.read<AuthCubit>().state;
+        final role = authState is AuthAuthenticated
+            ? authState.user.role
+            : DeliveryType.delivery;
 
         return Scaffold(
           appBar: AppBar(
             title: AppBarWidget(
               isOnline: isOnline,
               userName: shiftState.user?.name ?? 'كابتن',
+              role: role,
             ),
             scrolledUnderElevation: 0,
             backgroundColor: AppColors.screenBackground,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
           ),
           body: BlocBuilder<DashboardCubit, DashboardState>(
             builder: (context, dashState) {
@@ -86,14 +107,23 @@ class _DashboardContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'احصائياتي اليوم',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'احصائياتي اليوم',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           _DeliveryEarningsCard(feesToday: data.feesToday),

@@ -1,5 +1,4 @@
 import 'package:captain_app/api/api.dart';
-import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/wallet_model.dart';
 
 class WalletService {
@@ -19,7 +18,7 @@ class WalletService {
     };
 
     final uri = Uri.parse(
-      '${AppConstants.baseUrl}/wallet/statement',
+      '${_api.baseUrl}/wallet/statement',
     ).replace(queryParameters: queryParams);
 
     final data = await _api.get(url: uri.toString(), token: token);

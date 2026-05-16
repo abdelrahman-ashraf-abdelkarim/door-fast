@@ -146,6 +146,14 @@ class WebSocketService {
             });
           }
           break;
+          case 'reserve_new_order':
+          final message = raw['order'] ?? raw;
+          final orderId =
+              message['id']?.toString() ?? message['order_id']?.toString();
+          if (orderId != null) {
+            _controller.add({'event': 'reserve_new_order', 'order_id': orderId});
+          }
+          break;
 
         case 'order.cancelled':
           final orderId = raw['order_id']?.toString();

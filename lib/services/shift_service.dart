@@ -1,5 +1,4 @@
 import 'package:captain_app/api/api.dart';
-import 'package:captain_app/core/constants.dart';
 
 class ShiftTimesResult {
   final bool hasActiveShift;
@@ -15,7 +14,7 @@ class ShiftService {
 
   Future<ShiftTimesResult> fetchShiftTimes(String token) async {
     final data = await _api.get(
-      url: '${AppConstants.baseUrl}/shift/times',
+      url: '${_api.baseUrl}/shift/times',
       token: token,
     );
 

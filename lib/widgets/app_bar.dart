@@ -1,3 +1,4 @@
+import 'package:captain_app/models/auth_model.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -6,52 +7,43 @@ class AppBarWidget extends StatelessWidget {
     super.key,
     required this.isOnline,
     required this.userName,
+    required this.role,
   });
 
   final bool isOnline;
   final String userName;
+  final DeliveryType role;
   @override
   Widget build(BuildContext context) {
+    final isReserve = role == DeliveryType.reserve;
     return Row(
       children: [
-        Column(
+        Row(
           children: [
             Text(
               userName,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            isOnline
-                ? Row(
-                    children: [
-                      Text(
-                        "متصل الآن",
-                        style: TextStyle(color: Colors.green, fontSize: 16),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.circle, color: Colors.green, size: 14),
-                    ],
+            const SizedBox(width: 6),
+            Icon(Icons.circle, color: Colors.green, size: 10),
+            const SizedBox(width: 6),
+            isReserve
+                ? Text(
+                    "إحتياطي",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   )
-                : Row(
-                    children: [
-                      Text(
-                        "غير متصل",
-                        style: TextStyle(color: Colors.red, fontSize: 16),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.circle, color: Colors.red, size: 14),
-                    ],
+                : Text(
+                    "اساسي",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
           ],
         ),
         const Spacer(),
-        Text(
-          "DoorFast",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontFamily: "Roboto",
-            fontSize: 24,
-            color: Color(0xffec6623),
-          ),
+        Image.asset(
+          "assets/images/DF_logo_for_dash.png",
+          height: 70,
+          width: 140,
+          fit: BoxFit.contain,
         ),
       ],
     );

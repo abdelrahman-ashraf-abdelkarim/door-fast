@@ -1,3 +1,4 @@
+import 'package:captain_app/models/auth_model.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -45,11 +46,16 @@ class AppConstants {
     Color(0xFFFF5252),
   ];
 
+  static const String deliveryBaseUrl = "http://192.168.1.14:8000/api/delivery";
+  static const String reserveBaseUrl = "http://192.168.1.14:8000/api/reserve";
 
-  
-  static const String baseUrl = "http://192.168.1.14:8000/api/delivery";
-  static String invoiceUrl(String orderId) => "$baseUrl/orders/$orderId/invoice";
-  
+  static String getBaseUrl(DeliveryType role) {
+    return role == DeliveryType.reserve ? reserveBaseUrl : deliveryBaseUrl;
+  }
+
+  static String invoiceUrl(String orderId, DeliveryType role) =>
+      "${getBaseUrl(role)}/orders/$orderId/invoice";
+
   static const String reverbAppKey = '8cbbd9cb36e28664def7'; // نفس الـ .env
   static const String wsUrl = 'ws://192.168.1.14:8000';
   static const String apiKey = '8cbbd9cb36e28664def7';

@@ -143,7 +143,7 @@ class AccountStatementCubit extends Cubit<AccountStatementState> {
     if (from == null && to == null) return transactions;
 
     return transactions.where((t) {
-      final d = t.createdAt;
+      final d = t.createdAt.toUtc().add(const Duration(hours: 3));
       final dateOnly = DateTime.utc(d.year, d.month, d.day);
 
       final fromOnly = from != null
