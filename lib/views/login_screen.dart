@@ -109,12 +109,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const SizedBox(height: 32),
-                                const Text(
-                                  'اهلاً بك مجدداً ايها الكابتن!',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w700,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: const Text(
+                                    'اهلاً بك مجدداً ايها الكابتن!',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -149,8 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     prefixIcon: const Icon(Icons.person),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide:
-                                          const BorderSide(color: Colors.grey),
+                                      borderSide: const BorderSide(
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -220,11 +224,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                       onTap: isLoading ? null : _login,
                                       child: Container(
                                         width: double.infinity,
-                                        height: 50,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xffBA282E),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                         alignment: Alignment.center,
                                         child: isLoading
@@ -262,10 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 // ─── Widget: اختيار نوع المندوب ─────────────────────────────────────────────
 class _RoleSelector extends StatelessWidget {
-  const _RoleSelector({
-    required this.selected,
-    required this.onChanged,
-  });
+  const _RoleSelector({required this.selected, required this.onChanged});
 
   final DeliveryType selected;
   final ValueChanged<DeliveryType> onChanged;
@@ -322,6 +326,8 @@ class _Tab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,

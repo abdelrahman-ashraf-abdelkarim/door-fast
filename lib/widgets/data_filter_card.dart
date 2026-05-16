@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DateFilterCard extends StatefulWidget {
-  const DateFilterCard({
-    super.key,
-    this.onFilter,
-  });
+  const DateFilterCard({super.key, this.onFilter});
 
   final void Function(DateTime? from, DateTime? to)? onFilter;
 
@@ -130,6 +127,7 @@ class _DateFilterCardState extends State<DateFilterCard> {
           const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
           Text(
             text,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ],

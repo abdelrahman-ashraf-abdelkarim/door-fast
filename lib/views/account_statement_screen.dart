@@ -125,12 +125,15 @@ class _AccountStatementView extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "سجل العمليات",
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
+                          Flexible(
+                            child: const Text(
+                              "سجل العمليات",
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                           TextButton(
@@ -150,7 +153,7 @@ class _AccountStatementView extends StatelessWidget {
                               "عرض الكل",
                               style: TextStyle(
                                 color: AppColors.accentOrange,
-                                fontSize: 24,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

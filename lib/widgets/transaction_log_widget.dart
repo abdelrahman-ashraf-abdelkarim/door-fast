@@ -38,8 +38,8 @@ class TransactionLogWidget extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundColor: backgroundIconColor,
-              radius: 32,
-              child: FaIcon(icon, color: foregroundIconColor, size: 32),
+              radius: 24,
+              child: FaIcon(icon, color: foregroundIconColor, size: 22),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -81,9 +81,11 @@ class TransactionLogWidget extends StatelessWidget {
             ),
             Text(
               price,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isEntry ? AppColors.primaryTeal : AppColors.accentOrange,
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             ),

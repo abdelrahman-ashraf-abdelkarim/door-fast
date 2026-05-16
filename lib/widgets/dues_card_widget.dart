@@ -43,15 +43,21 @@ class DuesCardWidget extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 title,
-                style: TextStyle(fontSize: 18, color: AppColors.textSecondary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 8),
-              Text(
-                "$text ج.م",
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.normal,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  "$text ج.م",
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
             ],

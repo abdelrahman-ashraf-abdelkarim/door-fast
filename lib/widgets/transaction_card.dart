@@ -16,7 +16,8 @@ class TransactionCard extends StatelessWidget {
     required this.note,
     this.debit,
     this.credit,
-    required this.balance, required this.logId,
+    required this.balance,
+    required this.logId,
   });
 
   @override
@@ -49,9 +50,14 @@ class TransactionCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
-                date,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              Flexible(
+                child: Text(
+                  date,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                ),
               ),
             ],
           ),
@@ -61,6 +67,8 @@ class TransactionCard extends StatelessWidget {
           /// 🔸 Note
           Text(
             note,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
 
@@ -94,12 +102,15 @@ class TransactionCard extends StatelessWidget {
       children: [
         Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         const SizedBox(height: 6),
-        Text(
-          value != null ? value.toStringAsFixed(0) : "—",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value != null ? value.toStringAsFixed(0) : "—",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ),
       ],
