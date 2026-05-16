@@ -51,6 +51,8 @@ class _HomeShellState extends State<HomeShell> {
     context.read<OrdersCubit>().loadOrders(token, captainId, role: role);
     context.read<DashboardCubit>().loadDashboard(token);
     final shiftCubit = context.read<ShiftCubit>();
+    final authCubit = context.read<AuthCubit>();
+
     _wsSubscription = context.read<OrdersCubit>().wsStream.listen((data) async {
       if (!mounted) return;
       print('📡 HomeShell stream: $data');
@@ -59,10 +61,19 @@ class _HomeShellState extends State<HomeShell> {
         shiftCubit.onShiftActivated();
       } else if (event == 'shift_deactivated') {
         shiftCubit.onShiftDeactivated();
+      } else if (event == 'account_deactivated') {
+        _wsSubscription?.cancel();
+        _wsSubscription = null;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) authCubit.logout();
+        });
+        return;
       }
     });
   }
 
+  @override
   void dispose() {
     _wsSubscription?.cancel(); // ✅ cancel عند الإغلاق
     super.dispose();
@@ -80,53 +91,51 @@ class _HomeShellState extends State<HomeShell> {
           );
         }
       },
-      child: SafeArea(
-        child: Scaffold(
-          body: BlocBuilder<ShiftCubit, ShiftState>(
-            builder: (context, shiftState) {
-              final isOnline = shiftState.user?.status == CaptainStatus.active;
+      child: Scaffold(
+        body: BlocBuilder<ShiftCubit, ShiftState>(
+          builder: (context, shiftState) {
+            final isOnline = shiftState.user?.status == CaptainStatus.active;
 
-              // ← لو مش نشط، اعرض رسالة في كل الصفحات
-              if (!isOnline) {
-                return const _OfflineMessage();
-              }
+            // ← لو مش نشط، اعرض رسالة في كل الصفحات
+            if (!isOnline) {
+              return const _OfflineMessage();
+            }
 
-              return IndexedStack(index: _currentIndex, children: _screens);
-            },
-          ),
-          bottomNavigationBar: SafeArea(
-            top: false,
-            child: Material(
-              elevation: 12,
-              color: Colors.white,
-              child: BottomNavigationBar(
-                currentIndex: _currentIndex,
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.white,
-                selectedItemColor: Colors.deepOrangeAccent,
-                unselectedItemColor: Colors.grey,
-                showSelectedLabels: true,
-                showUnselectedLabels: true,
-                landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
-                onTap: (index) => setState(() => _currentIndex = index),
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dashboard_outlined),
-                    activeIcon: Icon(Icons.dashboard),
-                    label: 'الرئيسية',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.receipt_long_outlined),
-                    activeIcon: Icon(Icons.receipt_long),
-                    label: 'الطلبات',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.account_balance_wallet_outlined),
-                    activeIcon: Icon(Icons.account_balance_wallet),
-                    label: 'كشف حسابى',
-                  ),
-                ],
-              ),
+            return IndexedStack(index: _currentIndex, children: _screens);
+          },
+        ),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Material(
+            elevation: 12,
+            color: Colors.white,
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.white,
+              selectedItemColor: Colors.deepOrangeAccent,
+              unselectedItemColor: Colors.grey,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
+              onTap: (index) => setState(() => _currentIndex = index),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.dashboard_outlined),
+                  activeIcon: Icon(Icons.dashboard),
+                  label: 'الرئيسية',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.receipt_long_outlined),
+                  activeIcon: Icon(Icons.receipt_long),
+                  label: 'الطلبات',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.account_balance_wallet_outlined),
+                  activeIcon: Icon(Icons.account_balance_wallet),
+                  label: 'كشف حسابى',
+                ),
+              ],
             ),
           ),
         ),
@@ -141,12 +150,18 @@ class _OfflineMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text(
-        'انت غير نشط حاليا',
-        style: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.bold,
-          color: Color(0xffbe2c2d),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'انت غير نشط حاليا',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xffbe2c2d),
+            ),
+          ),
         ),
       ),
     );

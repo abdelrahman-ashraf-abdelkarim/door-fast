@@ -125,10 +125,14 @@ class _DateFilterCardState extends State<DateFilterCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          Text(
-            text,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.start,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),

@@ -59,7 +59,7 @@ class CaptainApp extends StatelessWidget {
         title: 'Door Fast App',
         theme: ThemeData(
           primarySwatch: Colors.orange,
-          fontFamily: 'Roboto',
+          fontFamily: 'Cairo',
           scaffoldBackgroundColor: Color(0xffF5F5F5),
         ),
         navigatorKey: navigatorKey,

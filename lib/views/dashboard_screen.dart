@@ -37,20 +37,30 @@ class DashboardScreen extends StatelessWidget {
               userName: shiftState.user?.name ?? 'كابتن',
               role: role,
             ),
+            titleSpacing: 7,
             scrolledUnderElevation: 0,
             backgroundColor: AppColors.screenBackground,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
+            leading: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+                const VerticalDivider(
+                  thickness: 1,
+                  width: 1,
+                  indent: 12,
+                  endIndent: 12,
+                ),
+              ],
+            ),
+            // leadingWidth: 45,
           ),
           body: BlocBuilder<DashboardCubit, DashboardState>(
             builder: (context, dashState) {
@@ -81,12 +91,18 @@ class _OfflineMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text(
-        'انت غير نشط حاليا',
-        style: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.bold,
-          color: Color(0xffbe2c2d),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'انت غير نشط حاليا',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xffbe2c2d),
+            ),
+          ),
         ),
       ),
     );
@@ -165,12 +181,15 @@ class _DeliveryEarningsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                ' ${feesToday.toStringAsFixed(0)} ',
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.teal,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  ' ${feesToday.toStringAsFixed(0)} ',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
                 ),
               ),
               Text('ج', style: TextStyle(fontSize: 22, color: Colors.teal)),

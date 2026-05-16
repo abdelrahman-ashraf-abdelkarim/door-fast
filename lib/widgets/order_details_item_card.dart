@@ -96,12 +96,15 @@ class OrderDetailsItemCard extends StatelessWidget {
 
           const SizedBox(width: 18),
 
-          Text(
-            'ج ${item.totalPrice.toStringAsFixed(2)}',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'ج ${item.totalPrice.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
         ],

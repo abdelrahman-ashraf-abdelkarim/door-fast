@@ -16,68 +16,20 @@ class ItemPriceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'قيمة المنتجات',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  'ج ${order.itemsTotalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            _priceRow(
+              label: 'قيمة المنتجات',
+              value: 'ج ${order.itemsTotalPrice.toStringAsFixed(2)}',
+              color: Colors.grey[700]!,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'رسوم التوصيل',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  'ج ${order.deliveryPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            _priceRow(
+              label: 'رسوم التوصيل',
+              value: 'ج ${order.deliveryPrice.toStringAsFixed(2)}',
+              color: Colors.grey[700]!,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'الخصم',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  'ج ${order.descount?.toStringAsFixed(2) ?? '0.00'}',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            _priceRow(
+              label: 'الخصم',
+              value: 'ج ${order.descount?.toStringAsFixed(2) ?? '0.00'}',
+              color: Colors.grey[700]!,
             ),
             Divider(color: Colors.grey[200]),
             Row(
@@ -87,22 +39,64 @@ class ItemPriceCard extends StatelessWidget {
                   'الإجمالي',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  'ج ${order.totalPrice.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: AppColors.accentOrange,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'ج ${order.totalPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: AppColors.accentOrange,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _priceRow({
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

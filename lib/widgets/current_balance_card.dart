@@ -12,10 +12,7 @@ class CurrentBalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFFB85C00),
-            Color(0xFFFF8C00),
-          ],
+          colors: [Color(0xFFB85C00), Color(0xFFFF8C00)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -50,18 +47,33 @@ class CurrentBalanceCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      balance.toStringAsFixed(0),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              balance.toStringAsFixed(2),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              "ج.م",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Text(
-                      "ج.م",
-                      style: TextStyle(color: Colors.white70, fontSize: 18),
                     ),
                   ],
                 ),

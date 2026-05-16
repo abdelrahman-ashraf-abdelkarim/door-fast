@@ -18,9 +18,12 @@ class WorkTimerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ShiftCubit, ShiftState>(
       builder: (context, state) {
-        return Text(
-          _formatDuration(state.duration),
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            _formatDuration(state.duration),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         );
       },
     );

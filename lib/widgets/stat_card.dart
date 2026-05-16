@@ -18,47 +18,52 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
-      padding: const EdgeInsets.all(16),
+      height: 130,
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        // gradient: LinearGradient(colors: [Color(0XFFFAF7FF), Colors.white]),
         borderRadius: BorderRadius.circular(16),
         border: Border(
           right: BorderSide(color: color ?? Colors.white, width: 4),
         ),
       ),
-
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (icon != null) Icon(icon, color: color, size: 24),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w700,
-                    ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 6),
+              ],
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           valueWidget ??
-              Text(
-                value ?? "",
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: color ?? Colors.black,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  value ?? "",
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: color ?? Colors.black,
+                  ),
                 ),
               ),
         ],

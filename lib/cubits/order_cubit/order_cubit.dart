@@ -119,7 +119,8 @@ class OrdersCubit extends Cubit<OrdersState> {
         return;
       }
       final newOrder = await _ordersService.fetchOrderById(orderId, _token!);
-      emit(state.copyWith(orders: [newOrder, ...state.orders]));
+      // emit(state.copyWith(orders: [newOrder, ...state.orders]));
+      emit(state.copyWith(orders: [...state.orders, newOrder]));
       NotificationService.showNotification(
         title: 'طلب جديد',
         body: 'رقم الطلب: ${newOrder.orderNumber}',
@@ -136,9 +137,10 @@ class OrdersCubit extends Cubit<OrdersState> {
       final exists = state.orders.any((o) => o.id == orderId);
 
       if (!exists) {
-        emit(state.copyWith(orders: [updated, ...state.orders]));
+        // emit(state.copyWith(orders: [updated, ...state.orders]));
+        emit(state.copyWith(orders: [...state.orders, updated]));
         NotificationService.showNotification(
-          title: 'طلب جديد',
+          title: updated.isDeliveryChosen ? 'الطلب مرسل اليك' : 'طلب جديد',
           body: 'رقم الطلب: ${updated.orderNumber}',
         );
       } else {

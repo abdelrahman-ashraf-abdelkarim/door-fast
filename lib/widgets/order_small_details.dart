@@ -60,12 +60,16 @@ class OrderContainer extends StatelessWidget {
                                   size: 24,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  order.senderName,
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
+                                Flexible(
+                                  child: Text(
+                                    order.senderName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -185,6 +189,8 @@ class ButtonCard extends StatelessWidget {
     return Center(
       child: Text(
         text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           fontSize: 18,
           color: Colors.white,

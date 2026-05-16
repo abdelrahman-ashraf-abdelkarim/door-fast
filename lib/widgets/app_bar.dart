@@ -18,27 +18,29 @@ class AppBarWidget extends StatelessWidget {
     final isReserve = role == DeliveryType.reserve;
     return Row(
       children: [
-        Row(
-          children: [
-            Text(
-              userName,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 6),
-            Icon(Icons.circle, color: Colors.green, size: 10),
-            const SizedBox(width: 6),
-            isReserve
-                ? Text(
-                    "إحتياطي",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  )
-                : Text(
-                    "اساسي",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-          ],
+        Flexible(
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  userName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.circle, color: Colors.green, size: 10),
+              const SizedBox(width: 6),
+
+              Text(
+                isReserve ? "إحتياطي" : "اساسي",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
-        const Spacer(),
+        const SizedBox(width: 8),
         Image.asset(
           "assets/images/DF_logo_for_dash.png",
           height: 70,

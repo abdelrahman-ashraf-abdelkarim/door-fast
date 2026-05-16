@@ -22,7 +22,7 @@ class ContactCard extends StatelessWidget {
 
   String get contactName => contact?.name.trim() ?? '';
   String get contactNotes => contact?.notes.trim() ?? '';
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -58,6 +58,8 @@ class ContactCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -65,13 +67,17 @@ class ContactCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          contactName.isEmpty ? 'غير متاح' : contactName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            contactName.isEmpty ? 'غير متاح' : contactName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         if (contactNotes.isNotEmpty) ...[
@@ -116,99 +122,6 @@ class ContactCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Column(
-                  //   children: [
-                  //     if (canCall) ...[
-                  //       Row(
-                  //         children: [
-                  //           GestureDetector(
-                  //             onTap: () => _callPhone(contactPhone),
-                  //             child: Container(
-                  //               width: 45,
-                  //               height: 45,
-                  //               decoration: BoxDecoration(
-                  //                 color: AppColors.successGreen,
-                  //                 borderRadius: BorderRadius.circular(14),
-                  //               ),
-                  //               child: const Icon(
-                  //                 Icons.call,
-                  //                 color: Colors.white,
-                  //                 size: 24,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           const SizedBox(width: 8),
-                  //           GestureDetector(
-                  //             onTap: () => _openWhatsApp(
-                  //               phone: "2$contactPhone",
-                  //               message: 'السلام عليكم، معاك مندوب التوصيل',
-                  //             ),
-                  //             child: Container(
-                  //               width: 45,
-                  //               height: 45,
-                  //               alignment: Alignment.center,
-                  //               decoration: BoxDecoration(
-                  //                 color: AppColors.successGreen,
-                  //                 borderRadius: BorderRadius.circular(14),
-                  //               ),
-                  //               child: const FaIcon(
-                  //                 FontAwesomeIcons.whatsapp,
-                  //                 color: Colors.white,
-                  //                 size: 24,
-                  //                 fontWeight: FontWeight.w900,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ],
-                  //     const SizedBox(height: 8),
-                  //     if (canCallTwo) ...[
-                  //       Row(
-                  //         children: [
-                  //           GestureDetector(
-                  //             onTap: () => _callPhone(contactPhoneTwo),
-                  //             child: Container(
-                  //               width: 45,
-                  //               height: 45,
-                  //               decoration: BoxDecoration(
-                  //                 color: Color(0xFF128C7E),
-                  //                 borderRadius: BorderRadius.circular(14),
-                  //               ),
-                  //               child: const Icon(
-                  //                 Icons.call,
-                  //                 color: Colors.white,
-                  //                 size: 24,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           const SizedBox(width: 8),
-                  //           GestureDetector(
-                  //             onTap: () => _openWhatsApp(
-                  //               phone: "2$contactPhoneTwo",
-                  //               message: 'السلام عليكم، معاك مندوب التوصيل',
-                  //             ),
-                  //             child: Container(
-                  //               width: 45,
-                  //               height: 45,
-                  //               alignment: Alignment.center,
-                  //               decoration: BoxDecoration(
-                  //                 color: Color(0xFF128C7E),
-                  //                 borderRadius: BorderRadius.circular(14),
-                  //               ),
-                  //               child: const FaIcon(
-                  //                 FontAwesomeIcons.whatsapp,
-                  //                 color: Colors.white,
-                  //                 size: 24,
-                  //                 fontWeight: FontWeight.w900,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ],
-                  //   ],
-                  // ),
                 ],
               ),
             ),

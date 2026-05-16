@@ -81,7 +81,7 @@ class OrderDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 const Text(
                   'محتويات الطلب',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
                 ...() {

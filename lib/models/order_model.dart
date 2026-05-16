@@ -55,6 +55,7 @@ class Order {
   final DateTime createdAt;
   final DateTime? acceptedAt;
   final double? descount;
+  final bool isDeliveryChosen;
 
   String get receiverName => receiver.name;
   String get receiverPhoneOne => receiver.phoneOne ?? "";
@@ -120,6 +121,7 @@ class Order {
     required this.createdAt,
     this.acceptedAt,
     this.items = const [],
+    this.isDeliveryChosen = false
   });
 
   Order copyWith({
@@ -181,6 +183,7 @@ class Order {
       kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
       deliveryPrice: (json['delivery_fee'] as num).toDouble(),
       notes: json['notes'] ?? '',
+      isDeliveryChosen: json['is_delivery_chosen']?? false,
       status: Order._parseStatus(json['status']),
       createdAt: DateTime.parse(json['created_at']),
       acceptedAt: json['accepted_at'] != null

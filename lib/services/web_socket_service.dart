@@ -146,12 +146,15 @@ class WebSocketService {
             });
           }
           break;
-          case 'reserve_new_order':
+        case 'reserve_new_order':
           final message = raw['order'] ?? raw;
           final orderId =
               message['id']?.toString() ?? message['order_id']?.toString();
           if (orderId != null) {
-            _controller.add({'event': 'reserve_new_order', 'order_id': orderId});
+            _controller.add({
+              'event': 'reserve_new_order',
+              'order_id': orderId,
+            });
           }
           break;
 
@@ -171,6 +174,11 @@ class WebSocketService {
           } else if (status == 'ended') {
             _controller.add({'event': 'shift_deactivated'});
           }
+          break;
+
+        case 'account.deactivated':
+          print('🚫 account.deactivated received');
+          _controller.add({'event': 'account_deactivated'});
           break;
 
         // ─── أحداث المحفظة ────────────────────────────────────────────────
