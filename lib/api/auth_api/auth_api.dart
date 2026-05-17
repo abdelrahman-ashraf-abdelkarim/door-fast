@@ -20,3 +20,25 @@ Future<AuthResponse> login(
     throw Exception(errorData['message'] ?? 'فشل تسجيل الدخول');
   }
 }
+
+Future<void> updateFcmToken(
+  String authToken,
+  String fcmToken,
+  DeliveryType role,  // ← زود ده
+) async {
+  try {
+    final url = '${AppConstants.getBaseUrl(role)}/fcm-token';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $authToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'fcm_token': fcmToken}),
+    );
+    print('📡 FCM Status Code: ${response.statusCode}');
+    print('📡 FCM Body: ${response.body}');
+  } catch (e) {
+    print('⚠️ updateFcmToken error: $e');
+  }
+}

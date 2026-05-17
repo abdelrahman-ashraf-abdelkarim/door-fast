@@ -4,6 +4,8 @@ enum OrderStatusFilter { waiting, accepted, delivered, newOrder }
 
 enum OrderKind { company, personToPerson }
 
+enum Discountype { percent, amount }
+
 class OrderContact {
   final String name;
   final String? phoneOne;
@@ -48,6 +50,7 @@ class Order {
   final OrderContact? sender;
   final OrderKind kind;
   final double deliveryPrice;
+  final Discountype? discountType;
   final String notes;
   final String? cancelReason;
   final List<OrderItem> items;
@@ -76,7 +79,15 @@ class Order {
   double get itemsTotalPrice =>
       items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalPrice => itemsTotalPrice + deliveryPrice - (descount ?? 0);
+  double get discountValue {
+    if (descount == 0 || discountType == null) return 0;
+    if (discountType == Discountype.percent) {
+      return ((itemsTotalPrice + deliveryPrice) * (descount! / 100));
+    }
+    return descount!; // amount
+  }
+
+  double get totalPrice => itemsTotalPrice + deliveryPrice - discountValue;
 
   Duration get waitingDuration => DateTime.now().difference(createdAt);
 
@@ -115,13 +126,14 @@ class Order {
     this.kind = OrderKind.company,
     required this.deliveryPrice,
     this.descount,
+    this.discountType,
     required this.notes,
     this.cancelReason,
     required this.status,
     required this.createdAt,
     this.acceptedAt,
     this.items = const [],
-    this.isDeliveryChosen = false
+    this.isDeliveryChosen = false,
   });
 
   Order copyWith({
@@ -133,6 +145,7 @@ class Order {
     DateTime? createdAt,
     DateTime? acceptedAt,
     double? descount,
+    Discountype? discountType,
   }) {
     return Order(
       id: id,
@@ -148,6 +161,7 @@ class Order {
       acceptedAt: acceptedAt ?? this.acceptedAt,
       items: items ?? this.items,
       descount: descount ?? this.descount,
+      discountType: discountType ?? this.discountType,
     );
   }
 
@@ -183,7 +197,7 @@ class Order {
       kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
       deliveryPrice: (json['delivery_fee'] as num).toDouble(),
       notes: json['notes'] ?? '',
-      isDeliveryChosen: json['is_delivery_chosen']?? false,
+      isDeliveryChosen: json['is_delivery_chosen'] ?? false,
       status: Order._parseStatus(json['status']),
       createdAt: DateTime.parse(json['created_at']),
       acceptedAt: json['accepted_at'] != null
@@ -202,6 +216,11 @@ class Order {
             ),
           )
           .toList(),
+      discountType: json['discount_type'] == 'percent'
+          ? Discountype.percent
+          : json['discount_type'] == 'amount'
+          ? Discountype.amount
+          : null,
     );
   }
 }

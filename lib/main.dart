@@ -7,6 +7,8 @@ import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/shift_service.dart';
 import 'package:captain_app/views/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,14 +18,16 @@ import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   final storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorageDirectory.web
         : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
+  HydratedBloc.storage = storage;
   await NotificationService.init();
 
-  HydratedBloc.storage = storage;
   runApp(const CaptainApp());
 }
 

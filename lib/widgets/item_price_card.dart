@@ -28,7 +28,7 @@ class ItemPriceCard extends StatelessWidget {
             ),
             _priceRow(
               label: 'الخصم',
-              value: 'ج ${order.descount?.toStringAsFixed(2) ?? '0.00'}',
+              value: 'ج ${order.discountValue.toStringAsFixed(2)}',
               color: Colors.grey[700]!,
             ),
             Divider(color: Colors.grey[200]),
