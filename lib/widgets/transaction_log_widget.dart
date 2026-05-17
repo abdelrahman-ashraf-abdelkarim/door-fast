@@ -55,14 +55,11 @@ class TransactionLogWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   Wrap(
-                    spacing: 4,
+                    spacing: 4.w,
                     children: [
                       Text(
                         day,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w100,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       Text(
                         month,
@@ -70,10 +67,7 @@ class TransactionLogWidget extends StatelessWidget {
                       ),
                       Text(
                         yearAndHour,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w100,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ),

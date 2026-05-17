@@ -27,9 +27,11 @@ class AccountStatementCubit extends Cubit<AccountStatementState> {
     emit(AccountStatementLoading());
     try {
       final wallet = await _walletService.fetchWalletStatement(token);
+      if (isClosed) return;
       emit(AccountStatementLoaded(wallet));
       _subscribeToWebSocket();
     } catch (e) {
+      if (isClosed) return;
       emit(AccountStatementError(e.toString()));
     }
   }
@@ -75,7 +77,7 @@ class AccountStatementCubit extends Cubit<AccountStatementState> {
   Future<void> _reloadSilently() async {
     try {
       final wallet = await _walletService.fetchWalletStatement(token);
-
+      if (isClosed) return;
       final current = state;
       if (current is! AccountStatementLoaded) {
         emit(AccountStatementLoaded(wallet));

@@ -21,18 +21,15 @@ class OrdersService {
 
   // جلب الطلبات الجديدة
   Future<List<Order>> fetchOrders(String token) async {
-    print('📡 Calling: ${_api.baseUrl}/orders/new');
     try {
       final data = await _api.get(
         url: '${_api.baseUrl}/orders/new',
         token: token,
       );
-      print('✅ Response: $data');
       return (data['orders'] as List)
           .map((json) => Order.fromJson(json))
           .toList();
     } catch (e) {
-      print('❌ Error: $e');
       rethrow;
     }
   }
@@ -52,16 +49,13 @@ class OrdersService {
         url: '${_api.baseUrl}/orders/$orderId',
         token: token,
       );
-      print('📦 fetchOrderById response: $data');
       if (data == null || data['success'] == false) {
         throw OrderNotFoundException(orderId);
       }
       return Order.fromJson(data['order']);
     } on OrderNotFoundException {
-      print('🚫 OrderNotFoundException thrown');
       rethrow; // ← خلّيه يعدي للـ cubit
     } on Exception catch (e) {
-      print('⚠️ Exception: ${e.toString()}');
       if (e.toString().contains('404')) {
         throw OrderNotFoundException(orderId); // ← 404 = مش موجود
       }

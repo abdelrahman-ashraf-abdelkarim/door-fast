@@ -56,22 +56,17 @@ class WebSocketService {
 
         onEvent: (dynamic event) {
           if (event is PusherEvent) {
-            print(
-              '🌐 Global: ${event.channelName} → ${event.eventName}: ${event.data}',
-            );
             _handleEvent(event);
           }
         },
 
         onConnectionStateChange: (currentState, previousState) {
-          print('🔌 Pusher: $previousState → $currentState');
           if (currentState == 'DISCONNECTED' && _token != null) {
             Future.delayed(const Duration(seconds: 5), () => _pusher.connect());
           }
         },
 
         onError: (message, code, error) {
-          print('❌ Pusher Error: $message');
           _initialized = false;
           Future.delayed(const Duration(seconds: 5), () {
             if (_token != null) _init();
@@ -84,7 +79,6 @@ class WebSocketService {
         channelName: 'orders',
         onEvent: (dynamic event) {
           if (event is PusherEvent) {
-            print('📨 orders → ${event.eventName}: ${event.data}');
             _handleEvent(event);
           }
         },
@@ -97,9 +91,6 @@ class WebSocketService {
           channelName: 'delivery.$_captainId',
           onEvent: (dynamic event) {
             if (event is PusherEvent) {
-              print(
-                '📨 delivery.$_captainId → ${event.eventName}: ${event.data}',
-              );
               _handleEvent(event);
             }
           },
@@ -107,17 +98,12 @@ class WebSocketService {
       }
 
       await _pusher.connect();
-      print('✅ Pusher connecting...');
     } catch (e) {
-      print('❌ Pusher Init Error: $e');
       _initialized = false;
     }
   }
 
   void _handleEvent(PusherEvent event) {
-    print(
-      '🎯 ALL events: channel=${event.channelName} event=${event.eventName} data=${event.data}',
-    );
     try {
       final raw = _decode(event.data);
 
@@ -167,7 +153,6 @@ class WebSocketService {
 
         // ─── أحداث الشيفت ─────────────────────────────────────────────────
         case 'shift.updated':
-          print('🔄 shift.updated received: $raw');
           final status = raw['status']?.toString();
           if (status == 'started') {
             _controller.add({'event': 'shift_activated'});
@@ -177,7 +162,6 @@ class WebSocketService {
           break;
 
         case 'account.deactivated':
-          print('🚫 account.deactivated received');
           _controller.add({'event': 'account_deactivated'});
           break;
 
@@ -189,9 +173,6 @@ class WebSocketService {
           final amount = raw['amount'];
           final type = raw['type'];
           final dir = raw['direction'];
-          print(
-            '💰 wallet.updated received — balance: $balance, amount: $amount, type: $type, direction: $dir',
-          );
           _controller.add({
             'event': 'wallet_updated',
             'balance': balance?.toString(),
@@ -201,8 +182,7 @@ class WebSocketService {
           });
           break;
       }
-    } catch (e) {
-      print('❌ Parse Error: $e');
+    } catch (_) {
     }
   }
 

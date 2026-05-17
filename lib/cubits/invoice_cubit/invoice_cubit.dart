@@ -16,15 +16,14 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     try {
       emit(InvoiceLoading());
 
-      
       final file = await PdfService.getInvoicePdf(
         orderNumber: orderNumber,
         url: url,
-        token: token
+        token: token,
       );
 
       final message = "فاتورة الطلب رقم $orderNumber";
-
+      if (isClosed) return;
       // Share the PDF file (user can choose WhatsApp, SMS, etc.)
       await SharePlus.instance.share(
         ShareParams(files: [XFile(file.path)], text: message),
@@ -39,9 +38,10 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         );
         await launchUrl(wa, mode: LaunchMode.externalApplication);
       }
-
+      if (isClosed) return;
       emit(InvoiceSuccess());
     } catch (e) {
+      if (isClosed) return;
       emit(InvoiceError("فشل تحميل الفاتورة"));
     }
   }

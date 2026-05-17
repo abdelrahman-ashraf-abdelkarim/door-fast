@@ -24,7 +24,7 @@ class DuesCardWidget extends StatelessWidget {
       child: Card(
         color: AppColors.cardBackground,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         child: Padding(
           padding: EdgeInsets.all(16.r),

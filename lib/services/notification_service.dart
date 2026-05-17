@@ -1,13 +1,13 @@
 import 'package:captain_app/core/app_navigation.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-// ─── Background Handler (لازم يكون TOP-LEVEL function خارج أي class) ──────────
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Firebase اتعمل init في main.dart قبل ما نيجي هنا
+  await Firebase.initializeApp();
   await NotificationService._showFcmAsLocal(message);
 }
 
@@ -22,17 +22,16 @@ class NotificationService {
   static int _notificationId = 0;
   static bool _isInitialized = false;
 
-  // ─── INIT الرئيسي (بيتنادى من main.dart) ─────────────────────────────────
   static Future<void> init() async {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    // 1. Timezone
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
 
-    // 2. Local Notifications init
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
@@ -42,66 +41,68 @@ class NotificationService {
       },
     );
 
-    // 3. Permission (Android 13+)
     await _plugin
-        .resolvePlatformSpecificImplementation
-            <AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
 
-    // 4. لو التطبيق اتفتح من local notification وهو terminated
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
     if (launchDetails?.didNotificationLaunchApp ?? false) {
       _handlePayload(launchDetails?.notificationResponse?.payload);
     }
 
-    // 5. FCM Setup
     await _initFcm();
   }
 
-  // ─── FCM Setup ────────────────────────────────────────────────────────────
+  static Future<void> _initForBackground() async {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
+    tz.initializeTimeZones();
+
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+    const initSettings = InitializationSettings(android: androidSettings);
+    await _plugin.initialize(initSettings);
+  }
+
   static Future<void> _initFcm() async {
     final fcm = FirebaseMessaging.instance;
-
-    // طلب permission
     await fcm.requestPermission(alert: true, badge: true, sound: true);
 
-    // Foreground: FCM مش بيظهر notification لوحده — إحنا بنعمله
+    // ─── Foreground ───────────────────────────────────────────
     FirebaseMessaging.onMessage.listen((message) {
       _showFcmAsLocal(message);
     });
 
-    // لو التطبيق في الـ background وفتح من الـ notification
+    // ─── Background (ضغط على الـ notification) ───────────────
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      _handlePayload(_ordersPayload);
+      _handleData(message.data); // ✅ بيعدي order_id
     });
 
-    // لو التطبيق كان terminated وفتح من الـ notification
+    // ─── Terminated (ضغط على الـ notification وفتح التطبيق) ──
     final initial = await fcm.getInitialMessage();
     if (initial != null) {
-      // استنى شوية عشان الـ navigator يكون جاهز
       Future.delayed(const Duration(milliseconds: 500), () {
-        _handlePayload(_ordersPayload);
+        _handleData(initial.data); // ✅ بيعدي order_id
       });
     }
   }
 
-  // ─── إرسال FCM Token للـ backend (بيتنادى من AuthCubit بعد اللوجين) ──────
   static Future<String?> getFcmToken() async {
     try {
-      final token = await FirebaseMessaging.instance.getToken();
-      return token;
+      return await FirebaseMessaging.instance.getToken();
     } catch (_) {
       return null;
     }
   }
 
-  // ─── Show Notification (Local — من WebSocket أو FCM) ─────────────────────
   static Future<void> showNotification({
     required String title,
     String? body,
   }) async {
-    if (!_isInitialized) await init();
-
     const androidDetails = AndroidNotificationDetails(
       _channelId,
       _channelName,
@@ -114,29 +115,33 @@ class NotificationService {
 
     await _plugin.show(
       _notificationId++,
-      '\u200F$title',  // RTL marker
+      '\u200F$title',
       body ?? '',
       const NotificationDetails(android: androidDetails),
       payload: _ordersPayload,
     );
   }
 
-  // ─── داخلي: حول FCM message لـ Local Notification ────────────────────────
   static Future<void> _showFcmAsLocal(RemoteMessage message) async {
+    await _initForBackground();
     final title = message.notification?.title ?? 'طلب جديد';
     final body = message.notification?.body ?? '';
     await showNotification(title: title, body: body);
   }
 
-  // ─── Cancel ───────────────────────────────────────────────────────────────
   static Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
 
-  // ─── Handle Payload (فتح شاشة الأوردرات) ─────────────────────────────────
+  // ─── بيفتح شاشة الأوردرات من الـ local notification payload ──
   static void _handlePayload(String? payload) {
     if (payload == _ordersPayload) {
       openOrdersScreen();
     }
+  }
+
+  // ─── بيفتح شاشة الأوردرات من الـ FCM data مع الـ order_id ───
+  static void _handleData(Map<String, dynamic> data) {
+    openOrdersScreen();
   }
 }

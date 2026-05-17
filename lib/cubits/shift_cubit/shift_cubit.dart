@@ -44,10 +44,7 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
   }
 
   Future<void> startShift() async {
-    print('🔍 startShift called, user status: ${state.user?.status}');
-    print('🔍 startTime: ${state.startTime}');
     if (state.user?.status != CaptainStatus.active) {
-      print('⛔ blocked by status guard');
       return;
     }
 
@@ -55,7 +52,7 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
       final authState = authCubit.state;
       if (authState is AuthAuthenticated) {
         final result = await shiftService.fetchShiftTimes(authState.token);
-
+        if (isClosed) return;
         // ← لو الوردية مش نشطة في الـ API، اعتبره offline
         if (!result.hasActiveShift) {
           final updatedUser = state.user!.copyWith(
@@ -73,6 +70,7 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
       }
     } catch (_) {
       final start = state.user?.loginAt ?? DateTime.now();
+      if (isClosed) return;
       emit(state.copyWith(startTime: start, duration: Duration.zero));
       _startTimer(start);
     }

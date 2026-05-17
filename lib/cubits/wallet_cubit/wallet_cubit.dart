@@ -15,8 +15,10 @@ class WalletCubit extends Cubit<WalletState> {
     emit(WalletLoading());
     try {
       final wallet = await _walletService.fetchWalletStatement(token);
+      if (isClosed) return;
       emit(WalletLoaded(wallet));
     } catch (e) {
+      if (isClosed) return;
       emit(WalletError(e.toString()));
     }
   }

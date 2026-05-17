@@ -24,10 +24,9 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   OrdersCubit({
     OrdersService? ordersService,
-    required Api api,
+    required this.api,
     required this.shiftCubit,
   }) : _ordersService = ordersService ?? OrdersService(api: api),
-       api = api,
        super(const OrdersState(orders: []));
 
   static const _pendingStatuses = {OrderStatus.waiting, OrderStatus.newOrder};
@@ -53,6 +52,7 @@ class OrdersCubit extends Cubit<OrdersState> {
         _ordersService.fetchDeliveredOrders(token),
       ]);
       final allOrders = [...results[0], ...results[1], ...results[2]];
+      if (isClosed) return;
       emit(state.copyWith(orders: allOrders, isLoading: false));
 
       if (!_wsConnected) {
@@ -60,6 +60,7 @@ class OrdersCubit extends Cubit<OrdersState> {
         await _connectWebSocket(token, captainId);
       }
     } catch (error) {
+      if (isClosed) return;
       emit(state.copyWith(isLoading: false, errorMessage: error.toString()));
     }
   }
@@ -71,7 +72,6 @@ class OrdersCubit extends Cubit<OrdersState> {
 
     await _wsSubscription?.cancel();
     _wsSubscription = _wsService.stream.listen((data) {
-      print('📨 cubit received: $data');
       final event = data['event'];
 
       if (event == 'shift_activated') {
@@ -113,21 +113,17 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> _fetchAndAddNewOrder(String orderId) async {
     if (_token == null) return;
     try {
-      print('🔍 fetching order: $orderId');
       if (state.orders.any((o) => o.id == orderId)) {
-        print('⚠️ order already exists: $orderId');
         return;
       }
       final newOrder = await _ordersService.fetchOrderById(orderId, _token!);
-      // emit(state.copyWith(orders: [newOrder, ...state.orders]));
+      if (isClosed) return;
       emit(state.copyWith(orders: [...state.orders, newOrder]));
       NotificationService.showNotification(
         title: 'طلب جديد',
         body: 'رقم الطلب: ${newOrder.orderNumber}',
       );
-    } catch (e) {
-      print('❌ _fetchAndAddNewOrder error: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _fetchAndUpdateOrder(String orderId) async {
@@ -135,6 +131,7 @@ class OrdersCubit extends Cubit<OrdersState> {
     try {
       final updated = await _ordersService.fetchOrderById(orderId, _token!);
       final exists = state.orders.any((o) => o.id == orderId);
+      if (isClosed) return;
 
       if (!exists) {
         // emit(state.copyWith(orders: [updated, ...state.orders]));
@@ -151,9 +148,7 @@ class OrdersCubit extends Cubit<OrdersState> {
       }
     } on OrderNotFoundException {
       _removeOrder(orderId);
-    } catch (e) {
-      print('❌ _fetchAndUpdateOrder error: $e');
-    }
+    } catch (_) {}
   }
 
   void _removeOrder(String orderId) {
@@ -177,8 +172,10 @@ class OrdersCubit extends Cubit<OrdersState> {
         }
         return o;
       }).toList();
+      if (isClosed) return;
       emit(state.copyWith(orders: updatedOrders));
     } catch (error) {
+      if (isClosed) return;
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
@@ -186,8 +183,10 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> cancelOrder(String orderId, String reason, String token) async {
     try {
       await _ordersService.cancelOrder(orderId, reason, token);
+      if (isClosed) return;
       await loadOrders(_token!, _captainId!, role: _role);
     } catch (error) {
+      if (isClosed) return;
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }
@@ -195,8 +194,10 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> completeOrder(String orderId, String token) async {
     try {
       await _ordersService.completeOrder(orderId, token);
+      if (isClosed) return;
       await loadOrders(_token!, _captainId!, role: _role);
     } catch (error) {
+      if (isClosed) return;
       emit(state.copyWith(errorMessage: error.toString()));
     }
   }

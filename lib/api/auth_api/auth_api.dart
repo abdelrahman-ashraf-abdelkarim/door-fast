@@ -24,11 +24,11 @@ Future<AuthResponse> login(
 Future<void> updateFcmToken(
   String authToken,
   String fcmToken,
-  DeliveryType role,  // ← زود ده
+  DeliveryType role, // ← زود ده
 ) async {
   try {
     final url = '${AppConstants.getBaseUrl(role)}/fcm-token';
-    final response = await http.post(
+    await http.post(
       Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $authToken',
@@ -36,9 +36,19 @@ Future<void> updateFcmToken(
       },
       body: jsonEncode({'fcm_token': fcmToken}),
     );
-    print('📡 FCM Status Code: ${response.statusCode}');
-    print('📡 FCM Body: ${response.body}');
+  } catch (_) {
+  }
+}
+
+Future<bool> validateToken(String authToken, DeliveryType role) async {
+  try {
+    final url = '${AppConstants.getBaseUrl(role)}/shift/times';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $authToken'},
+    );
+    return response.statusCode == 200;
   } catch (e) {
-    print('⚠️ updateFcmToken error: $e');
+    return false;
   }
 }

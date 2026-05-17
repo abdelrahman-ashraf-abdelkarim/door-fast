@@ -129,7 +129,6 @@ class OrderDetailsScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 12.h),
                           Text(
                             order.notes,
                             style: TextStyle(

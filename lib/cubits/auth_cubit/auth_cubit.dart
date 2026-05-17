@@ -8,7 +8,6 @@ import '../../models/auth_model.dart';
 class AuthCubit extends HydratedCubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
-  /// تسجيل الدخول (بيانات تجريبية)
   Future<void> login(
     String username,
     String password,
@@ -17,7 +16,6 @@ class AuthCubit extends HydratedCubit<AuthState> {
     emit(AuthLoading());
     try {
       final response = await authapi.login(username, password, role);
-      // احفظ التوكن
 
       if (response.user.status != CaptainStatus.active) {
         emit(const AuthError('حسابك غير مفعّل، تواصل مع الإدارة'));
@@ -28,7 +26,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
       _sendFcmTokenToBackend(response.token, role: response.user.role);
 
       FirebaseMessaging.instance.onTokenRefresh.listen((newFcmToken) {
-        _sendFcmTokenToBackend(response.token, fcmToken: newFcmToken);
+        _sendFcmTokenToBackend(response.token, fcmToken: newFcmToken, role: response.user.role);
       });
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -36,21 +34,35 @@ class AuthCubit extends HydratedCubit<AuthState> {
   }
 
   Future<void> _sendFcmTokenToBackend(
-  String authToken, {
-  String? fcmToken,
-  DeliveryType role = DeliveryType.delivery,
-}) async {
-  try {
-    final token = fcmToken ?? await NotificationService.getFcmToken();
-    if (token == null) return;
-
+    String authToken, {
+    String? fcmToken,
+    DeliveryType role = DeliveryType.delivery,
+  }) async {
+    try {
+      final token = fcmToken ?? await NotificationService.getFcmToken();
+      if (token == null) return;
       await authapi.updateFcmToken(authToken, token, role);
-    print('📱 FCM Token: $token');
-  } catch (e) {
-    print('⚠️ FCM token send failed: $e');
+    } catch (_) {
+    }
   }
-}
-  /// تسجيل الخروج
+
+  // ✅ الدالة دي بقت صح — مقفولة صح + بتستخدم في fromJson
+  Future<void> _validateTokenThenSendFcm(
+    String authToken,
+    DeliveryType role,
+  ) async {
+    try {
+      final isValid = await authapi.validateToken(authToken, role);
+      if (!isValid) {
+        emit(AuthUnauthenticated());
+        return;
+      }
+      _sendFcmTokenToBackend(authToken, role: role);
+    } catch (e) {
+      emit(AuthUnauthenticated());
+    }
+  } // ✅ القوس ده كان ناقص
+
   void logout() {
     emit(AuthUnauthenticated());
   }
@@ -59,11 +71,15 @@ class AuthCubit extends HydratedCubit<AuthState> {
   AuthState? fromJson(Map<String, dynamic> json) {
     if (json['type'] != 'authenticated') return AuthUnauthenticated();
 
-    final state = AuthAuthenticated(
-      AuthModel.fromJson(json['user']),
-      token: json['token'],
-    );
-    _sendFcmTokenToBackend(state.token);
+    final token = json['token'] as String?;
+    if (token == null || token.isEmpty) return AuthUnauthenticated();
+
+    final user = AuthModel.fromJson(json['user']);
+    final state = AuthAuthenticated(user, token: token);
+
+    // ✅ بقت بتستخدم _validateTokenThenSendFcm بدل _sendFcmTokenToBackend
+    _validateTokenThenSendFcm(token, user.role);
+
     return state;
   }
 
@@ -76,7 +92,6 @@ class AuthCubit extends HydratedCubit<AuthState> {
         'token': state.token,
       };
     }
-
     return {'type': 'unauthenticated'};
   }
 }

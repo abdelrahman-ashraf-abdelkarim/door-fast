@@ -45,10 +45,6 @@ class _HomeShellState extends State<HomeShell> {
     final captainId = authState.user.id;
     final role = authState.user.role;
 
-    print('🔑 Token: $token');
-    print('👤 CaptainId: $captainId');
-    print('🎭 Role: $role');
-
     context.read<OrdersCubit>().loadOrders(token, captainId, role: role);
     context.read<DashboardCubit>().loadDashboard(token);
     final shiftCubit = context.read<ShiftCubit>();
@@ -56,7 +52,6 @@ class _HomeShellState extends State<HomeShell> {
 
     _wsSubscription = context.read<OrdersCubit>().wsStream.listen((data) async {
       if (!mounted) return;
-      print('📡 HomeShell stream: $data');
       final event = data['event'];
       if (event == 'shift_activated') {
         shiftCubit.onShiftActivated();

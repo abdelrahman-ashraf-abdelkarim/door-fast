@@ -23,10 +23,12 @@ class DashboardCubit extends Cubit<DashboardState> {
         url: '${_api.baseUrl}/dashboard',
         token: token,
       );
+      if (isClosed) return;
       emit(
         state.copyWith(data: DashboardData.fromJson(data), isLoading: false),
       );
     } catch (e) {
+      if (isClosed) return;
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
 
@@ -51,6 +53,7 @@ class DashboardCubit extends Cubit<DashboardState> {
         url: '${_api.baseUrl}/dashboard',
         token: _token!,
       );
+      if (isClosed) return;
       emit(state.copyWith(data: DashboardData.fromJson(data)));
     } catch (_) {}
   }
