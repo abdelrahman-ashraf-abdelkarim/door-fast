@@ -7,6 +7,7 @@ import 'package:captain_app/widgets/order_timer_widget.dart';
 import 'package:captain_app/widgets/order_small_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderCard extends StatelessWidget {
   const OrderCard({
@@ -62,7 +63,7 @@ class OrderCard extends StatelessWidget {
       child: Card(
         elevation: 4,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -71,26 +72,26 @@ class OrderCard extends StatelessWidget {
                 children: [
                   Text(
                     "#${order.orderNumber}",
-                    style: const TextStyle(
-                      fontSize: 22,
+                    style: TextStyle(
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w900,
                       color: AppColors.pickupMarkerOrange,
                     ),
                   ),
                   if (!_isDeliveredOrder)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16.r),
                         // color: Colors.tealAccent[100],
                       ),
                       child: OrderTimerWidget(
                         order: order,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 16.sp,
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -101,22 +102,22 @@ class OrderCard extends StatelessWidget {
               Divider(
                 color: Colors.grey.withValues(alpha: 0.2),
                 thickness: 1,
-                indent: 16,
-                endIndent: 16,
+                indent: 16.w,
+                endIndent: 16.w,
               ),
 
               OrderContainer(order: order),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               if (order.status != OrderStatus.cancelled)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
                   child: GestureDetector(
                     onTap: () => _handleTap(context),
                     child: Container(
                       width: double.infinity,
-                      height: 48,
+                      height: 48.h,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                         color: Color.fromARGB(255, 13, 155, 108),
                       ),
                       child: ButtonCard(text: _getButtonText(order.status)),

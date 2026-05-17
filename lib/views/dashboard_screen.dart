@@ -15,6 +15,7 @@ import 'package:captain_app/widgets/stat_card.dart';
 import 'package:captain_app/widgets/work_time_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -37,13 +38,13 @@ class DashboardScreen extends StatelessWidget {
               userName: shiftState.user?.name ?? 'كابتن',
               role: role,
             ),
-            titleSpacing: 7,
+            titleSpacing: 7.w,
             scrolledUnderElevation: 0,
             backgroundColor: AppColors.screenBackground,
             leading: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.logout),
+                  icon: Icon(Icons.logout),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -52,11 +53,11 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                 ),
-                const VerticalDivider(
+                VerticalDivider(
                   thickness: 1,
-                  width: 1,
-                  indent: 12,
-                  endIndent: 12,
+                  width: 1.w,
+                  indent: 12.h,
+                  endIndent: 12.h,
                 ),
               ],
             ),
@@ -67,11 +68,11 @@ class DashboardScreen extends StatelessWidget {
               if (!isOnline) return const _OfflineMessage();
 
               if (dashState.isLoading && dashState.data == null) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               }
 
               if (dashState.data == null) {
-                return const Center(child: Text('تعذر تحميل البيانات'));
+                return Center(child: Text('تعذر تحميل البيانات'));
               }
 
               return _DashboardContent(data: dashState.data!);
@@ -90,15 +91,15 @@ class _OfflineMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             'انت غير نشط حاليا',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 28.sp,
               fontWeight: FontWeight.bold,
               color: Color(0xffbe2c2d),
             ),
@@ -119,7 +120,7 @@ class _DashboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -128,24 +129,27 @@ class _DashboardContent extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'احصائياتي اليوم',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 18.sp, color: Colors.grey[600]),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           _DeliveryEarningsCard(feesToday: data.feesToday),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           _StatsGrid(data: data),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           _CancelledOrdersCard(cancelledCount: data.cancelledToday),
         ],
       ),
@@ -164,19 +168,21 @@ class _DeliveryEarningsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 120,
+      height: 120.h,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         color: Colors.white70,
-        border: Border(bottom: BorderSide(width: 4, color: Colors.teal)),
+        border: Border(
+          bottom: BorderSide(width: 4.w, color: Colors.teal),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const Text(
+          Text(
             'خدمة التوصيل',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w600),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -185,14 +191,17 @@ class _DeliveryEarningsCard extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   ' ${feesToday.toStringAsFixed(2)} ',
-                  style: const TextStyle(
-                    fontSize: 32,
+                  style: TextStyle(
+                    fontSize: 32.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.teal,
                   ),
                 ),
               ),
-              Text('ج', style: TextStyle(fontSize: 22, color: Colors.teal)),
+              Text(
+                'ج',
+                style: TextStyle(fontSize: 22.sp, color: Colors.teal),
+              ),
             ],
           ),
         ],
@@ -214,8 +223,8 @@ class _StatsGrid extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: 12.w,
+      mainAxisSpacing: 12.h,
       childAspectRatio: 1.5,
       children: [
         const StatCard(
@@ -283,9 +292,9 @@ class _CancelledOrdersCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         color: Colors.pink[50],
       ),
       child: Row(
@@ -294,12 +303,12 @@ class _CancelledOrdersCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 16,
+                radius: 16.r,
                 backgroundColor: Colors.red[100],
-                child: const Icon(Icons.cancel, color: Color(0xffbe2c2d)),
+                child: Icon(Icons.cancel, color: Color(0xffbe2c2d)),
               ),
-              const SizedBox(width: 4),
-              const Text(
+              SizedBox(width: 4.w),
+              Text(
                 'طلبات ملغاة',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -307,8 +316,8 @@ class _CancelledOrdersCard extends StatelessWidget {
           ),
           Text(
             ' $cancelledCount ',
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 20.sp,
               color: Color(0xffbe2c2d),
               fontWeight: FontWeight.bold,
             ),

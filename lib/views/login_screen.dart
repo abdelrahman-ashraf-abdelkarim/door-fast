@@ -5,6 +5,7 @@ import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,8 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-
-  // ✅ نوع المندوب — افتراضي: أساسي
   DeliveryType _selectedRole = DeliveryType.delivery;
 
   @override
@@ -31,7 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // ✅ نمرر الـ role للـ AuthCubit
       context.read<AuthCubit>().login(
         _nameController.text.trim(),
         _passwordController.text.trim(),
@@ -42,8 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.sizeOf(context).height;
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -76,15 +72,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Column(
                       children: [
-                        // ─── Header / Logo ─────────────────────────────
+                        // ─── Header / Logo ──────────────────────────────
                         Container(
                           width: double.infinity,
-                          height: screenHeight / 2.8,
+                          height: 300.h,
                           decoration: BoxDecoration(
                             color: const Color(0xffF9C724),
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(45),
-                              bottomRight: Radius.circular(45),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(45.r),
+                              bottomRight: Radius.circular(45.r),
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -102,62 +98,62 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
 
                         Padding(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(24.w),
                           child: Form(
                             key: _formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const SizedBox(height: 32),
+                                SizedBox(height: 32.h),
                                 FittedBox(
                                   fit: BoxFit.scaleDown,
-                                  child: const Text(
+                                  child: Text(
                                     'اهلاً بك مجدداً ايها الكابتن!',
                                     style: TextStyle(
-                                      fontSize: 28,
+                                      fontSize: 28.sp,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                const Text(
+                                SizedBox(height: 8.h),
+                                Text(
                                   'سجل دخولك لمتابعة مهام التوصيل اليوميه',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
+                                SizedBox(height: 28.h),
 
-                                const SizedBox(height: 28),
-
-                                // ✅ ─── اختيار نوع المندوب ─────────────
+                                // ─── اختيار نوع المندوب ─────────────────
                                 _RoleSelector(
                                   selected: _selectedRole,
                                   onChanged: (role) =>
                                       setState(() => _selectedRole = role),
                                 ),
+                                SizedBox(height: 24.h),
 
-                                const SizedBox(height: 24),
-
-                                // ─── اسم المستخدم ───────────────────────
+                                // ─── اسم المستخدم ────────────────────────
                                 TextFormField(
                                   controller: _nameController,
+                                  style: TextStyle(fontSize: 16.sp),
                                   decoration: InputDecoration(
                                     labelText: 'اسم المستخدم',
-                                    labelStyle: const TextStyle(
+                                    labelStyle: TextStyle(
                                       color: AppColors.textPrimary,
+                                      fontSize: 15.sp,
                                     ),
                                     hintText: "أدخل اسم المستخدم",
-                                    prefixIcon: const Icon(Icons.person),
+                                    prefixIcon: Icon(Icons.person),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                         color: Colors.grey,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                         color: Color(0xffBA282E),
                                       ),
@@ -170,17 +166,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return null;
                                   },
                                 ),
+                                SizedBox(height: 16.h),
 
-                                const SizedBox(height: 16),
-
-                                // ─── كلمة المرور ────────────────────────
+                                // ─── كلمة المرور ─────────────────────────
                                 TextFormField(
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
+                                  style: TextStyle(fontSize: 16.sp),
                                   decoration: InputDecoration(
                                     labelText: 'كلمة المرور',
+                                    labelStyle: TextStyle(fontSize: 15.sp),
                                     hintText: "أدخل كلمة المرور",
-                                    prefixIcon: const Icon(Icons.lock),
+                                    prefixIcon: Icon(Icons.lock),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
@@ -194,10 +191,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                         color: Color(0xffBA282E),
                                       ),
@@ -213,10 +210,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return null;
                                   },
                                 ),
+                                SizedBox(height: 24.h),
 
-                                const SizedBox(height: 24),
-
-                                // ─── زر تسجيل الدخول ────────────────────
+                                // ─── زر تسجيل الدخول ─────────────────────
                                 BlocBuilder<AuthCubit, AuthState>(
                                   builder: (context, state) {
                                     final isLoading = state is AuthLoading;
@@ -225,12 +221,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Container(
                                         width: double.infinity,
                                         padding: EdgeInsets.symmetric(
-                                          vertical: 12,
+                                          vertical: 14.h,
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xffBA282E),
                                           borderRadius: BorderRadius.circular(
-                                            12,
+                                            12.r,
                                           ),
                                         ),
                                         alignment: Alignment.center,
@@ -238,10 +234,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ? const CircularProgressIndicator(
                                                 color: Colors.white,
                                               )
-                                            : const Text(
+                                            : Text(
                                                 'تسجيل الدخول',
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 18.sp,
                                                   fontWeight: FontWeight.w900,
                                                   color: Colors.white,
                                                 ),
@@ -279,9 +275,9 @@ class _RoleSelector extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFEEEEEE),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(4.w),
       child: Row(
         children: [
           _Tab(
@@ -318,10 +314,10 @@ class _Tab extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.symmetric(vertical: 12.h),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xffBA282E) : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
+            borderRadius: BorderRadius.circular(9.r),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -329,7 +325,7 @@ class _Tab extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 14.sp,
               fontWeight: FontWeight.bold,
               color: isSelected ? Colors.white : AppColors.textSecondary,
             ),

@@ -1,5 +1,7 @@
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+// ignore: unused_import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderTimerWidget extends StatelessWidget {
   const OrderTimerWidget({super.key, required this.order, this.style});

@@ -6,6 +6,7 @@ import 'package:captain_app/widgets/data_filter_card.dart';
 import 'package:captain_app/widgets/transaction_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TransactionLogScreen extends StatelessWidget {
   const TransactionLogScreen({super.key});
@@ -15,10 +16,7 @@ class TransactionLogScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('سجل العمليات المالية'),
-          centerTitle: true,
-        ),
+        appBar: AppBar(title: Text('سجل العمليات المالية'), centerTitle: true),
         body: BlocBuilder<AccountStatementCubit, AccountStatementState>(
           builder: (context, state) {
             return CustomScrollView(
@@ -26,25 +24,25 @@ class TransactionLogScreen extends StatelessWidget {
                 // ─── فلتر التاريخ ──────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     child: Card(
                       color: AppColors.cardBackground,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16.r),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.r),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "تصفيه حسب التاريخ",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 18,
+                                    fontSize: 18.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -55,31 +53,31 @@ class TransactionLogScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            const Row(
+                            SizedBox(height: 12.h),
+                            Row(
                               children: [
                                 Expanded(
                                   child: Text(
                                     "من",
                                     style: TextStyle(
                                       color: AppColors.textSecondary,
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 12),
+                                SizedBox(width: 12.w),
                                 Expanded(
                                   child: Text(
                                     "إلى",
                                     style: TextStyle(
                                       color: AppColors.textSecondary,
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             DateFilterCard(
                               onFilter: (from, to) {
                                 context
@@ -105,11 +103,11 @@ class TransactionLogScreen extends StatelessWidget {
                 // ─── قائمة العمليات ────────────────────────────────────────
                 else if (state is AccountStatementLoaded) ...[
                   if (state.displayedTransactions.isEmpty)
-                    const SliverFillRemaining(
+                    SliverFillRemaining(
                       child: Center(
                         child: Text(
                           'لا توجد عمليات',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16.sp),
                         ),
                       ),
                     )

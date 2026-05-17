@@ -1,6 +1,8 @@
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/order_list.dart';
 import 'package:flutter/material.dart';
+// ignore: unused_import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyOrderScreen extends StatelessWidget {
   const MyOrderScreen({super.key});
@@ -11,7 +13,7 @@ class MyOrderScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("طلباتى"),
+          title: Text("طلباتى"),
           centerTitle: true,
           bottom: const TabBar(
             tabs: [

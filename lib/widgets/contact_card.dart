@@ -2,6 +2,7 @@ import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/show_model_sheet_bottom_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContactCard extends StatelessWidget {
   const ContactCard({
@@ -31,27 +32,27 @@ class ContactCard extends StatelessWidget {
         borderRadius: BorderRadiusGeometry.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: EdgeInsets.all(14.r),
               decoration: BoxDecoration(
                 color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 55,
-                    height: 55,
+                    width: 55.w,
+                    height: 55.h,
                     decoration: BoxDecoration(
                       color: iconBg,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: Icon(Icons.person, color: iconFg, size: 32),
+                    child: Icon(Icons.person, color: iconFg, size: 32.r),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,12 +62,12 @@ class ContactCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: AlignmentDirectional.centerStart,
@@ -74,40 +75,40 @@ class ContactCard extends StatelessWidget {
                             contactName.isEmpty ? 'غير متاح' : contactName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                         if (contactNotes.isNotEmpty) ...[
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6.h),
                           Text(
                             contactNotes,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.black54),
+                            style: TextStyle(color: Colors.black54),
                           ),
                         ],
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Container(
-                    width: 55,
-                    height: 55,
+                    width: 55.w,
+                    height: 55.h,
                     decoration: BoxDecoration(
                       color: AppColors.successGreen,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
                     child: GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
+                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(16),
+                              top: Radius.circular(16.r),
                             ),
                           ),
                           builder: (_) {
@@ -118,30 +119,30 @@ class ContactCard extends StatelessWidget {
                       child: Icon(
                         Icons.perm_contact_calendar_rounded,
                         color: Colors.white,
-                        size: 28,
+                        size: 28.r,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
               decoration: BoxDecoration(
                 color: AppColors.lightSurface,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18.r),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.navigation_rounded,
                     color: AppColors.pickupMarkerOrange,
-                    size: 36,
+                    size: 36.r,
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,17 +151,17 @@ class ContactCard extends StatelessWidget {
                         Text(
                           titleLocation,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             color: Colors.grey[600],
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6.h),
                         Text(
                           orderLocation,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

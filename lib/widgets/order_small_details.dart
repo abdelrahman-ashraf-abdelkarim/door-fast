@@ -4,6 +4,7 @@ import 'package:captain_app/widgets/order_details_reciver_card.dart';
 import 'package:captain_app/widgets/total_order_small_details.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderContainer extends StatelessWidget {
   const OrderContainer({super.key, required this.order});
@@ -20,22 +21,24 @@ class OrderContainer extends StatelessWidget {
         order.status == OrderStatus.newOrder;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       decoration: BoxDecoration(
         // color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: isCustomerHidden
-          ? Center(child: Icon(Icons.lock, color: Colors.black54, size: 28))
+          ? Center(
+              child: Icon(Icons.lock, color: Colors.black54, size: 28.r),
+            )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 isSender
                     ? Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.r),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8.r),
                           border: Border.all(
                             color: Colors.blueGrey.withValues(alpha: 0.1),
                           ),
@@ -48,47 +51,47 @@ class OrderContainer extends StatelessWidget {
                               "العميل",
                               style: TextStyle(
                                 color: AppColors.textSecondary,
-                                fontSize: 18,
+                                fontSize: 18.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.person_2_sharp,
                                   color: Colors.blueGrey,
-                                  size: 24,
+                                  size: 24.r,
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.w),
                                 Flexible(
                                   child: Text(
                                     order.senderName,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textPrimary,
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12.h),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.location_pin,
                                   color: Colors.red,
-                                  size: 24,
+                                  size: 24.r,
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.w),
                                 Expanded(
                                   child: Text(
                                     order.senderAddress,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textSecondary,
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w500,
                                       fontFamily: "Roboto",
                                     ),
@@ -97,7 +100,7 @@ class OrderContainer extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12.h),
                             Center(
                               child: Icon(
                                 Icons.arrow_downward_sharp,
@@ -106,7 +109,7 @@ class OrderContainer extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12.h),
 
                             DottedBorder(
                               options: RoundedRectDottedBorderOptions(
@@ -115,15 +118,15 @@ class OrderContainer extends StatelessWidget {
                                 ), // نفس لون success
                                 strokeWidth: 1,
                                 strokeCap: StrokeCap.round,
-                                padding: const EdgeInsets.all(0),
+                                padding: EdgeInsets.all(0),
                                 dashPattern: [4, 3], // ----
-                                radius: const Radius.circular(8),
+                                radius: Radius.circular(8.r),
                               ),
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.all(16),
+                                padding: EdgeInsets.all(16.r),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   color: Color(
                                     0xffECFDF5,
                                   ).withValues(alpha: 0.5),
@@ -135,25 +138,25 @@ class OrderContainer extends StatelessWidget {
                                       "المستلم",
                                       style: TextStyle(
                                         color: AppColors.successGreen,
-                                        fontSize: 18,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    SizedBox(height: 12.h),
                                     Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.location_on,
                                           color: Colors.red,
-                                          size: 24,
+                                          size: 24.r,
                                         ),
-                                        const SizedBox(width: 8),
+                                        SizedBox(width: 8.w),
                                         Expanded(
                                           child: Text(
                                             order.receiverAddress,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: AppColors.textPrimary,
-                                              fontSize: 16,
+                                              fontSize: 16.sp,
                                               fontWeight: FontWeight.w800,
                                               fontFamily: "Roboto",
                                             ),
@@ -171,7 +174,7 @@ class OrderContainer extends StatelessWidget {
                         ),
                       )
                     : OrderDetailsReciverCard(order: order),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 TotalOrderSmallDetails(order: order),
               ],
             ),
@@ -191,8 +194,8 @@ class ButtonCard extends StatelessWidget {
         text,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontSize: 18,
+        style: TextStyle(
+          fontSize: 18.sp,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),

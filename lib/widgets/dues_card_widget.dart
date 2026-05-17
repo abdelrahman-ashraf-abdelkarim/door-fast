@@ -1,5 +1,6 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DuesCardWidget extends StatelessWidget {
   const DuesCardWidget({
@@ -26,28 +27,31 @@ class DuesCardWidget extends StatelessWidget {
           borderRadius: BorderRadiusGeometry.circular(16),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
                 backgroundColor: iconBackgroundColor,
-                radius: 24,
+                radius: 24.r,
                 child: Icon(
                   icon,
                   fontWeight: FontWeight.bold,
                   color: iconForegroundColor,
-                  size: 26,
+                  size: 26.r,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Text(
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: AlignmentDirectional.centerStart,
@@ -55,7 +59,7 @@ class DuesCardWidget extends StatelessWidget {
                   "$text ج.م",
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 24,
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.normal,
                   ),
                 ),

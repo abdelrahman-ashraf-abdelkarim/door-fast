@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContainerButtonWidget extends StatelessWidget {
   const ContainerButtonWidget({
@@ -21,10 +22,10 @@ class ContainerButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 50,
+      height: 50.h,
       decoration: BoxDecoration(
         border: Border.all(color: color),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         color: isWhite == true ? Colors.white : color,
       ),
       child: Center(
@@ -33,7 +34,7 @@ class ContainerButtonWidget extends StatelessWidget {
                 text ?? '',
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                 ),
               )

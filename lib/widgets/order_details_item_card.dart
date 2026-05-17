@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderDetailsItemCard extends StatelessWidget {
   final OrderItem item;
@@ -12,26 +13,26 @@ class OrderDetailsItemCard extends StatelessWidget {
     final marketColors = _marketPlaceColors(item.marketPlace);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 60.w,
+            height: 60.h,
             decoration: BoxDecoration(
               color: AppColors.lightSurface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
             child: Center(
               child: Text(
                 '${item.quantity}x',
-                style: const TextStyle(
-                  fontSize: 20,
+                style: TextStyle(
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.w800,
                   color: AppColors.accentOrange,
                 ),
@@ -39,7 +40,7 @@ class OrderDetailsItemCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 18),
+          SizedBox(width: 18.w),
 
           Expanded(
             child: Column(
@@ -47,45 +48,45 @@ class OrderDetailsItemCard extends StatelessWidget {
               children: [
                 if (item.marketPlace.isNotEmpty) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
                       color: marketColors.background,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(999.r),
                     ),
                     child: Text(
                       item.marketPlace,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.w700,
                         color: marketColors.foreground,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                 ],
 
                 Text(
                   item.productName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 Text(
                   item.details.isEmpty ? 'بدون تفاصيل إضافية' : item.details,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 16.sp,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -94,14 +95,14 @@ class OrderDetailsItemCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 18),
+          SizedBox(width: 18.w),
 
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               'ج ${item.totalPrice.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 20,
+              style: TextStyle(
+                fontSize: 20.sp,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),

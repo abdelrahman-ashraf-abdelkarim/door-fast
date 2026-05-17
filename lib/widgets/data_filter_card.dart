@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DateFilterCard extends StatefulWidget {
   const DateFilterCard({super.key, this.onFilter});
@@ -63,7 +64,7 @@ class _DateFilterCardState extends State<DateFilterCard> {
                 child: _dateField(format(fromDate)),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: GestureDetector(
                 onTap: pickToDate,
@@ -73,28 +74,28 @@ class _DateFilterCardState extends State<DateFilterCard> {
           ],
         ),
         if (widget.onFilter != null) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: [
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () => widget.onFilter!(fromDate, toDate),
-                  icon: const Icon(Icons.search, color: Colors.white),
-                  label: const Text(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  label: Text(
                     'بحث',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF8C00),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                 ),
               ),
               if (fromDate != null || toDate != null) ...[
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 IconButton(
                   onPressed: () {
                     setState(() {
@@ -103,7 +104,7 @@ class _DateFilterCardState extends State<DateFilterCard> {
                     });
                     widget.onFilter!(null, null);
                   },
-                  icon: const Icon(Icons.close, color: Colors.grey),
+                  icon: Icon(Icons.close, color: Colors.grey),
                   tooltip: 'مسح الفلتر',
                 ),
               ],
@@ -116,22 +117,22 @@ class _DateFilterCardState extends State<DateFilterCard> {
 
   Widget _dateField(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       decoration: BoxDecoration(
         color: const Color(0xFFEAEAEA),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+          Icon(Icons.keyboard_arrow_down, color: Colors.grey),
           Flexible(
             child: Text(
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.start,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
             ),
           ),
         ],

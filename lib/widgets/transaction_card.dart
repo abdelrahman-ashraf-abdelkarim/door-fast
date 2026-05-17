@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TransactionCard extends StatelessWidget {
   // final int id;
@@ -23,11 +24,11 @@ class TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -45,10 +46,7 @@ class TransactionCard extends StatelessWidget {
             children: [
               Text(
                 "$logId",
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
               Flexible(
                 child: Text(
@@ -56,28 +54,28 @@ class TransactionCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
 
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: TextStyle(fontSize: 13.sp, color: Colors.grey),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           /// 🔸 Note
           Text(
             note,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           /// 🔸 Divider
-          Container(height: 1, color: Colors.grey.shade200),
+          Container(height: 1.h, color: Colors.grey.shade200),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           /// 🔸 Values Row
           Row(
@@ -100,14 +98,17 @@ class TransactionCard extends StatelessWidget {
   }) {
     return Column(
       children: [
-        Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        const SizedBox(height: 6),
+        Text(
+          title,
+          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+        ),
+        SizedBox(height: 6.h),
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             value != null ? value.toStringAsFixed(0) : "—",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: color,
             ),

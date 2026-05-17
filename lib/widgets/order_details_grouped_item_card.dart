@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderDetailsGroupedItemCard extends StatelessWidget {
   final String marketPlace;
@@ -20,50 +21,49 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
     return AppConstants.marketPalette[index];
   }
 
-  double get _groupTotal =>
-      items.fold(0, (sum, item) => sum + item.totalPrice);
+  double get _groupTotal => items.fold(0, (sum, item) => sum + item.totalPrice);
 
   @override
   Widget build(BuildContext context) {
     final colors = _marketColors;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Header المحل ──
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+            padding: EdgeInsets.fromLTRB(18.w, 16.h, 18.w, 0.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
                     color: colors.background,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(999.r),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.storefront_rounded,
-                        size: 16,
+                        size: 16.r,
                         color: colors.foreground,
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6.w),
                       Text(
                         marketPlace,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w700,
                           color: colors.foreground,
                         ),
@@ -74,7 +74,7 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
                 Text(
                   'ج ${_groupTotal.toStringAsFixed(2)}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
                     color: colors.foreground,
                   ),
@@ -85,8 +85,8 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
 
           // ── Divider ──
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            child: Divider(color: Colors.grey.shade200, height: 1),
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+            child: Divider(color: Colors.grey.shade200, height: 1.h),
           ),
 
           // ── Items ──
@@ -98,28 +98,28 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 4, 18, 4),
+                  padding: EdgeInsets.fromLTRB(18.w, 4.h, 18.w, 4.h),
                   child: Row(
                     children: [
                       Container(
-                        width: 48,
-                        height: 48,
+                        width: 48.w,
+                        height: 48.h,
                         decoration: BoxDecoration(
                           color: AppColors.lightSurface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Center(
                           child: Text(
                             '${item.quantity}x',
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: TextStyle(
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.w800,
                               color: AppColors.accentOrange,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,20 +128,20 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
                               item.productName,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             if (item.details.isNotEmpty) ...[
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4.h),
                               Text(
                                 item.details,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 13,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
@@ -149,11 +149,11 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12.w),
                       Text(
                         'ج ${item.totalPrice.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
                         ),
@@ -163,14 +163,14 @@ class OrderDetailsGroupedItemCard extends StatelessWidget {
                 ),
                 if (!isLast)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Divider(color: Colors.grey.shade100, height: 1),
+                    padding: EdgeInsets.symmetric(horizontal: 18.w),
+                    child: Divider(color: Colors.grey.shade100, height: 1.h),
                   ),
               ],
             );
           }),
 
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
         ],
       ),
     );

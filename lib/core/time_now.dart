@@ -2,6 +2,7 @@ import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 class StartShiftTimeWidget extends StatelessWidget {
@@ -19,7 +20,7 @@ class StartShiftTimeWidget extends StatelessWidget {
 
         return Text(
           formattedTime,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style:  TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
         );
       },
     );

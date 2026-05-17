@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CurrentBalanceCard extends StatelessWidget {
   const CurrentBalanceCard({super.key, required this.balance});
@@ -8,9 +9,9 @@ class CurrentBalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 130,
+      height: 130.h,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         gradient: const LinearGradient(
           colors: [Color(0xFFB85C00), Color(0xFFFF8C00)],
           begin: Alignment.topLeft,
@@ -27,22 +28,22 @@ class CurrentBalanceCard extends StatelessWidget {
               opacity: 0.15,
               child: Icon(
                 Icons.account_balance_wallet,
-                size: 160,
+                size: 160.r,
                 color: Colors.white,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                const Text(
+                Text(
                   "الرصيد الحالي",
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  style: TextStyle(color: Colors.white70, fontSize: 16.sp),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -57,18 +58,18 @@ class CurrentBalanceCard extends StatelessWidget {
                           children: [
                             Text(
                               balance.toStringAsFixed(2),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 36,
+                                fontSize: 36.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            const Text(
+                            SizedBox(width: 6.w),
+                            Text(
                               "ج.م",
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 18,
+                                fontSize: 18.sp,
                               ),
                             ),
                           ],

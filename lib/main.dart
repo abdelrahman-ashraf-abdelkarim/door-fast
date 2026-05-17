@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -51,23 +52,28 @@ class CaptainApp extends StatelessWidget {
         ),
         BlocProvider(create: (_) => DashboardCubit(api: api)),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        locale: const Locale('ar'), // العربية افتراضيًا
-        supportedLocales: const [Locale('en'), Locale('ar')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        title: 'Door Fast App',
-        theme: ThemeData(
-          primarySwatch: Colors.orange,
-          fontFamily: 'Cairo',
-          scaffoldBackgroundColor: Color(0xffF5F5F5),
+      child: ScreenUtilInit(
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          locale: const Locale('ar'), // العربية افتراضيًا
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          title: 'Door Fast App',
+          theme: ThemeData(
+            primarySwatch: Colors.orange,
+            fontFamily: 'Cairo',
+            scaffoldBackgroundColor: Color(0xffF5F5F5),
+          ),
+          navigatorKey: navigatorKey,
+          home: const SplashScreen(),
         ),
-        navigatorKey: navigatorKey,
-        home: const SplashScreen(),
       ),
     );
   }

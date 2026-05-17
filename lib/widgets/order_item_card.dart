@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderItemCard extends StatelessWidget {
   const OrderItemCard({super.key, required this.item});
@@ -12,32 +13,32 @@ class OrderItemCard extends StatelessWidget {
         Center(
           child: Text(
             '${item.quantity}x',
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 20.sp,
               fontWeight: FontWeight.w800,
               color: AppColors.accentOrange,
             ),
           ),
         ),
-        const SizedBox(width: 18),
+        SizedBox(width: 18.w),
         Expanded(
           child: Text(
             item.productName,
             textAlign: TextAlign.right,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 18,
+            style: TextStyle(
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
         ),
-        const SizedBox(width: 18),
+        SizedBox(width: 18.w),
         Text(
           'ج ${item.totalPrice.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 20,
+          style: TextStyle(
+            fontSize: 20.sp,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),

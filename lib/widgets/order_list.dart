@@ -6,6 +6,7 @@ import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/widgets/order_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrdersList extends StatefulWidget {
   final OrderStatusFilter status;
@@ -31,7 +32,7 @@ class _OrdersListState extends State<OrdersList>
         final cubit = context.read<OrdersCubit>();
 
         if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
 
         final List<Order> orders;
@@ -49,8 +50,11 @@ class _OrdersListState extends State<OrdersList>
         }
 
         if (orders.isEmpty) {
-          return const Center(
-            child: Text("لا توجد طلبات حالياً", style: TextStyle(fontSize: 16)),
+          return Center(
+            child: Text(
+              "لا توجد طلبات حالياً",
+              style: TextStyle(fontSize: 16.sp),
+            ),
           );
         }
 

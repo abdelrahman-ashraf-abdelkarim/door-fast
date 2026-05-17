@@ -13,6 +13,7 @@ import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/views/my_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, this.initialIndex = 0});
@@ -149,15 +150,15 @@ class _OfflineMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             'انت غير نشط حاليا',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 28.sp,
               fontWeight: FontWeight.bold,
               color: Color(0xffbe2c2d),
             ),

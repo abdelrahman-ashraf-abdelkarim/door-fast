@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ItemPriceCard extends StatelessWidget {
   const ItemPriceCard({super.key, required this.order});
@@ -12,7 +13,7 @@ class ItemPriceCard extends StatelessWidget {
     return Card(
       color: AppColors.cardBackground,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -35,11 +36,11 @@ class ItemPriceCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'الإجمالي',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -47,9 +48,9 @@ class ItemPriceCard extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     'ج ${order.totalPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.accentOrange,
-                      fontSize: 22,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -68,7 +69,7 @@ class ItemPriceCard extends StatelessWidget {
     required Color color,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: EdgeInsets.symmetric(vertical: 2.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -79,19 +80,19 @@ class ItemPriceCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: color,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: TextStyle(
                 color: color,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),

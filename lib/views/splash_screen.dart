@@ -3,6 +3,7 @@ import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -66,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen>
           scale: _animation,
           child: Image.asset(
             'assets/images/logo-removebg-preview.png',
-            width: 180,
+            width: 180.w,
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionLogWidget extends StatelessWidget {
@@ -30,18 +31,18 @@ class TransactionLogWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: AppColors.cardBackground,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      margin: EdgeInsets.symmetric(vertical: 8.h),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         child: Row(
           children: [
             CircleAvatar(
               backgroundColor: backgroundIconColor,
-              radius: 24,
-              child: FaIcon(icon, color: foregroundIconColor, size: 22),
+              radius: 24.r,
+              child: FaIcon(icon, color: foregroundIconColor, size: 22.r),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,26 +51,26 @@ class TransactionLogWidget extends StatelessWidget {
                     title,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Wrap(
                     spacing: 4,
                     children: [
                       Text(
                         day,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w100,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       Text(
                         month,
-                        style: const TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                       Text(
                         yearAndHour,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w100,
                           color: AppColors.textSecondary,
                         ),
@@ -85,7 +86,7 @@ class TransactionLogWidget extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isEntry ? AppColors.primaryTeal : AppColors.accentOrange,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),

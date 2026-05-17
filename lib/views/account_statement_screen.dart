@@ -14,6 +14,7 @@ import 'package:captain_app/widgets/dues_card_widget.dart';
 import 'package:captain_app/widgets/transaction_log_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AccountStatementScreen extends StatelessWidget {
@@ -22,7 +23,7 @@ class AccountStatementScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.read<AuthCubit>().state;
-    if (authState is! AuthAuthenticated) return const SizedBox();
+    if (authState is! AuthAuthenticated) return SizedBox();
 
     return BlocProvider(
       create: (_) => AccountStatementCubit(
@@ -42,9 +43,9 @@ class _AccountStatementView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "كشف الحساب",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
         ),
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.screenBackground,
@@ -54,7 +55,7 @@ class _AccountStatementView extends StatelessWidget {
         builder: (context, state) {
           // ─── Loading ────────────────────────────────────────────────────
           if (state is AccountStatementLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
 
           // ─── Error ──────────────────────────────────────────────────────
@@ -65,11 +66,11 @@ class _AccountStatementView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(state.message, textAlign: TextAlign.center),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   ElevatedButton(
                     onPressed: () =>
                         context.read<AccountStatementCubit>().loadStatement(),
-                    child: const Text('إعادة المحاولة'),
+                    child: Text('إعادة المحاولة'),
                   ),
                 ],
               ),
@@ -86,14 +87,14 @@ class _AccountStatementView extends StatelessWidget {
             return Stack(
               children: [
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ─── الرصيد الحالي ─────────────────────────────────
                       CurrentBalanceCard(balance: wallet.currentBalance),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
 
                       // ─── إجمالي المدين والدائن ─────────────────────────
                       Row(
@@ -119,20 +120,20 @@ class _AccountStatementView extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
 
                       // ─── سجل العمليات ──────────────────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
-                            child: const Text(
+                            child: Text(
                               "سجل العمليات",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: AppColors.textPrimary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                                fontSize: 20.sp,
                               ),
                             ),
                           ),
@@ -149,11 +150,11 @@ class _AccountStatementView extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               "عرض الكل",
                               style: TextStyle(
                                 color: AppColors.accentOrange,
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -172,7 +173,7 @@ class _AccountStatementView extends StatelessWidget {
                 // ─── Badge "تحديث جديد" عند وصول بيانات WebSocket ────────
                 if (state.hasNewRealtime)
                   Positioned(
-                    top: 8,
+                    top: 8.h,
                     left: 0,
                     right: 0,
                     child: Center(
@@ -181,13 +182,13 @@ class _AccountStatementView extends StatelessWidget {
                             .read<AccountStatementCubit>()
                             .acknowledgeRealtime(),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 8.h,
                           ),
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(99, 112, 102, 224),
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(24.r),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black26,
@@ -196,15 +197,15 @@ class _AccountStatementView extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.arrow_upward,
                                 color: Colors.white,
-                                size: 16,
+                                size: 16.r,
                               ),
-                              SizedBox(width: 6),
+                              SizedBox(width: 6.w),
                               Text(
                                 'تحديث جديد',
                                 style: TextStyle(
@@ -222,7 +223,7 @@ class _AccountStatementView extends StatelessWidget {
             );
           }
 
-          return const SizedBox();
+          return SizedBox();
         },
       ),
     );

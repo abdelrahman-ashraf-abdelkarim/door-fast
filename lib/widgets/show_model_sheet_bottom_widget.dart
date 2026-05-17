@@ -1,5 +1,6 @@
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -53,62 +54,62 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle bar
           Container(
-            width: 50,
-            height: 5,
+            width: 50.w,
+            height: 5.h,
             decoration: BoxDecoration(
               color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.r),
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
-          const Text(
+          Text(
             "بيانات التواصل",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff25D366),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
               ),
               onPressed: () => _callPhone(phone: contactPhone),
-              icon: const Icon(
+              icon: Icon(
                 Icons.call,
                 color: Colors.white,
-                size: 24,
+                size: 24.r,
                 fontWeight: FontWeight.w900,
               ),
               label: Text(
                 contactPhone,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
 
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff25D366),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
               ),
               onPressed: () {
                 _openWhatsApp(
@@ -116,17 +117,17 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
                   message: 'السلام عليكم، معاك مندوب التوصيل',
                 );
               },
-              icon: const FaIcon(
+              icon: FaIcon(
                 FontAwesomeIcons.whatsapp,
                 color: Colors.white,
-                size: 24,
+                size: 24.r,
                 fontWeight: FontWeight.w900,
               ),
-              label: const Text(
+              label: Text(
                 "تواصل واتساب",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -134,39 +135,39 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
           ),
 
           if (canCallTwo) ...[
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff128C7E),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () => _callPhone(phone: contactPhoneTwo),
-                icon: const Icon(
+                icon: Icon(
                   Icons.call,
                   color: Colors.white,
-                  size: 24,
+                  size: 24.r,
                   fontWeight: FontWeight.w900,
                 ),
                 label: Text(
                   contactPhoneTwo,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff128C7E),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () {
                   _openWhatsApp(
@@ -174,17 +175,17 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
                     message: 'السلام عليكم، معاك مندوب التوصيل',
                   );
                 },
-                icon: const FaIcon(
+                icon: FaIcon(
                   FontAwesomeIcons.whatsapp,
                   color: Colors.white,
-                  size: 24,
+                  size: 24.r,
                   fontWeight: FontWeight.w900,
                 ),
-                label: const Text(
+                label: Text(
                   "تواصل واتساب",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -192,28 +193,28 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
             ),
           ],
           if (canAddress) ...[
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF9800),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () {
                   _openMapLink(contactAddress);
                 },
-                icon: const FaIcon(
+                icon: FaIcon(
                   FontAwesomeIcons.mapLocation,
                   color: Colors.white,
-                  size: 24,
+                  size: 24.r,
                   fontWeight: FontWeight.w900,
                 ),
-                label: const Text(
+                label: Text(
                   "موقع العميل",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -221,7 +222,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
             ),
           ],
           // call phone two Button
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
         ],
       ),
     );

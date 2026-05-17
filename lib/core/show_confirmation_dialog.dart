@@ -1,5 +1,6 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void showConfirmationDialog(
   BuildContext context, {
@@ -21,9 +22,9 @@ void showConfirmationDialog(
         builder: (dialogContext, setState) => AlertDialog(
           title: Text(title, textAlign: TextAlign.center),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          contentPadding: const EdgeInsets.all(20),
+          contentPadding: EdgeInsets.all(20.r),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
             // height: MediaQuery.of(context).size.height * 0.20,
@@ -33,7 +34,7 @@ void showConfirmationDialog(
               children: [
                 Text(message),
                 if (isCancelled) ...[
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   TextField(
                     controller: reasonController,
                     maxLines: 3,
@@ -50,7 +51,7 @@ void showConfirmationDialog(
                       hintText: 'اكتب سبب الرفض هنا',
                       errorText: errorText,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16.r),
                       ),
                     ),
                   ),
@@ -65,7 +66,7 @@ void showConfirmationDialog(
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.textSecondary,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: ElevatedButton(
                     onPressed: () {
@@ -82,7 +83,7 @@ void showConfirmationDialog(
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: colorContainer,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: ElevatedButton(
                     onPressed: () {

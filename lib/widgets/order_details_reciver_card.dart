@@ -1,5 +1,6 @@
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderDetailsReciverCard extends StatelessWidget {
   const OrderDetailsReciverCard({super.key, required this.order});
@@ -12,33 +13,33 @@ class OrderDetailsReciverCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(Icons.person_2_sharp, color: Colors.blueGrey, size: 24),
-            const SizedBox(width: 8),
+            Icon(Icons.person_2_sharp, color: Colors.blueGrey, size: 24.r),
+            SizedBox(width: 8.w),
             Flexible(
               child: Text(
                 order.receiverName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Row(
           children: [
-            const Icon(Icons.location_on, color: Colors.red, size: 24),
-            const SizedBox(width: 8),
+            Icon(Icons.location_on, color: Colors.red, size: 24.r),
+            SizedBox(width: 8.w),
             Flexible(
               child: Text(
                 order.receiverAddress,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                 ),
                 maxLines: 2,
