@@ -11,8 +11,10 @@ import 'package:captain_app/widgets/contact_card.dart';
 import 'package:captain_app/widgets/container_button_widget.dart';
 import 'package:captain_app/widgets/item_price_card.dart';
 import 'package:captain_app/widgets/order_details_grouped_item_card.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Order order;
@@ -33,6 +35,18 @@ class OrderDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ── Responsive helpers ──────────────────────────────────────────
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Scale factor based on 390 pt (iPhone 14) as the baseline
+    final double scale = (screenWidth / 390).clamp(0.75, 1.25);
+
+    double sp(double size) => size * scale; // font size
+    double wp(double px) => screenWidth * (px / 390); // width-based
+    double hp(double px) => screenHeight * (px / 844); // height-based
+    // ────────────────────────────────────────────────────────────────
+
     return BlocProvider(
       create: (_) => InvoiceCubit(),
       child: Directionality(
@@ -42,21 +56,23 @@ class OrderDetailsScreen extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('تفاصيل الطلب'),
+                Text('تفاصيل الطلب', style: TextStyle(fontSize: sp(17))),
                 Text(
                   "#${order.orderNumber}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.pickupMarkerOrange,
                     fontWeight: FontWeight.bold,
+                    fontSize: sp(17),
                   ),
                 ),
               ],
             ),
             centerTitle: true,
+            toolbarHeight: hp(56).clamp(48, 64),
           ),
           backgroundColor: AppColors.screenBackground,
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(wp(16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -69,7 +85,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     titleLocation: "عنوان الاستلام",
                     orderLocation: order.senderAddress,
                   ),
-                const SizedBox(height: 12),
+                SizedBox(height: hp(12)),
                 ContactCard(
                   title: 'المستلم',
                   contact: order.receiver,
@@ -78,12 +94,81 @@ class OrderDetailsScreen extends StatelessWidget {
                   titleLocation: "عنوان التسليم",
                   orderLocation: order.receiverAddress,
                 ),
-                const SizedBox(height: 16),
-                const Text(
+
+                // ── Notes section ────────────────────────────────────
+                if (order.notes.isNotEmpty) ...[
+                  SizedBox(height: hp(16)),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.commentDots,
+                        size: sp(18),
+                        color: Colors.red[800],
+                      ),
+                      SizedBox(width: wp(8)),
+                      Text(
+                        'الملاحظات',
+                        style: TextStyle(
+                          fontSize: sp(20),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: hp(16)),
+                  DottedBorder(
+                    options: RoundedRectDottedBorderOptions(
+                      color: const Color.fromARGB(255, 185, 16, 16),
+                      strokeWidth: 1,
+                      strokeCap: StrokeCap.round,
+                      padding: const EdgeInsets.all(0),
+                      dashPattern: const [4, 3],
+                      radius: const Radius.circular(8),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(wp(16)),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: const Color.fromARGB(
+                          255,
+                          253,
+                          236,
+                          236,
+                        ).withValues(alpha: 0.5),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: hp(12)),
+                          Text(
+                            order.notes,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: sp(16),
+                              fontWeight: FontWeight.w800,
+                              fontFamily: "Roboto",
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+
+                // ── Order items ──────────────────────────────────────
+                SizedBox(height: hp(16)),
+                Text(
                   'محتويات الطلب',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: sp(20),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: hp(16)),
                 ...() {
                   final grouped = <String, List<OrderItem>>{};
                   for (final item in order.items) {
@@ -99,9 +184,12 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                   );
                 }(),
-                const SizedBox(height: 16),
+
+                SizedBox(height: hp(16)),
                 ItemPriceCard(order: order),
-                const SizedBox(height: 20),
+                SizedBox(height: hp(20)),
+
+                // ── Action buttons ───────────────────────────────────
                 if (order.status == OrderStatus.accepted)
                   Column(
                     children: [
@@ -123,13 +211,11 @@ class OrderDetailsScreen extends StatelessWidget {
                           );
                         },
                         child: ContainerButtonWidget(
-                          // colors: AppConstants.acceptButtonGradientColors,
                           color: AppColors.buttonOrderCard,
-
                           text: '✓ تم التوصيل بنجاح',
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: hp(16)),
                       GestureDetector(
                         onTap: () {
                           showConfirmationDialog(
@@ -158,6 +244,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+
                 if (order.status == OrderStatus.delivered)
                   BlocConsumer<InvoiceCubit, InvoiceState>(
                     listener: (context, state) {

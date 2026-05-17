@@ -184,7 +184,7 @@ class _DeliveryEarningsCard extends StatelessWidget {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  ' ${feesToday.toStringAsFixed(0)} ',
+                  ' ${feesToday.toStringAsFixed(2)} ',
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -244,13 +244,14 @@ class _StatsGrid extends StatelessWidget {
         ),
         StatCard(
           title: ' التحصيل اليومى',
-          value: '${data.feesToday.toStringAsFixed(0)} ج',
+          value: '${data.collectionToday.toStringAsFixed(2)} ج',
           icon: Icons.monetization_on_outlined,
           color: Colors.orange,
         ),
-        const StatCard(
+        StatCard(
           title: 'إجمالي الخصومات',
-          value: '0 ج', // مش موجود في الـ API حالياً
+          value:
+              '${data.discountToday.toStringAsFixed(2)} ج', // مش موجود في الـ API حالياً
           icon: Icons.money_off,
           color: Colors.red,
         ),
@@ -263,7 +264,7 @@ class _StatsGrid extends StatelessWidget {
         ),
         StatCard(
           title: 'إجمالي الأرباح',
-          value: '${data.profitToday.toStringAsFixed(0)} ج',
+          value: '${data.profitToday.toStringAsFixed(2)} ج',
           color: Colors.deepPurpleAccent,
         ),
       ],

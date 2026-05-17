@@ -8,6 +8,8 @@ class DashboardData {
   final double feesToday;
   final double profitToday;
   final int currentTier;
+  final double collectionToday;
+  final double discountToday;
 
   const DashboardData({
     required this.shiftActive,
@@ -19,6 +21,8 @@ class DashboardData {
     required this.feesToday,
     required this.profitToday,
     required this.currentTier,
+    required this.collectionToday,
+    required this.discountToday,
   });
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
@@ -29,8 +33,10 @@ class DashboardData {
       newOrders: data['new_orders'] as int? ?? 0,
       activeOrders: data['active_orders'] as int? ?? 0,
       deliveredToday: data['delivered_today'] as int? ?? 0,
+      discountToday: (data['discount_today'] as num?)?.toDouble() ?? 0,
       cancelledToday: data['cancelled_today'] as int? ?? 0,
       feesToday: (data['fees_today'] as num?)?.toDouble() ?? 0.0,
+      collectionToday: (data['collection_today'] as num?)?.toDouble() ?? 0.0,
       profitToday: (data['profit_today'] as num?)?.toDouble() ?? 0.0,
       currentTier: data['current_tier'] as int? ?? 0,
     );

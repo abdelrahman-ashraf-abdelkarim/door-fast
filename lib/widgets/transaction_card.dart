@@ -83,8 +83,8 @@ class TransactionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _valueColumn(title: "مدين", value: debit, color: Colors.red),
-              _valueColumn(title: "دائن", value: credit, color: Colors.green),
+              _valueColumn(title: "مدين", value: debit, color: Colors.green),
+              _valueColumn(title: "دائن", value: credit, color: Colors.red),
               _valueColumn(title: "رصيد", value: balance, color: Colors.black),
             ],
           ),
