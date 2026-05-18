@@ -3,6 +3,8 @@ import 'package:captain_app/cubits/app_version_cubit/app_version_cubit.dart';
 import 'package:captain_app/cubits/app_version_cubit/app_version_state.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
+import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
+import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:captain_app/views/home_shell.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _animation;
   bool _animationDone = false;
   bool _versionCheckStarted = false;
+  bool _versionCheckDone = false;
   bool _hasNavigated = false;
 
   @override
@@ -65,8 +68,14 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateNormally() {
     if (!mounted || _hasNavigated) return;
 
-    _hasNavigated = true;
+    _versionCheckDone = true;
     final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      final shiftState = context.read<ShiftCubit>().state;
+      if (shiftState.user == null) return;
+    }
+
+    _hasNavigated = true;
     final destination = authState is AuthAuthenticated
         ? const HomeShell()
         : const LoginScreen();
@@ -223,16 +232,29 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AppVersionCubit, AppVersionState>(
-      listener: (context, state) {
-        if (state is AppVersionForceUpdate) {
-          _showForceUpdateDialog(state.updateUrl);
-        } else if (state is AppVersionOptionalUpdate) {
-          _showOptionalUpdateDialog(state.updateUrl);
-        } else if (state is AppVersionUpToDate || state is AppVersionError) {
-          _navigateNormally();
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AppVersionCubit, AppVersionState>(
+          listener: (context, state) {
+            if (state is AppVersionForceUpdate) {
+              _showForceUpdateDialog(state.updateUrl);
+            } else if (state is AppVersionOptionalUpdate) {
+              _showOptionalUpdateDialog(state.updateUrl);
+            } else if (state is AppVersionUpToDate ||
+                state is AppVersionError) {
+              _navigateNormally();
+            }
+          },
+        ),
+        BlocListener<ShiftCubit, ShiftState>(
+          listener: (context, shiftState) {
+            if (!_versionCheckDone) return;
+            if (shiftState.user != null) {
+              _navigateNormally();
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: const Color(0xfff8c624),
         body: Center(
