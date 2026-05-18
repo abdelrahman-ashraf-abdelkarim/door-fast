@@ -25,7 +25,7 @@ class ShiftState extends Equatable {
     return ShiftState(
       startTime: startTime,
       duration: startTime == null
-          ? Duration(milliseconds: json['durationInMilliseconds'] as int? ?? 0)
+          ? Duration.zero
           : DateTime.now().difference(startTime),
       user: json['user'] == null
           ? null
@@ -52,7 +52,7 @@ class ShiftState extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'startTime': startTime?.toIso8601String(),
-      'durationInMilliseconds': duration.inMilliseconds,
+      // duration is intentionally excluded — recalculated from startTime on restore
       'user': user?.toJson(),
     };
   }

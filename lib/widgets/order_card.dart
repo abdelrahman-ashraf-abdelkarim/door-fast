@@ -1,5 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/core/show_confirmation_dialog.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/views/order_details_screen.dart';
@@ -10,16 +12,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderCard extends StatelessWidget {
-  const OrderCard({
-    super.key,
-    required this.itemsCount,
-    required this.order,
-    required this.token,
-  });
+  const OrderCard({super.key, required this.itemsCount, required this.order});
 
   final int itemsCount;
   final Order order;
-  final String token;
 
   bool get _isPendingOrder {
     return order.status == OrderStatus.newOrder ||
@@ -37,6 +33,9 @@ class OrderCard extends StatelessWidget {
         title: 'تأكيد القبول',
         message: 'هل أنت متأكد من قبول هذا الطلب؟',
         onConfirm: (_) {
+          final authState = context.read<AuthCubit>().state;
+          if (authState is! AuthAuthenticated) return;
+          final token = authState.token;
           context.read<OrdersCubit>().acceptOrder(
             order.id,
             token,
@@ -50,9 +49,7 @@ class OrderCard extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => OrderDetailsScreen(order: order, token: token),
-      ),
+      MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
     );
   }
 

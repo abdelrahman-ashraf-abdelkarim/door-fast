@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,8 +15,8 @@ class TotalOrderSmallDetails extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xffBAE6FD)),
-        color: Color(0xffBAE6FD).withValues(alpha: 0.3),
+        border: Border.all(color: AppColors.infoLight),
+        color: AppColors.infoLight.withValues(alpha: 0.3),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -23,7 +24,7 @@ class TotalOrderSmallDetails extends StatelessWidget {
           Text(
             "الإجمالى المطلوب",
             style: TextStyle(
-              color: Color(0xff0369A1),
+              color: AppColors.infoText,
               fontSize: 18.sp,
               fontWeight: FontWeight.w800,
             ),
@@ -31,7 +32,7 @@ class TotalOrderSmallDetails extends StatelessWidget {
           Text(
             "${order.totalPrice.toString()} ج",
             style: TextStyle(
-              color: Color(0xff0369A1),
+              color: AppColors.infoText,
               fontSize: 18.sp,
               fontWeight: FontWeight.w800,
             ),

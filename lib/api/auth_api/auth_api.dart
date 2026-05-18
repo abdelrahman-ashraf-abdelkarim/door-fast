@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/auth_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 Future<AuthResponse> login(
   String username,
@@ -9,14 +8,18 @@ Future<AuthResponse> login(
   DeliveryType role,
 ) async {
   final loginUrl = '${AppConstants.getBaseUrl(role)}/login';
-  final response = await http.post(
-    Uri.parse(loginUrl),
-    body: {'username': username, 'password': password},
+  final response = await Dio().post(
+    loginUrl,
+    data: {'username': username, 'password': password},
+    options: Options(validateStatus: (_) => true),
   );
   if (response.statusCode == 200) {
-    return AuthResponse.fromJson(jsonDecode(response.body), role: role);
+    return AuthResponse.fromJson(
+      response.data as Map<String, dynamic>,
+      role: role,
+    );
   } else {
-    final errorData = jsonDecode(response.body);
+    final errorData = response.data as Map<String, dynamic>;
     throw Exception(errorData['message'] ?? 'فشل تسجيل الدخول');
   }
 }
@@ -28,24 +31,25 @@ Future<void> updateFcmToken(
 ) async {
   try {
     final url = '${AppConstants.getBaseUrl(role)}/fcm-token';
-    await http.post(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $authToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'fcm_token': fcmToken}),
+    await Dio().post(
+      url,
+      data: {'fcm_token': fcmToken},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+      ),
     );
-  } catch (_) {
-  }
+  } catch (_) {}
 }
 
 Future<bool> validateToken(String authToken, DeliveryType role) async {
   try {
     final url = '${AppConstants.getBaseUrl(role)}/shift/times';
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {'Authorization': 'Bearer $authToken'},
+    final response = await Dio().get(
+      url,
+      options: Options(headers: {'Authorization': 'Bearer $authToken'}),
     );
     return response.statusCode == 200;
   } catch (e) {

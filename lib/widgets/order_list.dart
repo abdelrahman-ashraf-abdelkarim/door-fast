@@ -1,5 +1,3 @@
-import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
-import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/order_model.dart';
@@ -26,7 +24,6 @@ class _OrdersListState extends State<OrdersList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final token = (context.read<AuthCubit>().state as AuthAuthenticated).token;
     return BlocBuilder<OrdersCubit, OrdersState>(
       builder: (context, state) {
         final cubit = context.read<OrdersCubit>();
@@ -64,11 +61,7 @@ class _OrdersListState extends State<OrdersList>
           // reverse: true,
           itemBuilder: (context, index) {
             final order = orders[index];
-            return OrderCard(
-              itemsCount: order.totalItemsCount,
-              order: order,
-              token: token,
-            );
+            return OrderCard(itemsCount: order.totalItemsCount, order: order);
           },
         );
       },

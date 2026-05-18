@@ -98,7 +98,7 @@ class AuthResponse {
         phone: json['user']['phone'],
         status: json['user']['status'] == 'has_active_shift'
             ? CaptainStatus.active
-            : CaptainStatus.active,
+            : CaptainStatus.nonActive,
         loginAt: json['user']['login_at'] != null
             ? DateTime.tryParse(json['user']['login_at'])
             : null,

@@ -19,6 +19,15 @@ class AppColors {
   static const textSecondary = Color(0xFF7A7A7A);
   static const buttonOrderCard = Color.fromARGB(255, 13, 155, 108);
   static const buttonOrderDialog = Color(0xff7066E0);
+  static const dangerRed2 = Color(0xffbe2c2d);
+  static const loginAccent = Color(0xffBA282E);
+  static const successLight = Color(0xffECFDF5);
+  static const successText = Color(0xff10B981);
+  static const infoLight = Color(0xffBAE6FD);
+  static const infoText = Color(0xff0369A1);
+  static const loginBackground = Color(0xFFF7F7F7);
+  static const loginHeaderBackground = Color(0xffF9C724);
+  static const roleSelectorBackground = Color(0xFFEEEEEE);
 }
 
 class AppConstants {
@@ -46,7 +55,10 @@ class AppConstants {
     Color(0xFFFF5252),
   ];
 
-  static const String baseUrl = "http://192.168.1.14:8000/api";
+  static const String baseUrl = String.fromEnvironment(
+    'BASE_URL',
+    defaultValue: 'http://localhost:8000/api',
+  );
   static const String deliveryBaseUrl = "$baseUrl/delivery";
   static const String reserveBaseUrl = "$baseUrl/reserve";
 
@@ -57,10 +69,28 @@ class AppConstants {
   static String invoiceUrl(String orderId, DeliveryType role) =>
       "${getBaseUrl(role)}/orders/$orderId/invoice";
 
-  static const String reverbAppKey = '8cbbd9cb36e28664def7'; // نفس الـ .env
-  static const String wsUrl = 'ws://192.168.1.14:8000';
-  static const String apiKey = '8cbbd9cb36e28664def7';
-  static const String reverbHost = '192.168.1.14';
-  static const int reverbPort = 8000; // port Reverb مش Laravel
-  static const String cluster = 'mt1'; // port Reverb مش Laravel
+  static const String reverbAppKey = String.fromEnvironment(
+    'REVERB_KEY',
+    defaultValue: '',
+  );
+  static const String wsUrl = String.fromEnvironment(
+    'WS_URL',
+    defaultValue: 'ws://localhost:8000',
+  );
+  static const String apiKey = String.fromEnvironment(
+    'API_KEY',
+    defaultValue: reverbAppKey,
+  );
+  static const String reverbHost = String.fromEnvironment(
+    'REVERB_HOST',
+    defaultValue: 'localhost',
+  );
+  static const int reverbPort = int.fromEnvironment(
+    'REVERB_PORT',
+    defaultValue: 8000,
+  );
+  static const String cluster = String.fromEnvironment(
+    'PUSHER_CLUSTER',
+    defaultValue: 'mt1',
+  );
 }

@@ -1,22 +1,50 @@
+import 'dart:async';
+
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class OrderTimerWidget extends StatelessWidget {
+class OrderTimerWidget extends StatefulWidget {
   const OrderTimerWidget({super.key, required this.order, this.style});
 
   final Order order;
   final TextStyle? style;
 
   @override
+  State<OrderTimerWidget> createState() => _OrderTimerWidgetState();
+}
+
+class _OrderTimerWidgetState extends State<OrderTimerWidget> {
+  late Timer _timer;
+  late Duration _duration;
+
+  @override
+  void initState() {
+    super.initState();
+    _duration = widget.order.activeDuration;
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() => _duration = widget.order.activeDuration);
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant OrderTimerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.order != widget.order) {
+      _duration = widget.order.activeDuration;
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: Stream.periodic(const Duration(seconds: 1), (tick) => tick),
-      builder: (context, snapshot) {
-        return Text(_formatDuration(order.activeDuration), style: style);
-      },
-    );
+    return Text(_formatDuration(_duration), style: widget.style);
   }
 
   String _formatDuration(Duration duration) {

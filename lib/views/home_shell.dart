@@ -11,9 +11,9 @@ import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/views/my_order_screen.dart';
+import 'package:captain_app/widgets/offline_message_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, this.initialIndex = 0});
@@ -94,7 +94,7 @@ class _HomeShellState extends State<HomeShell> {
 
             // ← لو مش نشط، اعرض رسالة في كل الصفحات
             if (!isOnline) {
-              return const _OfflineMessage();
+              return const OfflineMessageWidget();
             }
 
             return IndexedStack(index: _currentIndex, children: _screens);
@@ -132,30 +132,6 @@ class _HomeShellState extends State<HomeShell> {
                   label: 'كشف حسابى',
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OfflineMessage extends StatelessWidget {
-  const _OfflineMessage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'انت غير نشط حاليا',
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              color: Color(0xffbe2c2d),
             ),
           ),
         ),

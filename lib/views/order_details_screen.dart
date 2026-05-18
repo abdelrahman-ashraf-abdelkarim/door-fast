@@ -19,12 +19,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Order order;
-  final String token;
-  const OrderDetailsScreen({
-    super.key,
-    required this.order,
-    required this.token,
-  });
+  const OrderDetailsScreen({super.key, required this.order});
 
   String _invoiceUrl(BuildContext context) {
     final authState = context.read<AuthCubit>().state;
@@ -36,6 +31,12 @@ class OrderDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! AuthAuthenticated) {
+      return const SizedBox.shrink();
+    }
+    final token = authState.token;
+
     return BlocProvider(
       create: (_) => InvoiceCubit(),
       child: Directionality(

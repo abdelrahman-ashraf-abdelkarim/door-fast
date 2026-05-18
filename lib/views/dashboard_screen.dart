@@ -11,6 +11,7 @@ import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/dashboard_model.dart';
 import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/widgets/app_bar.dart';
+import 'package:captain_app/widgets/offline_message_widget.dart';
 import 'package:captain_app/widgets/stat_card.dart';
 import 'package:captain_app/widgets/work_time_widget.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           body: BlocBuilder<DashboardCubit, DashboardState>(
             builder: (context, dashState) {
-              if (!isOnline) return const _OfflineMessage();
+              if (!isOnline) return const OfflineMessageWidget();
 
               if (dashState.isLoading && dashState.data == null) {
                 return Center(child: CircularProgressIndicator());
@@ -80,32 +81,6 @@ class DashboardScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-// ─── Offline ──────────────────────────────────────────────────
-
-class _OfflineMessage extends StatelessWidget {
-  const _OfflineMessage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'انت غير نشط حاليا',
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              color: Color(0xffbe2c2d),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -305,7 +280,7 @@ class _CancelledOrdersCard extends StatelessWidget {
               CircleAvatar(
                 radius: 16.r,
                 backgroundColor: Colors.red[100],
-                child: Icon(Icons.cancel, color: Color(0xffbe2c2d)),
+                child: Icon(Icons.cancel, color: AppColors.dangerRed2),
               ),
               SizedBox(width: 4.w),
               Text(
@@ -318,7 +293,7 @@ class _CancelledOrdersCard extends StatelessWidget {
             ' $cancelledCount ',
             style: TextStyle(
               fontSize: 20.sp,
-              color: Color(0xffbe2c2d),
+              color: AppColors.dangerRed2,
               fontWeight: FontWeight.bold,
             ),
           ),

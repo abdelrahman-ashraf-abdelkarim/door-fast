@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F7F7),
+        backgroundColor: AppColors.loginBackground,
         resizeToAvoidBottomInset: true,
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 300.h,
                           decoration: BoxDecoration(
-                            color: const Color(0xffF9C724),
+                            color: AppColors.loginHeaderBackground,
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(45.r),
                               bottomRight: Radius.circular(45.r),
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
-                                        color: Color(0xffBA282E),
+                                        color: AppColors.loginAccent,
                                       ),
                                     ),
                                   ),
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
-                                        color: Color(0xffBA282E),
+                                        color: AppColors.loginAccent,
                                       ),
                                     ),
                                   ),
@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           vertical: 14.h,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xffBA282E),
+                                          color: AppColors.loginAccent,
                                           borderRadius: BorderRadius.circular(
                                             12.r,
                                           ),
@@ -280,7 +280,7 @@ class _RoleSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFEEEEEE),
+        color: AppColors.roleSelectorBackground,
         borderRadius: BorderRadius.circular(12.r),
       ),
       padding: EdgeInsets.all(4.w),
@@ -326,7 +326,7 @@ class _Tab extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(vertical: 12.h),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xffBA282E) : Colors.transparent,
+            color: isSelected ? AppColors.loginAccent : Colors.transparent,
             borderRadius: BorderRadius.circular(9.r),
           ),
           alignment: Alignment.center,

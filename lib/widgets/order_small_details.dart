@@ -113,9 +113,7 @@ class OrderContainer extends StatelessWidget {
 
                             DottedBorder(
                               options: RoundedRectDottedBorderOptions(
-                                color: const Color(
-                                  0xff10B981,
-                                ), // نفس لون success
+                                color: AppColors.successText,
                                 strokeWidth: 1,
                                 strokeCap: StrokeCap.round,
                                 padding: EdgeInsets.all(0),
@@ -127,9 +125,9 @@ class OrderContainer extends StatelessWidget {
                                 padding: EdgeInsets.all(16.r),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.r),
-                                  color: Color(
-                                    0xffECFDF5,
-                                  ).withValues(alpha: 0.5),
+                                  color: AppColors.successLight.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
