@@ -90,8 +90,8 @@ class OrderDetailsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       FaIcon(
-                        FontAwesomeIcons.commentDots,
-                        size: 18.r,
+                        FontAwesomeIcons.penToSquare,
+                        size: 20.r,
                         color: Colors.red[800],
                       ),
                       SizedBox(width: 8.w),
@@ -100,6 +100,7 @@ class OrderDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
+                          color: Colors.red[800],
                         ),
                       ),
                     ],
@@ -148,12 +149,24 @@ class OrderDetailsScreen extends StatelessWidget {
 
                 // ── Order items ──────────────────────────────────────
                 SizedBox(height: 16.h),
-                Text(
-                  'محتويات الطلب',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FaIcon(
+                      FontAwesomeIcons.basketShopping,
+                      size: 20.r,
+                      color: AppColors.accentOrange,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'محتويات الطلب',
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.accentOrange,
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 16.h),
                 ...() {

@@ -46,8 +46,9 @@ class AppConstants {
     Color(0xFFFF5252),
   ];
 
-  static const String deliveryBaseUrl = "http://192.168.1.14:8000/api/delivery";
-  static const String reserveBaseUrl = "http://192.168.1.14:8000/api/reserve";
+  static const String baseUrl = "http://192.168.1.14:8000/api";
+  static const String deliveryBaseUrl = "$baseUrl/delivery";
+  static const String reserveBaseUrl = "$baseUrl/reserve";
 
   static String getBaseUrl(DeliveryType role) {
     return role == DeliveryType.reserve ? reserveBaseUrl : deliveryBaseUrl;

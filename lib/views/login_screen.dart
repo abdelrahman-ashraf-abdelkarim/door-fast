@@ -6,6 +6,7 @@ import 'package:captain_app/views/home_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -231,8 +232,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         alignment: Alignment.center,
                                         child: isLoading
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white,
+                                            ? SizedBox(
+                                                height: 24.h,
+                                                width: 24.w,
+                                                child:
+                                                    const CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                    ),
                                               )
                                             : Text(
                                                 'تسجيل الدخول',
@@ -281,12 +287,14 @@ class _RoleSelector extends StatelessWidget {
       child: Row(
         children: [
           _Tab(
-            label: '🚴 مندوب أساسي',
+            label: 'مندوب أساسي',
+            icon: FontAwesomeIcons.user,
             isSelected: selected == DeliveryType.delivery,
             onTap: () => onChanged(DeliveryType.delivery),
           ),
           _Tab(
-            label: '🔄 مندوب احتياطي',
+            label: 'مندوب احتياطي',
+            icon: FontAwesomeIcons.userClock,
             isSelected: selected == DeliveryType.reserve,
             onTap: () => onChanged(DeliveryType.reserve),
           ),
@@ -301,11 +309,13 @@ class _Tab extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    required this.icon,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final FaIconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -320,15 +330,26 @@ class _Tab extends StatelessWidget {
             borderRadius: BorderRadius.circular(9.r),
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : AppColors.textSecondary,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(
+                icon,
+                size: 16.sp,
+                color: isSelected ? Colors.white : AppColors.textSecondary,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
         ),
       ),

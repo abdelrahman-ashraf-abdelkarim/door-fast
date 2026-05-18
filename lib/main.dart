@@ -1,9 +1,11 @@
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/core/app_navigation.dart';
+import 'package:captain_app/cubits/app_version_cubit/app_version_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
+import 'package:captain_app/services/app_version_service.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/shift_service.dart';
 import 'package:captain_app/views/splash_screen.dart';
@@ -16,8 +18,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +53,10 @@ class CaptainApp extends StatelessWidget {
               OrdersCubit(api: api, shiftCubit: context.read<ShiftCubit>()),
         ),
         BlocProvider(create: (_) => DashboardCubit(api: api)),
+        BlocProvider(
+          create: (_) =>
+              AppVersionCubit(appVersionService: AppVersionService()),
+        ),
       ],
       child: ScreenUtilInit(
         designSize: const Size(390, 844),
