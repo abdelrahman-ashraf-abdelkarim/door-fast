@@ -30,7 +30,7 @@ class TotalOrderSmallDetails extends StatelessWidget {
             ),
           ),
           Text(
-            "${order.totalPrice.toString()} ج",
+            "${order.totalPrice.toStringAsFixed(2)} ج",
             style: TextStyle(
               color: AppColors.infoText,
               fontSize: 18.sp,
