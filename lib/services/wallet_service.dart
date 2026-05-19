@@ -7,12 +7,10 @@ class WalletService {
 
   Future<WalletModel> fetchWalletStatement(
     String token, {
-    int page = 1,
     String? from,
     String? to,
   }) async {
     final queryParams = {
-      'page': page.toString(),
       if (from != null) 'from': from,
       if (to != null) 'to': to,
     };

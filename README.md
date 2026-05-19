@@ -10,7 +10,7 @@ source code.
 
 Available variables:
 
-- `BASE_URL`: Backend API root, for example `http://192.168.1.14:8000/api`
+- `BASE_URL`: Backend API root, for example `http://localhost:8000/api`
 - `REVERB_KEY`: Reverb/Pusher app key
 - `API_KEY`: Optional realtime API key override. Defaults to `REVERB_KEY`
 - `WS_URL`: WebSocket URL. Defaults to `ws://localhost:8000`
@@ -22,10 +22,10 @@ Available variables:
 
 ```bash
 flutter run \
-  --dart-define=BASE_URL=http://192.168.1.14:8000/api \
+  --dart-define=BASE_URL=http://192.168.1.x:8000/api \
   --dart-define=REVERB_KEY=xxx \
-  --dart-define=WS_URL=ws://192.168.1.14:8000 \
-  --dart-define=REVERB_HOST=192.168.1.14 \
+  --dart-define=WS_URL=ws://192.168.1.x:8000 \
+  --dart-define=REVERB_HOST=192.168.1.x \
   --dart-define=REVERB_PORT=8000 \
   --dart-define=PUSHER_CLUSTER=mt1
 ```

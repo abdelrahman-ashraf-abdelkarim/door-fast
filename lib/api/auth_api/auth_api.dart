@@ -3,6 +3,13 @@ import 'package:captain_app/models/auth_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+  @override
+  String toString() => message;
+}
+
 Future<AuthResponse> login(
   String username,
   String password,
@@ -19,7 +26,7 @@ Future<AuthResponse> login(
   );
   if (loginRes.statusCode != 200) {
     final errorData = loginRes.data as Map<String, dynamic>;
-    throw Exception(errorData['message'] ?? 'فشل تسجيل الدخول');
+    throw AuthException(errorData['message'] ?? 'فشل تسجيل الدخول');
   }
 
   final token = (loginRes.data as Map<String, dynamic>)['token'] as String;

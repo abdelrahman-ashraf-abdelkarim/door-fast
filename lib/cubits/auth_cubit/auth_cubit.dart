@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:captain_app/api/auth_api/auth_api.dart' as authapi;
 import 'package:captain_app/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -75,7 +74,13 @@ class AuthCubit extends HydratedCubit<AuthState> {
       emit(AuthAuthenticated(response.user, token: response.token));
       _sendFcmTokenToBackend(response.token, role: response.user.role);
     } catch (e) {
-      emit(AuthError(e.toString()));
+      print('ERROR TYPE: ${e.runtimeType}');
+      print('ERROR: $e');
+      if (e is authapi.AuthException) {
+        emit(AuthError(e.toString()));
+      } else {
+        emit(const AuthError('حدث خطأ، تحقق من الاتصال بالإنترنت'));
+      }
     }
   }
 
