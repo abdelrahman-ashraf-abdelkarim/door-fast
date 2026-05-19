@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/views/order_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -5,15 +6,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void showOrderAcceptedDialog(BuildContext context, Order order) {
   final parentContext = context;
+  var isDialogOpen = true;
 
   showDialog(
     context: context,
     barrierDismissible: true,
     builder: (dialogContext) {
       Future.delayed(const Duration(seconds: 2), () {
-        if (!dialogContext.mounted || !parentContext.mounted) return;
+        // [FIX-12] check mounted before navigation to prevent double navigation
+        if (!isDialogOpen || !dialogContext.mounted || !parentContext.mounted) {
+          return;
+        }
 
-        Navigator.of(dialogContext).pop();
+        isDialogOpen = false;
+        if (Navigator.of(dialogContext).canPop()) {
+          Navigator.of(dialogContext).pop();
+        }
         Navigator.push(
           parentContext,
           MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
@@ -41,7 +49,11 @@ void showOrderAcceptedDialog(BuildContext context, Order order) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 60.r),
+                Icon(
+                  Icons.check_circle,
+                  color: AppColors.successGreen,
+                  size: 60.r,
+                ),
                 SizedBox(height: 12.h),
                 Text(
                   'تم قبول الطلب',
@@ -57,5 +69,7 @@ void showOrderAcceptedDialog(BuildContext context, Order order) {
         ),
       );
     },
-  );
+  ).then((_) {
+    isDialogOpen = false;
+  });
 }

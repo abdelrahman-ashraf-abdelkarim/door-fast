@@ -9,7 +9,6 @@ import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/dashboard_model.dart';
-import 'package:captain_app/views/login_screen.dart';
 import 'package:captain_app/widgets/app_bar.dart';
 import 'package:captain_app/widgets/offline_message_widget.dart';
 import 'package:captain_app/widgets/stat_card.dart';
@@ -47,11 +46,8 @@ class DashboardScreen extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.logout),
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
+                    // [FIX-02] proper logout via AuthCubit
+                    context.read<AuthCubit>().logout();
                   },
                 ),
                 VerticalDivider(

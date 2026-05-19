@@ -1,3 +1,6 @@
+import 'package:captain_app/core/constants.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/order_model.dart';
@@ -27,6 +30,14 @@ class _OrdersListState extends State<OrdersList>
     return BlocBuilder<OrdersCubit, OrdersState>(
       builder: (context, state) {
         final cubit = context.read<OrdersCubit>();
+
+        // [FIX-20] show error state when orders fail to load
+        if (state.errorMessage != null) {
+          return _OrdersErrorState(
+            message: state.errorMessage!,
+            onRetry: () => _retryLoadOrders(context),
+          );
+        }
 
         if (state.isLoading) {
           return Center(child: CircularProgressIndicator());
@@ -65,6 +76,51 @@ class _OrdersListState extends State<OrdersList>
           },
         );
       },
+    );
+  }
+
+  void _retryLoadOrders(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! AuthAuthenticated) return;
+
+    context.read<OrdersCubit>().loadOrders(
+      authState.token,
+      authState.user.id,
+      role: authState.user.role,
+    );
+  }
+}
+
+class _OrdersErrorState extends StatelessWidget {
+  const _OrdersErrorState({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(24.r),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: AppColors.dangerRed, size: 56.r),
+            SizedBox(height: 16.h),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16.sp),
+            ),
+            SizedBox(height: 24.h),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('إعادة المحاولة'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

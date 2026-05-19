@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:captain_app/api/auth_api/auth_api.dart' as authapi;
 import 'package:captain_app/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,6 +11,7 @@ import '../../models/auth_model.dart';
 class AuthCubit extends HydratedCubit<AuthState> {
   static const String _authTokenKey = 'auth_token';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  StreamSubscription<String>? _fcmTokenRefreshSub;
 
   AuthModel? _hydratedUser;
   String? _legacyHydratedToken;
@@ -57,16 +60,19 @@ class AuthCubit extends HydratedCubit<AuthState> {
       }
 
       await _secureStorage.write(key: _authTokenKey, value: response.token);
-      emit(AuthAuthenticated(response.user, token: response.token));
-      _sendFcmTokenToBackend(response.token, role: response.user.role);
+      await _fcmTokenRefreshSub?.cancel();
 
-      FirebaseMessaging.instance.onTokenRefresh.listen((newFcmToken) {
+      _fcmTokenRefreshSub = FirebaseMessaging.instance.onTokenRefresh.listen((
+        newFcmToken,
+      ) {
         _sendFcmTokenToBackend(
           response.token,
           fcmToken: newFcmToken,
           role: response.user.role,
         );
       });
+      emit(AuthAuthenticated(response.user, token: response.token));
+      _sendFcmTokenToBackend(response.token, role: response.user.role);
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -102,6 +108,8 @@ class AuthCubit extends HydratedCubit<AuthState> {
   } // ✅ القوس ده كان ناقص
 
   Future<void> logout() async {
+    await _fcmTokenRefreshSub?.cancel();
+    _fcmTokenRefreshSub = null;
     await _secureStorage.delete(key: _authTokenKey);
     emit(AuthUnauthenticated());
   }
@@ -122,5 +130,11 @@ class AuthCubit extends HydratedCubit<AuthState> {
       return {'type': 'authenticated', 'user': state.user.toJson()};
     }
     return {'type': 'unauthenticated'};
+  }
+
+  @override
+  Future<void> close() async {
+    await _fcmTokenRefreshSub?.cancel();
+    return super.close();
   }
 }

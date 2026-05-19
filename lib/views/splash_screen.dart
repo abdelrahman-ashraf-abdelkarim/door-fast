@@ -66,13 +66,20 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateNormally() {
-    if (!mounted || _hasNavigated) return;
+    if (!mounted || _hasNavigated) {
+      _versionCheckDone = true;
+      return;
+    }
 
     _versionCheckDone = true;
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthAuthenticated) {
       final shiftState = context.read<ShiftCubit>().state;
-      if (shiftState.user == null) return;
+      if (shiftState.user == null) {
+        // [FIX-05] set _versionCheckDone before waiting for ShiftCubit listener
+        _versionCheckDone = true;
+        return;
+      }
     }
 
     _hasNavigated = true;
@@ -86,6 +93,9 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _showForceUpdateDialog(String updateUrl) async {
+    // [FIX-17] mark version check as done even in force update path
+    _versionCheckDone = true;
+
     if (!mounted || _hasNavigated) return;
 
     await showDialog<void>(
@@ -256,7 +266,7 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       ],
       child: Scaffold(
-        backgroundColor: const Color(0xfff8c624),
+        backgroundColor: AppColors.splashBackground,
         body: Center(
           child: ScaleTransition(
             scale: _animation,

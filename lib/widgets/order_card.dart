@@ -115,7 +115,7 @@ class OrderCard extends StatelessWidget {
                       height: 48.h,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.r),
-                        color: Color.fromARGB(255, 13, 155, 108),
+                        color: AppColors.orderCardGreen,
                       ),
                       child: ButtonCard(text: _getButtonText(order.status)),
                     ),

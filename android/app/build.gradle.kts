@@ -44,7 +44,7 @@ if (keystorePropertiesFile.exists()) {
     create("release") {
         keyAlias = keystoreProperties["keyAlias"] as String
         keyPassword = keystoreProperties["keyPassword"] as String
-        storeFile = file(keystoreProperties["storeFile"] as String)
+        storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
         storePassword = keystoreProperties["storePassword"] as String
     }
 }
@@ -53,8 +53,13 @@ if (keystorePropertiesFile.exists()) {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-        isMinifyEnabled = false
-        isShrinkResources = false
+            // [FIX-13] enable minification and resource shrinking for release
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

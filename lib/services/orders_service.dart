@@ -55,6 +55,11 @@ class OrdersService {
       return Order.fromJson(data['order']);
     } on OrderNotFoundException {
       rethrow; // ← خلّيه يعدي للـ cubit
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) {
+        throw OrderNotFoundException(orderId); // ← 404 = مش موجود
+      }
+      rethrow;
     } on Exception catch (e) {
       if (e.toString().contains('404')) {
         throw OrderNotFoundException(orderId); // ← 404 = مش موجود

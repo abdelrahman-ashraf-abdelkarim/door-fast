@@ -1,5 +1,6 @@
 import 'package:captain_app/api/api.dart';
 import 'package:captain_app/core/app_navigation.dart';
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/app_version_cubit/app_version_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
@@ -41,44 +42,47 @@ class CaptainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final authCubit = AuthCubit();
     final api = Api(authCubit);
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: authCubit),
-        BlocProvider<ShiftCubit>(
-          create: (context) =>
-              ShiftCubit(context.read<AuthCubit>(), ShiftService(api: api)),
-        ),
-        BlocProvider<OrdersCubit>(
-          create: (context) =>
-              OrdersCubit(api: api, shiftCubit: context.read<ShiftCubit>()),
-        ),
-        BlocProvider(create: (_) => DashboardCubit(api: api)),
-        BlocProvider(
-          create: (_) =>
-              AppVersionCubit(appVersionService: AppVersionService()),
-        ),
-      ],
-      child: ScreenUtilInit(
-        designSize: const Size(390, 844),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) => MaterialApp(
-          debugShowCheckedModeBanner: false,
-          locale: const Locale('ar'), // العربية افتراضيًا
-          supportedLocales: const [Locale('en'), Locale('ar')],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          title: 'Door Fast App',
-          theme: ThemeData(
-            primarySwatch: Colors.orange,
-            fontFamily: 'Cairo',
-            scaffoldBackgroundColor: Color(0xffF5F5F5),
+    return RepositoryProvider<Api>.value(
+      value: api,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: authCubit),
+          BlocProvider<ShiftCubit>(
+            create: (context) =>
+                ShiftCubit(context.read<AuthCubit>(), ShiftService(api: api)),
           ),
-          navigatorKey: navigatorKey,
-          home: const SplashScreen(),
+          BlocProvider<OrdersCubit>(
+            create: (context) =>
+                OrdersCubit(api: api, shiftCubit: context.read<ShiftCubit>()),
+          ),
+          BlocProvider(create: (_) => DashboardCubit(api: api)),
+          BlocProvider(
+            create: (_) =>
+                AppVersionCubit(appVersionService: AppVersionService()),
+          ),
+        ],
+        child: ScreenUtilInit(
+          designSize: const Size(390, 844),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            locale: const Locale('ar'), // العربية افتراضيًا
+            supportedLocales: const [Locale('en'), Locale('ar')],
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            title: 'Door Fast App',
+            theme: ThemeData(
+              primarySwatch: Colors.orange,
+              fontFamily: 'Cairo',
+              scaffoldBackgroundColor: AppColors.appScaffoldBackground,
+            ),
+            navigatorKey: navigatorKey,
+            home: const SplashScreen(),
+          ),
         ),
       ),
     );

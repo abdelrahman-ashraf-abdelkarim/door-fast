@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,8 +9,13 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
   const ShowModelSheetBottomWidget({super.key, this.contact});
 
   Future<void> _callPhone({required String phone}) async {
+    // [FIX-10] double-check before launching
+    if (phone.trim().isEmpty) return;
+
     final url = Uri.parse('tel:$phone');
-    await launchUrl(url);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    }
   }
 
   Future<void> _openWhatsApp({
@@ -31,16 +37,34 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
     }
   }
 
-  Future<void> _openMapLink(String? url) async {
-    if (url == null || url.trim().isEmpty) return;
+  Future<void> _openMapLink(BuildContext context, String? url) async {
+    try {
+      if (url == null || url.trim().isEmpty) return;
 
-    final uri = Uri.parse(url);
+      final uri = Uri.parse(url);
 
-    if (!await canLaunchUrl(uri)) {
-      throw Exception('Invalid map url');
+      // [FIX-11] handle invalid map URL gracefully instead of throwing
+      if (!await canLaunchUrl(uri)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تعذّر فتح الخريطة'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (error) {
+      debugPrint('[FIX-11] Map launch error: $error');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('حدث خطأ أثناء فتح الخريطة')),
+        );
+      }
     }
-
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   final OrderContact? contact;
@@ -77,38 +101,41 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
 
           SizedBox(height: 10.h),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff25D366),
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-              ),
-              onPressed: () => _callPhone(phone: contactPhone),
-              icon: Icon(
-                Icons.call,
-                color: Colors.white,
-                size: 24.r,
-                fontWeight: FontWeight.w900,
-              ),
-              label: Text(
-                contactPhone,
-                style: TextStyle(
+          if (canCall) ...[
+            // [FIX-10] only show call button if phone number exists
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.whatsAppGreen,
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                ),
+                onPressed: () => _callPhone(phone: contactPhone),
+                icon: Icon(
+                  Icons.call,
                   color: Colors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
+                  size: 24.r,
+                  fontWeight: FontWeight.w900,
+                ),
+                label: Text(
+                  contactPhone,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          SizedBox(height: 20.h),
+            SizedBox(height: 20.h),
+          ],
 
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff25D366),
+                backgroundColor: AppColors.whatsAppGreen,
                 padding: EdgeInsets.symmetric(vertical: 12.h),
               ),
               onPressed: () {
@@ -140,7 +167,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff128C7E),
+                  backgroundColor: AppColors.whatsAppDarkGreen,
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () => _callPhone(phone: contactPhoneTwo),
@@ -166,7 +193,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff128C7E),
+                  backgroundColor: AppColors.whatsAppDarkGreen,
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () {
@@ -198,11 +225,11 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF9800),
+                  backgroundColor: AppColors.mapButtonOrange,
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () {
-                  _openMapLink(contactAddress);
+                  _openMapLink(context, contactAddress);
                 },
                 icon: FaIcon(
                   FontAwesomeIcons.mapLocation,

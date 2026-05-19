@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -16,7 +17,7 @@ class OfflineMessageWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 28.sp,
               fontWeight: FontWeight.bold,
-              color: Color(0xffbe2c2d),
+              color: AppColors.dangerRed2,
             ),
           ),
         ),

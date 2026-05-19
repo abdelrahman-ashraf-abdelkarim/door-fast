@@ -27,7 +27,8 @@ class AccountStatementScreen extends StatelessWidget {
 
     return BlocProvider(
       create: (_) => AccountStatementCubit(
-        walletService: WalletService(api: Api(context.read<AuthCubit>())),
+        // [FIX-24] inject the shared Api instance
+        walletService: WalletService(api: context.read<Api>()),
         webSocketService: WebSocketService(),
         token: authState.token,
       )..loadStatement(),
@@ -187,7 +188,7 @@ class _AccountStatementView extends StatelessWidget {
                             vertical: 8.h,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(99, 112, 102, 224),
+                            color: AppColors.realtimeBadgeBackground,
                             borderRadius: BorderRadius.circular(24.r),
                             boxShadow: [
                               BoxShadow(

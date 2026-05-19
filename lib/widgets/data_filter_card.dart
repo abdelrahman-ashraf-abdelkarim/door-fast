@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -86,7 +87,7 @@ class _DateFilterCardState extends State<DateFilterCard> {
                     style: TextStyle(color: Colors.white, fontSize: 16.sp),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF8C00),
+                    backgroundColor: AppColors.balanceGradientEnd,
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.r),
@@ -119,7 +120,7 @@ class _DateFilterCardState extends State<DateFilterCard> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAEAEA),
+        color: AppColors.filterFieldBackground,
         borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(

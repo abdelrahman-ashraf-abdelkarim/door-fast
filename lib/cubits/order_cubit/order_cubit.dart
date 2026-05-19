@@ -7,6 +7,7 @@ import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/orders_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:captain_app/services/web_socket_service.dart';
 
@@ -181,6 +182,14 @@ class OrdersCubit extends Cubit<OrdersState> {
   }
 
   Future<void> cancelOrder(String orderId, String reason, String token) async {
+    // [FIX-03] guard against null values in case of logout during operation
+    if (_token == null || _captainId == null) {
+      debugPrint(
+        '[OrderCubit] cancelOrder aborted: token or captainId is null',
+      );
+      return;
+    }
+
     try {
       await _ordersService.cancelOrder(orderId, reason, token);
       if (isClosed) return;
@@ -192,6 +201,14 @@ class OrdersCubit extends Cubit<OrdersState> {
   }
 
   Future<void> completeOrder(String orderId, String token) async {
+    // [FIX-03] guard against null values in case of logout during operation
+    if (_token == null || _captainId == null) {
+      debugPrint(
+        '[OrderCubit] completeOrder aborted: token or captainId is null',
+      );
+      return;
+    }
+
     try {
       await _ordersService.completeOrder(orderId, token);
       if (isClosed) return;
@@ -230,5 +247,5 @@ class OrdersCubit extends Cubit<OrdersState> {
 
   double get totalDeliveryEarnings => state.orders
       .where((o) => o.status == OrderStatus.delivered)
-      .fold(0.0, (sum, o) => sum + o.deliveryPrice);
+      .fold(0.0, (sum, o) => sum + o.deliveryFee);
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
@@ -89,10 +91,76 @@ class Api {
   Never _handleError(DioException e) {
     final statusCode = e.response?.statusCode;
     final body = e.response?.data;
-    throw Exception(
-      'there is a problem with status code $statusCode with body $body',
-    );
+
+    // [FIX-15] log full details internally, show safe message to users
+    debugPrint('[API Error] Status: $statusCode | Body: $body');
+
+    final apiMessage = statusCode == 400 || statusCode == 422
+        ? _extractUserMessage(body)
+        : null;
+    if (apiMessage != null) {
+      throw ApiException(apiMessage, statusCode: statusCode);
+    }
+
+    switch (statusCode) {
+      case 401:
+        throw ApiException(
+          'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.',
+          statusCode: statusCode,
+        );
+      case 403:
+        throw ApiException(
+          'ليس لديك صلاحية للقيام بهذه العملية.',
+          statusCode: statusCode,
+        );
+      case 404:
+        throw ApiException(
+          'البيانات المطلوبة غير موجودة.',
+          statusCode: statusCode,
+        );
+      case 422:
+        throw ApiException(
+          'البيانات المُدخلة غير صحيحة، يرجى المراجعة.',
+          statusCode: statusCode,
+        );
+      case 500:
+      case 502:
+      case 503:
+        throw ApiException(
+          'حدث خطأ في الخادم، يرجى المحاولة لاحقاً.',
+          statusCode: statusCode,
+        );
+      default:
+        throw ApiException(
+          'حدث خطأ في الاتصال، يرجى المحاولة مجدداً.',
+          statusCode: statusCode,
+        );
+    }
   }
+
+  String? _extractUserMessage(dynamic body) {
+    try {
+      final decoded = body is String ? jsonDecode(body) : body;
+      if (decoded is! Map) return null;
+
+      final message = decoded['message']?.toString().trim();
+      if (message == null || message.isEmpty) return null;
+
+      return message;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class ApiException implements Exception {
+  const ApiException(this.message, {this.statusCode});
+
+  final String message;
+  final int? statusCode;
+
+  @override
+  String toString() => message;
 }
 
 // ─── Token Interceptor ───────────────────────────────────────────────────────

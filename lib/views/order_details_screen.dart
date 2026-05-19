@@ -69,8 +69,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   ContactCard(
                     title: 'المرسل',
                     contact: order.sender,
-                    iconBg: const Color(0xFFE3F2FD),
-                    iconFg: const Color(0xFF1565C0),
+                    iconBg: AppColors.senderIconBackground,
+                    iconFg: AppColors.senderIconForeground,
                     titleLocation: "عنوان الاستلام",
                     orderLocation: order.senderAddress,
                   ),
@@ -78,7 +78,7 @@ class OrderDetailsScreen extends StatelessWidget {
                 ContactCard(
                   title: 'المستلم',
                   contact: order.receiver,
-                  iconBg: const Color(0xFFFFF3E0),
+                  iconBg: AppColors.receiverIconBackground,
                   iconFg: AppColors.accentOrange,
                   titleLocation: "عنوان التسليم",
                   orderLocation: order.receiverAddress,
@@ -109,7 +109,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   SizedBox(height: 16.h),
                   DottedBorder(
                     options: RoundedRectDottedBorderOptions(
-                      color: const Color.fromARGB(255, 185, 16, 16),
+                      color: AppColors.notesBorder,
                       strokeWidth: 1,
                       strokeCap: StrokeCap.round,
                       padding: EdgeInsets.all(0),
@@ -121,12 +121,7 @@ class OrderDetailsScreen extends StatelessWidget {
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.r),
-                        color: const Color.fromARGB(
-                          255,
-                          253,
-                          236,
-                          236,
-                        ).withValues(alpha: 0.5),
+                        color: AppColors.notesBackground.withValues(alpha: 0.5),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

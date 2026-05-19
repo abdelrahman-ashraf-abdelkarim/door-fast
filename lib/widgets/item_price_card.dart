@@ -24,7 +24,7 @@ class ItemPriceCard extends StatelessWidget {
             ),
             _priceRow(
               label: 'رسوم التوصيل',
-              value: 'ج ${order.deliveryPrice.toStringAsFixed(2)}',
+              value: 'ج ${order.deliveryFee.toStringAsFixed(2)}',
               color: Colors.grey[700]!,
             ),
             _priceRow(

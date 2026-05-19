@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:captain_app/models/order_model.dart';
+import 'package:captain_app/services/tick_service.dart';
 import 'package:flutter/material.dart';
 
 class OrderTimerWidget extends StatefulWidget {
@@ -14,14 +15,15 @@ class OrderTimerWidget extends StatefulWidget {
 }
 
 class _OrderTimerWidgetState extends State<OrderTimerWidget> {
-  late Timer _timer;
+  late StreamSubscription<int> _subscription;
   late Duration _duration;
 
   @override
   void initState() {
     super.initState();
     _duration = widget.order.activeDuration;
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    // [FIX-19] subscribe to shared stream instead of creating new Timer
+    _subscription = TickService.tickStream.listen((_) {
       if (mounted) {
         setState(() => _duration = widget.order.activeDuration);
       }
@@ -38,7 +40,7 @@ class _OrderTimerWidgetState extends State<OrderTimerWidget> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _subscription.cancel(); // [FIX-19] cancel subscription on dispose
     super.dispose();
   }
 

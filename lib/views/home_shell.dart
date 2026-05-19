@@ -47,17 +47,13 @@ class _HomeShellState extends State<HomeShell> {
 
     context.read<OrdersCubit>().loadOrders(token, captainId, role: role);
     context.read<DashboardCubit>().loadDashboard(token);
-    final shiftCubit = context.read<ShiftCubit>();
     final authCubit = context.read<AuthCubit>();
 
     _wsSubscription = context.read<OrdersCubit>().wsStream.listen((data) async {
       if (!mounted) return;
       final event = data['event'];
-      if (event == 'shift_activated') {
-        shiftCubit.onShiftActivated();
-      } else if (event == 'shift_deactivated') {
-        shiftCubit.onShiftDeactivated();
-      } else if (event == 'account_deactivated') {
+      // [FIX-04] removed duplicate shift_activated handler
+      if (event == 'account_deactivated') {
         _wsSubscription?.cancel();
         _wsSubscription = null;
 
@@ -87,54 +83,56 @@ class _HomeShellState extends State<HomeShell> {
           );
         }
       },
-      child: Scaffold(
-        body: BlocBuilder<ShiftCubit, ShiftState>(
-          builder: (context, shiftState) {
-            final isOnline = shiftState.user?.status == CaptainStatus.active;
+      child: BlocBuilder<ShiftCubit, ShiftState>(
+        builder: (context, shiftState) {
+          final isOnline = shiftState.user?.status == CaptainStatus.active;
 
-            // ← لو مش نشط، اعرض رسالة في كل الصفحات
-            if (!isOnline) {
-              return const OfflineMessageWidget();
-            }
+          // ← لو مش نشط، اعرض رسالة في كل الصفحات
+          if (!isOnline) {
+            return const Scaffold(
+              body: SafeArea(child: OfflineMessageWidget()),
+            );
+          }
 
-            return IndexedStack(index: _currentIndex, children: _screens);
-          },
-        ),
-        bottomNavigationBar: SafeArea(
-          top: false,
-          child: Material(
-            elevation: 12,
-            color: Colors.white,
-            child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
-              selectedItemColor: Colors.deepOrangeAccent,
-              unselectedItemColor: Colors.grey,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
-              onTap: (index) => setState(() => _currentIndex = index),
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard_outlined),
-                  activeIcon: Icon(Icons.dashboard),
-                  label: 'الرئيسية',
+          return Scaffold(
+            body: IndexedStack(index: _currentIndex, children: _screens),
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: Material(
+                elevation: 12,
+                color: Colors.white,
+                child: BottomNavigationBar(
+                  currentIndex: _currentIndex,
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.white,
+                  selectedItemColor: Colors.deepOrangeAccent,
+                  unselectedItemColor: Colors.grey,
+                  showSelectedLabels: true,
+                  showUnselectedLabels: true,
+                  landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
+                  onTap: (index) => setState(() => _currentIndex = index),
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.dashboard_outlined),
+                      activeIcon: Icon(Icons.dashboard),
+                      label: 'الرئيسية',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.receipt_long_outlined),
+                      activeIcon: Icon(Icons.receipt_long),
+                      label: 'الطلبات',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.account_balance_wallet_outlined),
+                      activeIcon: Icon(Icons.account_balance_wallet),
+                      label: 'كشف حسابى',
+                    ),
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.receipt_long_outlined),
-                  activeIcon: Icon(Icons.receipt_long),
-                  label: 'الطلبات',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_balance_wallet_outlined),
-                  activeIcon: Icon(Icons.account_balance_wallet),
-                  label: 'كشف حسابى',
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

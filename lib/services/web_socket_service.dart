@@ -13,7 +13,7 @@ class WebSocketService {
       PusherChannelsFlutter.getInstance();
   static bool _initialized = false;
 
-  final StreamController<Map<String, dynamic>> _controller =
+  StreamController<Map<String, dynamic>> _controller =
       StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get stream => _controller.stream;
@@ -25,6 +25,10 @@ class WebSocketService {
 
   Future<void> connect(String token, String captainId) async {
     if (_initialized) return;
+    // [FIX-09] recreate StreamController if it was closed
+    if (_controller.isClosed) {
+      _controller = StreamController<Map<String, dynamic>>.broadcast();
+    }
     _initialized = true;
     _token = token;
     _captainId = captainId;
@@ -32,6 +36,7 @@ class WebSocketService {
   }
 
   Future<void> disconnect() async {
+    // [FIX-09] close StreamController and reset initialized flag
     _initialized = false;
     final captainId = _captainId;
     _token = null;
@@ -44,6 +49,10 @@ class WebSocketService {
       }
       await _pusher.disconnect();
     } catch (_) {}
+
+    if (!_controller.isClosed) {
+      await _controller.close();
+    }
   }
 
   // ─── Internal ─────────────────────────────────────────────────────────────
@@ -114,7 +123,7 @@ class WebSocketService {
           final orderId =
               message['id']?.toString() ?? message['order_id']?.toString();
           if (orderId != null) {
-            _controller.add({'event': 'new_order', 'order_id': orderId});
+            _addEvent({'event': 'new_order', 'order_id': orderId});
           }
           break;
 
@@ -124,7 +133,7 @@ class WebSocketService {
           final status = message['status']?.toString();
           final deliveryId = message['delivery_id']?.toString();
           if (orderId != null) {
-            _controller.add({
+            _addEvent({
               'event': 'order_updated',
               'order_id': orderId,
               'status': status,
@@ -137,17 +146,14 @@ class WebSocketService {
           final orderId =
               message['id']?.toString() ?? message['order_id']?.toString();
           if (orderId != null) {
-            _controller.add({
-              'event': 'reserve_new_order',
-              'order_id': orderId,
-            });
+            _addEvent({'event': 'reserve_new_order', 'order_id': orderId});
           }
           break;
 
         case 'order.cancelled':
           final orderId = raw['order_id']?.toString();
           if (orderId != null) {
-            _controller.add({'event': 'order_cancelled', 'order_id': orderId});
+            _addEvent({'event': 'order_cancelled', 'order_id': orderId});
           }
           break;
 
@@ -155,14 +161,14 @@ class WebSocketService {
         case 'shift.updated':
           final status = raw['status']?.toString();
           if (status == 'started') {
-            _controller.add({'event': 'shift_activated'});
+            _addEvent({'event': 'shift_activated'});
           } else if (status == 'ended') {
-            _controller.add({'event': 'shift_deactivated'});
+            _addEvent({'event': 'shift_deactivated'});
           }
           break;
 
         case 'account.deactivated':
-          _controller.add({'event': 'account_deactivated'});
+          _addEvent({'event': 'account_deactivated'});
           break;
 
         // ─── أحداث المحفظة ────────────────────────────────────────────────
@@ -173,7 +179,7 @@ class WebSocketService {
           final amount = raw['amount'];
           final type = raw['type'];
           final dir = raw['direction'];
-          _controller.add({
+          _addEvent({
             'event': 'wallet_updated',
             'balance': balance?.toString(),
             'amount': amount?.toString(),
@@ -182,8 +188,12 @@ class WebSocketService {
           });
           break;
       }
-    } catch (_) {
-    }
+    } catch (_) {}
+  }
+
+  void _addEvent(Map<String, dynamic> event) {
+    if (_controller.isClosed) return;
+    _controller.add(event);
   }
 
   Map<String, dynamic> _decode(dynamic data) {

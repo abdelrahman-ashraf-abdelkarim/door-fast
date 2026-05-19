@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:captain_app/core/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -35,8 +36,17 @@ class PdfService {
     final filePath = "${invoicesDir.path}/$orderNumber.pdf";
     final file = File(filePath);
 
-    // ✅ cache
-    if (await file.exists()) return file;
+    // [FIX-21] check cache validity - invalidate files older than 30 minutes
+    if (await file.exists()) {
+      final lastModified = await file.lastModified();
+      final age = DateTime.now().difference(lastModified);
+
+      if (age.inMinutes < AppConstants.pdfCacheValidityMinutes) {
+        return file;
+      }
+
+      await file.delete();
+    }
 
     final response = await Dio().get(
       url,

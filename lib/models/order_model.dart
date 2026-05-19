@@ -49,7 +49,7 @@ class Order {
   final OrderContact receiver;
   final OrderContact? sender;
   final OrderKind kind;
-  final double deliveryPrice;
+  final double deliveryFee;
   final Discountype? discountType;
   final String notes;
   final String? cancelReason;
@@ -82,12 +82,12 @@ class Order {
   double get discountValue {
     if (descount == 0 || discountType == null) return 0;
     if (discountType == Discountype.percent) {
-      return ((itemsTotalPrice + deliveryPrice) * (descount! / 100));
+      return ((itemsTotalPrice + deliveryFee) * (descount! / 100));
     }
     return descount!; // amount
   }
 
-  double get totalPrice => itemsTotalPrice + deliveryPrice - discountValue;
+  double get totalPrice => itemsTotalPrice + deliveryFee - discountValue;
 
   Duration get waitingDuration => DateTime.now().difference(createdAt);
 
@@ -103,8 +103,8 @@ class Order {
     return acceptedAt == null ? waitingDuration : acceptedDuration;
   }
 
-  static OrderStatus _parseStatus(String status) {
-    switch (status) {
+  static OrderStatus _parseStatus(Object? status) {
+    switch (status?.toString()) {
       case 'pending':
         return OrderStatus.waiting;
       case 'received':
@@ -118,13 +118,52 @@ class Order {
     }
   }
 
+  static Map<String, dynamic> _asMap(Object? value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) {
+      return value.map((key, value) => MapEntry(key.toString(), value));
+    }
+    return const {};
+  }
+
+  static List<dynamic> _asList(Object? value) {
+    if (value is List) return value;
+    return const [];
+  }
+
+  static String _asString(Object? value, [String fallback = '']) {
+    return value?.toString() ?? fallback;
+  }
+
+  static int _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static double _asDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? 0.0;
+  }
+
+  static bool _asBool(Object? value) {
+    if (value is bool) return value;
+    final normalized = value?.toString().toLowerCase();
+    return normalized == 'true' || normalized == '1';
+  }
+
+  static DateTime? _tryParseDate(Object? value) {
+    if (value is DateTime) return value;
+    return DateTime.tryParse(value?.toString() ?? '');
+  }
+
   Order({
     required this.id,
     required this.orderNumber,
     required this.receiver,
     this.sender,
     this.kind = OrderKind.company,
-    required this.deliveryPrice,
+    required this.deliveryFee,
     this.descount,
     this.discountType,
     required this.notes,
@@ -153,7 +192,7 @@ class Order {
       receiver: receiver,
       sender: sender ?? this.sender,
       kind: kind ?? this.kind,
-      deliveryPrice: deliveryPrice,
+      deliveryFee: deliveryFee,
       notes: notes,
       cancelReason: cancelReason ?? this.cancelReason,
       status: status ?? this.status,
@@ -166,56 +205,56 @@ class Order {
   }
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    final client = json['client'];
-    final sendTo = json['send_to'];
+    // [FIX-14] safe null handling for API fields that may be missing
+    final client = _asMap(json['client']);
+    final sendTo = _asMap(json['send_to']);
+    final hasSendTo = sendTo.isNotEmpty;
 
     final receiver = OrderContact(
-      name: sendTo?['name'] ?? client['name'],
-      phoneOne: sendTo?['phone'] ?? client['phone'],
-      phoneTwo: sendTo?['phone2'] ?? client['phone2'],
-      address: sendTo?['address'] ?? client['address'] ?? '',
-      linkAddress: sendTo?['delivery_link'] ?? client['delivery_link'] ?? '',
+      name: _asString(sendTo['name'] ?? client['name']),
+      phoneOne: _asString(sendTo['phone'] ?? client['phone']),
+      phoneTwo: _asString(sendTo['phone2'] ?? client['phone2']),
+      address: _asString(sendTo['address'] ?? client['address']),
+      linkAddress: _asString(
+        sendTo['delivery_link'] ?? client['delivery_link'],
+      ),
     );
 
     /// 👇 المرسل موجود بس في حالة person-to-person
     OrderContact? sender;
 
-    if (sendTo != null) {
+    if (hasSendTo) {
       sender = OrderContact(
-        name: client['name'],
-        phoneOne: client['phone'],
-        phoneTwo: client['phone2'],
-        address: client['address'] ?? '',
-        linkAddress: client['delivery_link'] ?? '',
+        name: _asString(client['name']),
+        phoneOne: _asString(client['phone']),
+        phoneTwo: _asString(client['phone2']),
+        address: _asString(client['address']),
+        linkAddress: _asString(client['delivery_link']),
       );
     }
     return Order(
-      id: json['id'].toString(),
-      orderNumber: json['order_number'],
+      id: _asString(json['id']),
+      orderNumber: _asString(json['order_number']),
       receiver: receiver,
       sender: sender,
-      kind: sendTo != null ? OrderKind.personToPerson : OrderKind.company,
-      deliveryPrice: (json['delivery_fee'] as num).toDouble(),
-      notes: json['notes'] ?? '',
-      isDeliveryChosen: json['is_delivery_chosen'] ?? false,
+      kind: hasSendTo ? OrderKind.personToPerson : OrderKind.company,
+      deliveryFee: _asDouble(json['delivery_fee']),
+      notes: _asString(json['notes']),
+      isDeliveryChosen: _asBool(json['is_delivery_chosen']),
       status: Order._parseStatus(json['status']),
-      createdAt: DateTime.parse(json['created_at']),
-      acceptedAt: json['accepted_at'] != null
-          ? DateTime.parse(json['accepted_at'])
-          : null,
-      descount: json['discount'] != null
-          ? (json['discount'] as num).toDouble()
-          : null,
-      items: (json['items'] as List)
-          .map(
-            (item) => OrderItem(
-              productName: item['item_name'],
-              quantity: item['quantity'],
-              deliveryPrice: (item['unit_price'] as num).toDouble(),
-              marketPlace: item['shop']?['name'] ?? '',
-            ),
-          )
-          .toList(),
+      createdAt: _tryParseDate(json['created_at']) ?? DateTime.now(),
+      acceptedAt: _tryParseDate(json['accepted_at']),
+      descount: json['discount'] != null ? _asDouble(json['discount']) : null,
+      items: _asList(json['items']).map((item) {
+        final itemMap = _asMap(item);
+        final shop = _asMap(itemMap['shop']);
+        return OrderItem(
+          productName: _asString(itemMap['item_name']),
+          quantity: _asInt(itemMap['quantity']),
+          deliveryPrice: _asDouble(itemMap['unit_price']),
+          marketPlace: _asString(shop['name']),
+        );
+      }).toList(),
       discountType: json['discount_type'] == 'percent'
           ? Discountype.percent
           : json['discount_type'] == 'amount'

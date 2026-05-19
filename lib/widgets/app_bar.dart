@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -38,7 +39,7 @@ class AppBarWidget extends StatelessWidget {
               SizedBox(width: 6.w),
 
               Text(
-                isReserve ? "إحتياطي" : "اساسي",
+                isReserve ? AppConstants.roleBackup : AppConstants.rolePrimary,
                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
               ),
             ],

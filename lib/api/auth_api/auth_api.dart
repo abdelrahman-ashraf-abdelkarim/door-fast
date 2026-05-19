@@ -1,6 +1,7 @@
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 Future<AuthResponse> login(
   String username,
@@ -41,7 +42,9 @@ Future<void> updateFcmToken(
         },
       ),
     );
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[AuthApi] FCM Token update failed: $e');
+  }
 }
 
 Future<bool> validateToken(String authToken, DeliveryType role) async {

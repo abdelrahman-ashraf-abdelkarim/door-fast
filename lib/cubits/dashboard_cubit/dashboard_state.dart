@@ -1,6 +1,8 @@
 import 'package:captain_app/models/dashboard_model.dart';
+import 'package:equatable/equatable.dart';
 
-class DashboardState {
+// [FIX-08] extend Equatable to prevent unnecessary rebuilds
+class DashboardState extends Equatable {
   final DashboardData? data;
   final bool isLoading;
   final String? errorMessage;
@@ -18,4 +20,7 @@ class DashboardState {
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
+
+  @override
+  List<Object?> get props => [data, isLoading, errorMessage];
 }

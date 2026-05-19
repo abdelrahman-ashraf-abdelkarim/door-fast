@@ -1,3 +1,4 @@
+import 'package:captain_app/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,7 +14,10 @@ class CurrentBalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24.r),
         gradient: const LinearGradient(
-          colors: [Color(0xFFB85C00), Color(0xFFFF8C00)],
+          colors: [
+            AppColors.balanceGradientStart,
+            AppColors.balanceGradientEnd,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

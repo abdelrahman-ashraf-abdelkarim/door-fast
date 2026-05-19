@@ -35,3 +35,9 @@ If `API_KEY` is different from `REVERB_KEY`, add:
 ```bash
 --dart-define=API_KEY=xxx
 ```
+
+## إعداد Firebase
+
+1. احصل على ملف `google-services.json` من [Firebase Console](https://console.firebase.google.com)
+2. ضعه في المسار: `android/app/google-services.json`
+3. لا ترفع هذا الملف للـ repository أبداً
