@@ -8,21 +8,37 @@ Future<AuthResponse> login(
   String password,
   DeliveryType role,
 ) async {
-  final loginUrl = '${AppConstants.getBaseUrl(role)}/login';
-  final response = await Dio().post(
-    loginUrl,
+  final dio = Dio();
+  final baseUrl = AppConstants.getBaseUrl(role);
+
+  // 1. Login
+  final loginRes = await dio.post(
+    "$baseUrl/login",
     data: {'username': username, 'password': password},
     options: Options(validateStatus: (_) => true),
   );
-  if (response.statusCode == 200) {
-    return AuthResponse.fromJson(
-      response.data as Map<String, dynamic>,
-      role: role,
-    );
-  } else {
-    final errorData = response.data as Map<String, dynamic>;
+  if (loginRes.statusCode != 200) {
+    final errorData = loginRes.data as Map<String, dynamic>;
     throw Exception(errorData['message'] ?? 'فشل تسجيل الدخول');
   }
+
+  final token = (loginRes.data as Map<String, dynamic>)['token'] as String;
+  final authHeader = Options(headers: {'Authorization': 'Bearer $token'});
+
+  // 2. Shift Status + 3. Shift Times — بالتوازي
+  final results = await Future.wait([
+    dio.get('$baseUrl/shift/status', options: authHeader),
+    dio.get('$baseUrl/shift/times', options: authHeader),
+  ]);
+
+  final statusRes = results[0].data as Map<String, dynamic>;
+  final timesRes = results[1].data as Map<String, dynamic>;
+
+  return AuthResponse.fromJson({
+    'login': loginRes.data,
+    'status': statusRes,
+    'times': timesRes,
+  });
 }
 
 Future<void> updateFcmToken(
@@ -56,6 +72,7 @@ Future<bool> validateToken(String authToken, DeliveryType role) async {
     );
     return response.statusCode == 200;
   } catch (e) {
+    debugPrint('[AuthApi] FCM Token update failed: $e');
     return false;
   }
 }

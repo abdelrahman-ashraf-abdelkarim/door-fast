@@ -53,7 +53,8 @@ class AuthCubit extends HydratedCubit<AuthState> {
     emit(AuthLoading());
     try {
       final response = await authapi.login(username, password, role);
-
+      print('USER STATUS: ${response.user.status}'); // ← شوف إيه اللي بييجي
+      print('FULL RESPONSE: ${response.user.toJson()}');
       if (response.user.status != CaptainStatus.active) {
         emit(const AuthError('حسابك غير مفعّل، تواصل مع الإدارة'));
         return;

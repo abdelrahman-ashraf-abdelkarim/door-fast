@@ -40,21 +40,63 @@ class WalletModel {
     );
   }
 
+  // ─── helpers داخلية ───────────────────────────────────────────────────────
+
+  /// يحوّل أي قيمة لـ double بأمان
+  static double _toDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString()) ?? 0.0;
+  }
+
+  /// يحوّل أي قيمة لـ int بأمان
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
   // ─── fromJson ─────────────────────────────────────────────────────────────
   factory WalletModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'];
-    final paginated = data['transactions'];
+    // ── الـ data الرئيسية ──────────────────────────────────────────────────
+    // لو json['data'] مش Map نرجع model فاضي بدل crash
+    final rawData = json['data'];
+    final data = rawData is Map<String, dynamic>
+        ? rawData
+        : (rawData is Map
+              ? Map<String, dynamic>.from(rawData)
+              : <String, dynamic>{});
+
+    // ── بيانات الـ pagination ──────────────────────────────────────────────
+    // لو data['transactions'] مش Map نستخدم map فاضي
+    final rawPaginated = data['transactions'];
+    final paginated = rawPaginated is Map<String, dynamic>
+        ? rawPaginated
+        : (rawPaginated is Map
+              ? Map<String, dynamic>.from(rawPaginated)
+              : <String, dynamic>{});
+
+    // ── قائمة الـ transactions ─────────────────────────────────────────────
+    // لو paginated['data'] مش List نستخدم قائمة فاضية
+    final rawList = paginated['data'];
+    final transactionList = rawList is List ? rawList : <dynamic>[];
 
     return WalletModel(
-      currentBalance: (data['current_balance'] as num).toDouble(),
-      totalDebit: (data['total_debit'] as num).toDouble(),
-      totalCredit: (data['total_credit'] as num).toDouble(),
-      transactions: (paginated['data'] as List)
-          .map((t) => TransactionModel.fromJson(t))
+      currentBalance: _toDouble(data['current_balance']),
+      totalDebit: _toDouble(data['total_debit']),
+      totalCredit: _toDouble(data['total_credit']),
+      transactions: transactionList
+          .whereType<Map>()
+          .map(
+            (t) => TransactionModel.fromJson(
+              t is Map<String, dynamic> ? t : Map<String, dynamic>.from(t),
+            ),
+          )
           .toList(),
-      currentPage: paginated['current_page'],
-      lastPage: paginated['last_page'],
-      total: paginated['total'],
+      currentPage: _toInt(paginated['current_page']),
+      lastPage: _toInt(paginated['last_page']),
+      total: _toInt(paginated['total']),
     );
   }
 }

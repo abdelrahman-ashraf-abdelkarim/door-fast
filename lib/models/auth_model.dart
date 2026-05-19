@@ -49,7 +49,9 @@ class AuthModel {
       name: user['name'],
       code: user['code'],
       phone: user['phone'],
-      status: user['status'] == 'has_active_shift'
+      status:
+          user['status'] ==
+              'active' // ← من الـ user مش من data
           ? CaptainStatus.active
           : CaptainStatus.nonActive,
       loginAt: user['login_at'] != null
@@ -77,33 +79,70 @@ class AuthResponse {
   final bool success;
   final String token;
   final AuthModel user;
+  final ShiftModel? shift;
 
   AuthResponse({
     required this.success,
     required this.token,
     required this.user,
+    this.shift,
   });
 
-  factory AuthResponse.fromJson(
-    Map<String, dynamic> json, {
-    DeliveryType role = DeliveryType.delivery,
-  }) {
+  factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    final loginData = json['login'] as Map<String, dynamic>;
+    final statusData = json['status'] as Map<String, dynamic>;
+    final timesData =
+        (json['times'] as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+
+    final userJson = loginData['user'] as Map<String, dynamic>;
+    final hasActiveShift = statusData['shift_active'] ?? false;
+    final shiftStartRaw = timesData['shift_start'] as String?;
+    final shiftStart = shiftStartRaw != null
+        ? DateTime.tryParse(shiftStartRaw)
+        : null;
+
     return AuthResponse(
-      success: json['success'],
-      token: json['token'],
-      user: AuthModel(
-        id: json['user']['id'].toString(),
-        name: json['user']['name'],
-        code: json['user']['code'],
-        phone: json['user']['phone'],
-        status: json['user']['status'] == 'has_active_shift'
-            ? CaptainStatus.active
-            : CaptainStatus.nonActive,
-        loginAt: json['user']['login_at'] != null
-            ? DateTime.tryParse(json['user']['login_at'])
-            : null,
-        role: role,
+      success: loginData['success'],
+      token: loginData['token'],
+      user: AuthModel.fromJson(userJson).copyWith(
+        status: hasActiveShift ? CaptainStatus.active : CaptainStatus.nonActive,
+        loginAt: shiftStart,
       ),
+      shift: ShiftModel(
+        hasActiveShift: hasActiveShift,
+        shiftStart: shiftStart,
+        shiftEnd: timesData['shift_end'] != null
+            ? DateTime.tryParse(timesData['shift_end'])
+            : null,
+        durationMinutes: timesData['duration_minutes'] ?? 0,
+      ),
+    );
+  }
+}
+
+class ShiftModel {
+  final bool hasActiveShift;
+  final DateTime? shiftStart;
+  final DateTime? shiftEnd;
+  final int durationMinutes;
+
+  const ShiftModel({
+    required this.hasActiveShift,
+    this.shiftStart,
+    this.shiftEnd,
+    required this.durationMinutes,
+  });
+
+  factory ShiftModel.fromJson(Map<String, dynamic> json) {
+    return ShiftModel(
+      hasActiveShift: json['has_active_shift'] ?? false,
+      shiftStart: json['shift_start'] != null
+          ? DateTime.tryParse(json['shift_start'])
+          : null,
+      shiftEnd: json['shift_end'] != null
+          ? DateTime.tryParse(json['shift_end'])
+          : null,
+      durationMinutes: json['duration_minutes'] ?? 0,
     );
   }
 }
