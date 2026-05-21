@@ -103,6 +103,17 @@ class Order {
     return acceptedAt == null ? waitingDuration : acceptedDuration;
   }
 
+  /// يجمّع الـ items حسب الـ marketplace اسمه — انتقل من الـ UI للـ model
+  /// مثال: { 'كارفور': [item1, item2], 'غير محدد': [item3] }
+  Map<String, List<OrderItem>> get groupedByMarketplace {
+    final grouped = <String, List<OrderItem>>{};
+    for (final item in items) {
+      final key = item.marketPlace.isEmpty ? 'غير محدد' : item.marketPlace;
+      grouped.putIfAbsent(key, () => []).add(item);
+    }
+    return grouped;
+  }
+
   static OrderStatus _parseStatus(Object? status) {
     switch (status?.toString()) {
       case 'pending':

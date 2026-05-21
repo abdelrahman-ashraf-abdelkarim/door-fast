@@ -24,7 +24,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ShiftCubit, ShiftState>(
       builder: (context, shiftState) {
-        final isOnline = shiftState.user?.status == CaptainStatus.active;
+        final isOnline = shiftState.hasShiftActive;
         // ✅ نجيب الـ role من الـ AuthCubit
         final authState = context.read<AuthCubit>().state;
         final role = authState is AuthAuthenticated

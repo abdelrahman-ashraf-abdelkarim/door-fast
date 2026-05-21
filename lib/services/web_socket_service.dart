@@ -11,9 +11,22 @@ class WebSocketService {
 
   static final PusherChannelsFlutter _pusher =
       PusherChannelsFlutter.getInstance();
-  static bool _initialized = false;
 
-  StreamController<Map<String, dynamic>> _controller =
+  // ─── State ────────────────────────────────────────────────────────────────
+  bool _initialized = false;
+  bool _isConnected = false; // ✅ تتبع حالة الاتصال الفعلية
+
+  // ─── Exponential Backoff ──────────────────────────────────────────────────
+  int _retryCount = 0;
+  Timer? _retryTimer;
+
+  Duration get _retryDelay {
+    final seconds = (5 * (1 << _retryCount)).clamp(5, 60);
+    return Duration(seconds: seconds);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  final StreamController<Map<String, dynamic>> _controller =
       StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get stream => _controller.stream;
@@ -25,35 +38,50 @@ class WebSocketService {
 
   Future<void> connect(String token, String captainId) async {
     if (_initialized) return;
-    // [FIX-09] recreate StreamController if it was closed
-    if (_controller.isClosed) {
-      _controller = StreamController<Map<String, dynamic>>.broadcast();
-    }
     _initialized = true;
+    _isConnected = false;
     _token = token;
     _captainId = captainId;
+    _retryCount = 0;
     await _init();
   }
 
   Future<void> disconnect() async {
-    // [FIX-09] close StreamController and reset initialized flag
     _initialized = false;
+    _isConnected = false;
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _retryCount = 0;
     final captainId = _captainId;
     _token = null;
     _captainId = null;
     try {
       await _pusher.unsubscribe(channelName: 'orders');
       if (captainId != null) {
-        // delivery.$captainId يغطي أحداث الشيفت والمحفظة معاً
         await _pusher.unsubscribe(channelName: 'delivery.$captainId');
       }
       await _pusher.disconnect();
     } catch (_) {}
-
-    if (!_controller.isClosed) {
-      await _controller.close();
-    }
   }
+
+  // ✅ reconnect — يُستدعى من HomeShell عند رجوع الـ app من الـ background
+  // الفرق عن الإصدار القديم: بيشتغل حتى لو _initialized = true
+  // لأن الاتصال ممكن يكون اتقطع من غير ما _initialized يتغير
+  Future<void> reconnect() async {
+    if (_token == null || _captainId == null) return;
+
+    // ✅ لو الاتصال شغّال فعلاً، مش محتاج نعمل حاجة
+    if (_isConnected) return;
+
+    // ✅ reset كامل وابدأ من أول
+    _initialized = false;
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _retryCount = 0;
+    _initialized = true;
+    await _init();
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   // ─── Internal ─────────────────────────────────────────────────────────────
 
@@ -70,20 +98,30 @@ class WebSocketService {
         },
 
         onConnectionStateChange: (currentState, previousState) {
-          if (currentState == 'DISCONNECTED' && _token != null) {
-            Future.delayed(const Duration(seconds: 5), () => _pusher.connect());
+          if (currentState == 'CONNECTED') {
+            _isConnected = true; // ✅ سجّل أن الاتصال شغّال
+            _retryCount = 0;
+            _retryTimer?.cancel();
+            _retryTimer = null;
+          }
+
+          if (currentState == 'DISCONNECTED') {
+            _isConnected = false; // ✅ سجّل أن الاتصال انقطع
+            if (_token != null) {
+              _scheduleRetryConnect();
+            }
           }
         },
 
         onError: (message, code, error) {
+          _isConnected = false;
           _initialized = false;
-          Future.delayed(const Duration(seconds: 5), () {
-            if (_token != null) _init();
-          });
+          if (_token != null) {
+            _scheduleRetryInit();
+          }
         },
       );
 
-      // ─── Channel الأوردرات العام ──────────────────────────────────────────
       await _pusher.subscribe(
         channelName: 'orders',
         onEvent: (dynamic event) {
@@ -93,8 +131,6 @@ class WebSocketService {
         },
       );
 
-      // ─── Channel الشيفت والمحفظة — نفس الـ channel ──────────────────────
-      // Backend يبرودكاست الاتنين على delivery.$captainId
       if (_captainId != null) {
         await _pusher.subscribe(
           channelName: 'delivery.$_captainId',
@@ -108,16 +144,42 @@ class WebSocketService {
 
       await _pusher.connect();
     } catch (e) {
+      _isConnected = false;
       _initialized = false;
+      if (_token != null) {
+        _scheduleRetryInit();
+      }
     }
   }
+
+  // ✅ retry للـ connect فقط (الـ pusher اتقطع لكن init تم)
+  void _scheduleRetryConnect() {
+    _retryTimer?.cancel();
+    _retryTimer = Timer(_retryDelay, () {
+      _retryCount++;
+      if (_token != null) _pusher.connect();
+    });
+  }
+
+  // ✅ retry كامل من الـ _init (حصل error في الـ init نفسه)
+  void _scheduleRetryInit() {
+    _retryTimer?.cancel();
+    _retryTimer = Timer(_retryDelay, () {
+      _retryCount++;
+      if (_token != null) {
+        _initialized = true;
+        _init();
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
 
   void _handleEvent(PusherEvent event) {
     try {
       final raw = _decode(event.data);
 
       switch (event.eventName) {
-        // ─── أحداث الأوردرات ──────────────────────────────────────────────
         case 'App\\Events\\NewOrderEvent':
           final message = raw['order'] ?? raw;
           final orderId =
@@ -141,6 +203,7 @@ class WebSocketService {
             });
           }
           break;
+
         case 'reserve_new_order':
           final message = raw['order'] ?? raw;
           final orderId =
@@ -157,7 +220,6 @@ class WebSocketService {
           }
           break;
 
-        // ─── أحداث الشيفت ─────────────────────────────────────────────────
         case 'shift.updated':
           final status = raw['status']?.toString();
           if (status == 'started') {
@@ -171,9 +233,6 @@ class WebSocketService {
           _addEvent({'event': 'account_deactivated'});
           break;
 
-        // ─── أحداث المحفظة ────────────────────────────────────────────────
-        // broadcastAs() في Backend = 'wallet.updated'
-        // البيانات: { user_id, balance, amount, type, direction }
         case 'wallet.updated':
           final balance = raw['balance'];
           final amount = raw['amount'];

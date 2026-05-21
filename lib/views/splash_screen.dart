@@ -1,14 +1,14 @@
 import 'package:captain_app/core/constants.dart';
+import 'package:captain_app/core/splash_navigator.dart';
 import 'package:captain_app/cubits/app_version_cubit/app_version_cubit.dart';
 import 'package:captain_app/cubits/app_version_cubit/app_version_state.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
-import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
-import 'package:captain_app/views/home_shell.dart';
-import 'package:captain_app/views/login_screen.dart';
+import 'package:captain_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,26 +33,37 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      FlutterNativeSplash.remove();
+      await NotificationService.requestAllPermissions();
+    });
+
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(
+        milliseconds: 600,
+      ), // ✅ أسرع — الـ native splash بيعرض الـ logo، الـ animation بس للـ polish
     )..forward();
 
     _animation = Tween<double>(
-      begin: 0.5,
+      begin: 0.5, // ✅ من 0.92 مش 0.5 — الـ logo مش بيظهر من فراغ
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    // ✅ ابدأ الـ version check بالتوازي مع الـ animation فوراً
+    _checkVersion();
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _animationDone = true;
-        _checkVersion();
+        // ✅ لو الـ version check خلصت قبل الـ animation، navigate فوراً
+        if (_versionCheckDone) _navigateNormally();
       }
     });
   }
 
   Future<void> _checkVersion() async {
-    if (!mounted || !_animationDone || _versionCheckStarted) return;
+    if (!mounted || _versionCheckStarted) return;
 
     _versionCheckStarted = true;
 
@@ -61,39 +72,41 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       await context.read<AppVersionCubit>().checkVersion(packageInfo.version);
     } catch (_) {
-      _navigateNormally();
+      // ✅ لو في error، انتظر الـ animation تخلص الأول لو لسه شغالة
+      if (_animationDone) {
+        _navigateNormally();
+      }
+      // لو مش done، الـ animation listener هيـ call _navigateNormally
     }
   }
 
+  // ─── Navigation ───────────────────────────────────────────────────────────
+
   void _navigateNormally() {
-    if (!mounted || _hasNavigated) {
-      _versionCheckDone = true;
+    // ✅ لازم الاتنين يخلصوا قبل ما نـ navigate
+    if (!_animationDone || !mounted || _hasNavigated) {
+      if (mounted && !_hasNavigated) _versionCheckDone = true;
       return;
     }
 
     _versionCheckDone = true;
+
     final authState = context.read<AuthCubit>().state;
-    if (authState is AuthAuthenticated) {
-      final shiftState = context.read<ShiftCubit>().state;
-      if (shiftState.user == null) {
-        // [FIX-05] set _versionCheckDone before waiting for ShiftCubit listener
-        _versionCheckDone = true;
-        return;
-      }
-    }
+    final shiftState = context.read<ShiftCubit>().state;
+
+    final destination = SplashNavigator.resolve(authState, shiftState);
+    if (destination == null) return; // انتظر ShiftCubit listener
 
     _hasNavigated = true;
-    final destination = authState is AuthAuthenticated
-        ? const HomeShell()
-        : const LoginScreen();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => destination),
     );
   }
 
+  // ─── Update Dialogs ───────────────────────────────────────────────────────
+
   Future<void> _showForceUpdateDialog(String updateUrl) async {
-    // [FIX-17] mark version check as done even in force update path
     _versionCheckDone = true;
 
     if (!mounted || _hasNavigated) return;

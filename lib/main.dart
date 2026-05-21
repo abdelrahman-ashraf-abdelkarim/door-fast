@@ -11,23 +11,36 @@ import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/shift_service.dart';
 import 'package:captain_app/views/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:captain_app/firebase_options.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   final storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+        : HydratedStorageDirectory(
+            (await getApplicationDocumentsDirectory()).path,
+          ),
   );
   HydratedBloc.storage = storage;
   await NotificationService.init();
@@ -51,10 +64,7 @@ class CaptainApp extends StatelessWidget {
             create: (context) =>
                 ShiftCubit(context.read<AuthCubit>(), ShiftService(api: api)),
           ),
-          BlocProvider<OrdersCubit>(
-            create: (context) =>
-                OrdersCubit(api: api, shiftCubit: context.read<ShiftCubit>()),
-          ),
+          BlocProvider<OrdersCubit>(create: (context) => OrdersCubit(api: api)),
           BlocProvider(create: (_) => DashboardCubit(api: api)),
           BlocProvider(
             create: (_) =>

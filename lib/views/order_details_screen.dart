@@ -165,21 +165,14 @@ class OrderDetailsScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 16.h),
-                ...() {
-                  final grouped = <String, List<OrderItem>>{};
-                  for (final item in order.items) {
-                    final key = item.marketPlace.isEmpty
-                        ? 'غير محدد'
-                        : item.marketPlace;
-                    grouped.putIfAbsent(key, () => []).add(item);
-                  }
-                  return grouped.entries.map(
-                    (entry) => OrderDetailsGroupedItemCard(
-                      marketPlace: entry.key,
-                      items: entry.value,
-                    ),
-                  );
-                }(),
+
+                // ✅ الـ grouping انتقل للـ Order model — الـ screen بتعرض بس
+                ...order.groupedByMarketplace.entries.map(
+                  (entry) => OrderDetailsGroupedItemCard(
+                    marketPlace: entry.key,
+                    items: entry.value,
+                  ),
+                ),
 
                 SizedBox(height: 16.h),
                 ItemPriceCard(order: order),

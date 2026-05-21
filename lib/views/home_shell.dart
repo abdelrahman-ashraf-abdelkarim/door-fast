@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:captain_app/cubits/dashboard_cubit/dashboard_cubit.dart';
 import 'package:captain_app/cubits/order_cubit/order_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_cubit.dart';
 import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
-import 'package:captain_app/models/auth_model.dart';
+import 'package:captain_app/services/web_socket_service.dart';
 import 'package:captain_app/views/account_statement_screen.dart';
 import 'package:captain_app/views/dashboard_screen.dart';
 import 'package:captain_app/views/login_screen.dart';
@@ -23,7 +21,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   late int _currentIndex;
 
   final List<Widget> _screens = const [
@@ -32,11 +30,11 @@ class _HomeShellState extends State<HomeShell> {
     AccountStatementScreen(),
   ];
 
-  StreamSubscription? _wsSubscription;
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    WidgetsBinding.instance.addObserver(this);
 
     final authState = context.read<AuthCubit>().state;
     if (authState is! AuthAuthenticated) return;
@@ -47,28 +45,38 @@ class _HomeShellState extends State<HomeShell> {
 
     context.read<OrdersCubit>().loadOrders(token, captainId, role: role);
     context.read<DashboardCubit>().loadDashboard(token);
-    final authCubit = context.read<AuthCubit>();
-
-    _wsSubscription = context.read<OrdersCubit>().wsStream.listen((data) async {
-      if (!mounted) return;
-      final event = data['event'];
-      // [FIX-04] removed duplicate shift_activated handler
-      if (event == 'account_deactivated') {
-        _wsSubscription?.cancel();
-        _wsSubscription = null;
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) authCubit.logout();
-        });
-        return;
-      }
-    });
   }
 
   @override
   void dispose() {
-    _wsSubscription?.cancel(); // ✅ cancel عند الإغلاق
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+
+    // ✅ 1. أعد الاتصال بالـ WebSocket
+    WebSocketService().reconnect().then((_) {
+      if (!mounted) return;
+
+      // ✅ 2. أعد subscribe في AuthCubit و ShiftCubit على نفس الـ stream
+      context.read<AuthCubit>().relistenToWebSocket();
+      context.read<ShiftCubit>().relistenToWebSocket();
+      context.read<OrdersCubit>().relistenToWebSocket();
+    });
+
+    // ✅ 3. أعد تحميل الطلبات عشان تتجدد بعد ما الـ app يرجع
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! AuthAuthenticated) return;
+
+    context.read<OrdersCubit>().loadOrders(
+      authState.token,
+      authState.user.id,
+      role: authState.user.role,
+    );
+    context.read<DashboardCubit>().loadDashboard(authState.token);
   }
 
   @override
@@ -84,10 +92,11 @@ class _HomeShellState extends State<HomeShell> {
         }
       },
       child: BlocBuilder<ShiftCubit, ShiftState>(
+        buildWhen: (prev, curr) =>
+            prev.user?.shiftStatus != curr.user?.shiftStatus,
         builder: (context, shiftState) {
-          final isOnline = shiftState.user?.status == CaptainStatus.active;
+          final isOnline = shiftState.hasShiftActive;
 
-          // ← لو مش نشط، اعرض رسالة في كل الصفحات
           if (!isOnline) {
             return const Scaffold(
               body: SafeArea(child: OfflineMessageWidget()),

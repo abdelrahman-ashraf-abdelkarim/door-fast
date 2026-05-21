@@ -1,5 +1,7 @@
 enum CaptainStatus { active, nonActive }
 
+enum ShiftStatus { active, nonActive }
+
 enum DeliveryType { delivery, reserve }
 
 class AuthModel {
@@ -8,6 +10,7 @@ class AuthModel {
   final String code;
   final String phone;
   final CaptainStatus status;
+  final ShiftStatus shiftStatus;
   final DateTime? loginAt;
   final DeliveryType role;
 
@@ -17,6 +20,7 @@ class AuthModel {
     required this.code,
     required this.phone,
     required this.status,
+    this.shiftStatus = ShiftStatus.nonActive,
     this.loginAt,
     this.role = DeliveryType.delivery,
   });
@@ -27,6 +31,7 @@ class AuthModel {
     String? code,
     String? phone,
     CaptainStatus? status,
+    ShiftStatus? shiftStatus,
     DateTime? loginAt,
     DeliveryType? role,
   }) {
@@ -36,6 +41,7 @@ class AuthModel {
       code: code ?? this.code,
       phone: phone ?? this.phone,
       status: status ?? this.status,
+      shiftStatus: shiftStatus ?? this.shiftStatus,
       loginAt: loginAt ?? this.loginAt,
       role: role ?? this.role,
     );
@@ -49,9 +55,7 @@ class AuthModel {
       name: user['name'],
       code: user['code'],
       phone: user['phone'],
-      status:
-          user['status'] ==
-              'active' // ← من الـ user مش من data
+      status: (user['status'] ?? 'active') == 'active'
           ? CaptainStatus.active
           : CaptainStatus.nonActive,
       loginAt: user['login_at'] != null
@@ -105,7 +109,12 @@ class AuthResponse {
       success: loginData['success'],
       token: loginData['token'],
       user: AuthModel.fromJson(userJson).copyWith(
-        status: hasActiveShift ? CaptainStatus.active : CaptainStatus.nonActive,
+        status: statusData['shift_active'] == true
+            ? CaptainStatus.active
+            : CaptainStatus.nonActive,
+        shiftStatus: hasActiveShift
+            ? ShiftStatus.active
+            : ShiftStatus.nonActive,
         loginAt: shiftStart,
       ),
       shift: ShiftModel(

@@ -1,7 +1,7 @@
+import 'package:captain_app/core/app_logger.dart';
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
 class AuthException implements Exception {
   final String message;
@@ -51,7 +51,7 @@ Future<AuthResponse> login(
 Future<void> updateFcmToken(
   String authToken,
   String fcmToken,
-  DeliveryType role, // ← زود ده
+  DeliveryType role,
 ) async {
   try {
     final url = '${AppConstants.getBaseUrl(role)}/fcm-token';
@@ -66,7 +66,7 @@ Future<void> updateFcmToken(
       ),
     );
   } catch (e) {
-    debugPrint('[AuthApi] FCM Token update failed: $e');
+    AppLogger.w('AuthApi', 'FCM Token update failed', e);
   }
 }
 
@@ -79,7 +79,7 @@ Future<bool> validateToken(String authToken, DeliveryType role) async {
     );
     return response.statusCode == 200;
   } catch (e) {
-    debugPrint('[AuthApi] FCM Token update failed: $e');
+    AppLogger.w('AuthApi', 'Token validation failed', e);
     return false;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:captain_app/core/app_logger.dart';
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/order_model.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
 
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (error) {
-      debugPrint('[FIX-11] Map launch error: $error');
+      AppLogger.e('MapLink', 'Map launch error', error: error);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('حدث خطأ أثناء فتح الخريطة')),
@@ -248,7 +249,6 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               ),
             ),
           ],
-          // call phone two Button
           SizedBox(height: 10.h),
         ],
       ),

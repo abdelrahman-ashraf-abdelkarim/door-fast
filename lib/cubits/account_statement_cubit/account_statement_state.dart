@@ -25,7 +25,7 @@ class AccountStatementLoaded extends AccountStatementState {
   final bool hasNewRealtime;
 
   // ─── Constructor لأول تحميل (بدون فلتر) ─────────────────────────────────
-  AccountStatementLoaded(this.wallet)
+  AccountStatementLoaded(this.wallet, List<TransactionModel> transactions)
     : displayedTransactions = wallet.transactions,
       filterFrom = null,
       filterTo = null,

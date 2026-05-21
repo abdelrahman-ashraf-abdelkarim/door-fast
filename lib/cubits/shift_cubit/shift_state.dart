@@ -35,6 +35,10 @@ class ShiftState extends Equatable {
 
   bool get isStarted => startTime != null;
 
+  bool get isCaptainActive => user?.status == CaptainStatus.active;
+
+  bool get hasShiftActive => user?.shiftStatus == ShiftStatus.active;
+
   ShiftState copyWith({
     DateTime? startTime,
     Duration? duration,
@@ -59,5 +63,4 @@ class ShiftState extends Equatable {
 
   @override
   List<Object?> get props => [startTime, duration, user];
-  bool get isUserActive => user?.status == CaptainStatus.active;
 }

@@ -1,4 +1,6 @@
 import 'package:captain_app/core/app_navigation.dart';
+import 'package:captain_app/firebase_options.dart';
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,8 +9,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  await NotificationService._showFcmAsLocal(message);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.showFcmAsLocal(message);
 }
 
 class NotificationService {
@@ -55,6 +57,35 @@ class NotificationService {
     await _initFcm();
   }
 
+  static Future<void> requestAllPermissions() async {
+    // 1. Battery Optimization
+    final isBatteryIgnoring =
+        await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+    if (isBatteryIgnoring != true) {
+      await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+    }
+
+    // 2. Xiaomi AutoStart — ضروري جداً على Xiaomi
+    final isAutoStartEnabled =
+        await DisableBatteryOptimization.isAutoStartEnabled;
+    if (isAutoStartEnabled != true) {
+      await DisableBatteryOptimization.showEnableAutoStartSettings(
+        "Enable Auto Start",
+        "Please enable auto start to allow notifications and background service to work properly.",
+      );
+    }
+
+    // 3. Xiaomi Battery Saver
+    final isManufacturerIgnoring = await DisableBatteryOptimization
+        .isManufacturerBatteryOptimizationDisabled;
+    if (isManufacturerIgnoring != true) {
+      await DisableBatteryOptimization.showDisableManufacturerBatteryOptimizationSettings(
+        "Your device has additional battery optimization that may block notifications.",
+        "Please disable it to receive notifications.",
+      );
+    }
+  }
+
   static Future<void> _initForBackground() async {
     if (_isInitialized) return;
     _isInitialized = true;
@@ -74,7 +105,7 @@ class NotificationService {
 
     // ─── Foreground ───────────────────────────────────────────
     FirebaseMessaging.onMessage.listen((message) {
-      _showFcmAsLocal(message);
+      showFcmAsLocal(message);
     });
 
     // ─── Background (ضغط على الـ notification) ───────────────
@@ -122,7 +153,7 @@ class NotificationService {
     );
   }
 
-  static Future<void> _showFcmAsLocal(RemoteMessage message) async {
+  static Future<void> showFcmAsLocal(RemoteMessage message) async {
     await _initForBackground();
     final title = message.notification?.title ?? 'طلب جديد';
     final body = message.notification?.body ?? '';

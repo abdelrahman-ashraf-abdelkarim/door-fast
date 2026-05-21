@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:captain_app/api/auth_api/auth_api.dart' as authapi;
 import 'package:captain_app/services/notification_service.dart';
+import 'package:captain_app/services/web_socket_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -10,7 +11,9 @@ import '../../models/auth_model.dart';
 class AuthCubit extends HydratedCubit<AuthState> {
   static const String _authTokenKey = 'auth_token';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
   StreamSubscription<String>? _fcmTokenRefreshSub;
+  StreamSubscription<Map<String, dynamic>>? _wsSubscription;
 
   AuthModel? _hydratedUser;
   String? _legacyHydratedToken;
@@ -42,6 +45,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
 
     emit(AuthAuthenticated(user, token: token));
     _validateTokenThenSendFcm(token, user.role);
+    _listenToWebSocket();
   }
 
   Future<void> login(
@@ -52,8 +56,6 @@ class AuthCubit extends HydratedCubit<AuthState> {
     emit(AuthLoading());
     try {
       final response = await authapi.login(username, password, role);
-      print('USER STATUS: ${response.user.status}'); // ← شوف إيه اللي بييجي
-      print('FULL RESPONSE: ${response.user.toJson()}');
       if (response.user.status != CaptainStatus.active) {
         emit(const AuthError('حسابك غير مفعّل، تواصل مع الإدارة'));
         return;
@@ -71,17 +73,30 @@ class AuthCubit extends HydratedCubit<AuthState> {
           role: response.user.role,
         );
       });
+
       emit(AuthAuthenticated(response.user, token: response.token));
       _sendFcmTokenToBackend(response.token, role: response.user.role);
+      _listenToWebSocket();
     } catch (e) {
-      print('ERROR TYPE: ${e.runtimeType}');
-      print('ERROR: $e');
       if (e is authapi.AuthException) {
         emit(AuthError(e.toString()));
       } else {
         emit(const AuthError('حدث خطأ، تحقق من الاتصال بالإنترنت'));
       }
     }
+  }
+
+  // ✅ public — بيتكال من HomeShell بعد reconnect
+  void relistenToWebSocket() => _listenToWebSocket();
+
+  void _listenToWebSocket() {
+    _wsSubscription?.cancel();
+    // ✅ دايماً بيسمع على نفس الـ stream الثابت في الـ singleton
+    _wsSubscription = WebSocketService().stream.listen((data) {
+      if (data['event'] == 'account_deactivated') {
+        logout();
+      }
+    });
   }
 
   Future<void> _sendFcmTokenToBackend(
@@ -96,7 +111,6 @@ class AuthCubit extends HydratedCubit<AuthState> {
     } catch (_) {}
   }
 
-  // ✅ الدالة دي بقت صح — مقفولة صح + بتستخدم في fromJson
   Future<void> _validateTokenThenSendFcm(
     String authToken,
     DeliveryType role,
@@ -111,11 +125,13 @@ class AuthCubit extends HydratedCubit<AuthState> {
     } catch (e) {
       emit(AuthUnauthenticated());
     }
-  } // ✅ القوس ده كان ناقص
+  }
 
   Future<void> logout() async {
     await _fcmTokenRefreshSub?.cancel();
+    await _wsSubscription?.cancel();
     _fcmTokenRefreshSub = null;
+    _wsSubscription = null;
     await _secureStorage.delete(key: _authTokenKey);
     emit(AuthUnauthenticated());
   }
@@ -141,6 +157,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
   @override
   Future<void> close() async {
     await _fcmTokenRefreshSub?.cancel();
+    await _wsSubscription?.cancel();
     return super.close();
   }
 }

@@ -15,7 +15,6 @@ import 'package:captain_app/widgets/transaction_log_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AccountStatementScreen extends StatelessWidget {
   const AccountStatementScreen({super.key});
@@ -238,32 +237,23 @@ class _TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDebit = transaction.isDebit;
-
-    // استخدم transaction_date لو موجودة، وإلا created_at
-    final date = transaction.createdAt;
-    final parts = formatDateParts(date);
-    final priceStr =
-        '${isDebit ? '+' : '-'}${transaction.amount.toStringAsFixed(0)} ج.م';
-
-    final icon = transaction.type == 'delivery_fee_received'
-        ? FontAwesomeIcons.truckFast
-        : FontAwesomeIcons.moneyBills;
+    // ✅ displayIcon و displayAmount انتقلوا للـ TransactionModel — الـ widget بتعرض بس
+    final parts = formatDateParts(transaction.createdAt);
 
     return TransactionLogWidget(
-      icon: icon,
-      foregroundIconColor: isDebit
+      icon: transaction.displayIcon,
+      foregroundIconColor: transaction.isDebit
           ? AppColors.customerIconSecondaryForeground
           : AppColors.customerIconPrimaryForeground,
-      backgroundIconColor: isDebit
+      backgroundIconColor: transaction.isDebit
           ? AppColors.customerIconSecondaryBackground
           : AppColors.customerIconPrimaryBackground,
       title: transaction.description,
       day: parts.day,
       month: parts.month,
       yearAndHour: parts.yearAndHour,
-      price: priceStr,
-      isEntry: isDebit,
+      price: transaction.displayAmount,
+      isEntry: transaction.isDebit,
     );
   }
 }

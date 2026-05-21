@@ -1,18 +1,26 @@
 import 'dart:convert';
-
+import 'package:captain_app/core/app_logger.dart';
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class Api {
   late final Dio _dio;
   final AuthCubit _authCubit;
 
   Api(AuthCubit authCubit) : _authCubit = authCubit {
-    _dio = Dio();
+    _dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
+      ),
+    );
+    // ترتيب الـ interceptors مهم: Token أولاً، ثم Retry
     _dio.interceptors.add(TokenInterceptor(authCubit));
+    _dio.interceptors.add(RetryInterceptor(_dio));
   }
 
   // ─── ✅ baseUrl ديناميكي بناءً على نوع المندوب المسجّل ───────────────────
@@ -93,7 +101,7 @@ class Api {
     final body = e.response?.data;
 
     // [FIX-15] log full details internally, show safe message to users
-    debugPrint('[API Error] Status: $statusCode | Body: $body');
+    AppLogger.e('Api', 'HTTP Error — status: $statusCode | body: $body');
 
     final apiMessage = statusCode == 400 || statusCode == 422
         ? _extractUserMessage(body)
@@ -161,6 +169,70 @@ class ApiException implements Exception {
 
   @override
   String toString() => message;
+}
+class RetryInterceptor extends Interceptor {
+  RetryInterceptor(this._dio);
+
+  final Dio _dio;
+
+  static const int _maxRetries = 3;
+
+  // الـ status codes اللي بنعمل عليها retry
+  static const Set<int> _retryableStatusCodes = {500, 502, 503};
+
+  // الـ HTTP methods اللي بنعمل عليها retry (GET بس افتراضياً)
+  static const Set<String> _retryableMethods = {'GET'};
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final options = err.requestOptions;
+
+    // جيب العداد الحالي من الـ options (0 لو أول مرة)
+    final attempt = (options.extra['_retryCount'] as int?) ?? 0;
+
+    final shouldRetry = attempt < _maxRetries && _isRetryable(err, options);
+
+    if (!shouldRetry) {
+      return handler.next(err);
+    }
+
+    // حفظ العداد الجديد في الـ extra map
+    options.extra['_retryCount'] = attempt + 1;
+
+    // Exponential backoff: 1s, 2s, 4s
+    final delay = Duration(seconds: 1 << attempt);
+    AppLogger.d(
+      'RetryInterceptor',
+      'attempt ${attempt + 1}/$_maxRetries — '
+      'retrying in ${delay.inSeconds}s → ${options.method} ${options.path}',
+    );
+
+    await Future<void>.delayed(delay);
+
+    try {
+      final response = await _dio.fetch<dynamic>(options);
+      return handler.resolve(response);
+    } on DioException catch (retryErr) {
+      return handler.next(retryErr);
+    }
+  }
+
+  bool _isRetryable(DioException err, RequestOptions options) {
+    // بس الـ methods المسموح بيها
+    if (!_retryableMethods.contains(options.method.toUpperCase())) {
+      return false;
+    }
+
+    // Network errors (timeout, no connection, …)
+    if (err.response == null) return true;
+
+    // Server errors المؤقتة
+    final statusCode = err.response!.statusCode ?? 0;
+    return _retryableStatusCodes.contains(statusCode);
+  }
 }
 
 // ─── Token Interceptor ───────────────────────────────────────────────────────

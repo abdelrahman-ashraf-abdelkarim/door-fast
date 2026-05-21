@@ -1,3 +1,5 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class TransactionModel {
   final int id;
   final int logId;
@@ -38,6 +40,15 @@ class TransactionModel {
   double? get debit => isDebit ? amount : null;
   double? get credit => isCredit ? amount : null;
   double get balance => balanceAfter;
+
+  /// النص المعروض للمبلغ مع الإشارة والعملة — انتقل من الـ UI للـ model
+  String get displayAmount =>
+      '${isDebit ? '+' : '-'}${amount.toStringAsFixed(0)} ج.م';
+
+  /// الأيقونة المناسبة لنوع العملية — انتقل من الـ UI للـ model
+  FaIconData get displayIcon => type == 'delivery_fee_received'
+      ? FontAwesomeIcons.truckFast
+      : FontAwesomeIcons.moneyBills;
 
   // ─── helpers داخلية ───────────────────────────────────────────────────────
 
