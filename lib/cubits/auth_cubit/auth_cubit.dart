@@ -3,6 +3,7 @@ import 'package:captain_app/api/auth_api/auth_api.dart' as authapi;
 import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/web_socket_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'auth_state.dart';
@@ -108,6 +109,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
       final token = fcmToken ?? await NotificationService.getFcmToken();
       if (token == null) return;
       await authapi.updateFcmToken(authToken, token, role);
+      debugPrint('📱 FCM TOKEN: $token');
     } catch (_) {}
   }
 

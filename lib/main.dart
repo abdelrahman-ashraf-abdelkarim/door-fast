@@ -26,9 +26,7 @@ import 'package:captain_app/firebase_options.dart';
 void main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -44,7 +42,10 @@ void main() async {
   );
   HydratedBloc.storage = storage;
   await NotificationService.init();
-
+  final fcmToken = await NotificationService.getFcmToken();
+  debugPrint('=============================');
+  debugPrint('FCM TOKEN: $fcmToken');
+  debugPrint('=============================');
   runApp(const CaptainApp());
 }
 
