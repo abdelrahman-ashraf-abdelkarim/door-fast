@@ -68,12 +68,6 @@ class NotificationService {
         >()
         ?.createNotificationChannel(_androidChannel);
 
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
-
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
     if (launchDetails?.didNotificationLaunchApp ?? false) {
       _handlePayload(launchDetails?.notificationResponse?.payload);

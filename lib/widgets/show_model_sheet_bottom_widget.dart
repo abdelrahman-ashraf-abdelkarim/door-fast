@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ShowModelSheetBottomWidget extends StatelessWidget {
-  const ShowModelSheetBottomWidget({super.key, this.contact});
+  const ShowModelSheetBottomWidget({super.key, this.user, this.contact});
 
   Future<void> _callPhone({required String phone}) async {
     // [FIX-10] double-check before launching
@@ -68,6 +68,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
     }
   }
 
+  final String? user;
   final OrderContact? contact;
   String get contactPhone => contact?.phoneOne ?? '';
   String get contactPhoneTwo => contact?.phoneTwo ?? '';
@@ -142,7 +143,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               onPressed: () {
                 _openWhatsApp(
                   phone: "2$contactPhone",
-                  message: 'السلام عليكم، معاك مندوب التوصيل',
+                  message: 'اهلا وسهلا , مع حضرتك $user مندوب توصيل دوور فاست',
                 );
               },
               icon: FaIcon(
@@ -198,9 +199,11 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 onPressed: () {
+                  // رسالة وتس
                   _openWhatsApp(
                     phone: "2$contactPhoneTwo",
-                    message: 'السلام عليكم، معاك مندوب التوصيل',
+                    message:
+                        'اهلا وسهلا , مع حضرتك $user مندوب توصيل دوور فاست',
                   );
                 },
                 icon: FaIcon(

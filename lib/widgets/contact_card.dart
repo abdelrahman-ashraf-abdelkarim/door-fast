@@ -12,7 +12,7 @@ class ContactCard extends StatelessWidget {
     required this.iconBg,
     required this.iconFg,
     required this.titleLocation,
-    required this.orderLocation,
+    required this.orderLocation, required this.user,
   });
   final String title;
   final OrderContact? contact;
@@ -20,6 +20,7 @@ class ContactCard extends StatelessWidget {
   final Color iconFg;
   final String titleLocation;
   final String orderLocation;
+  final String user;
 
   String get contactName => contact?.name.trim() ?? '';
   String get contactNotes => contact?.notes.trim() ?? '';
@@ -110,7 +111,7 @@ class ContactCard extends StatelessWidget {
                             ),
                           ),
                           builder: (_) {
-                            return ShowModelSheetBottomWidget(contact: contact);
+                            return ShowModelSheetBottomWidget(contact: contact, user: user);
                           },
                         );
                       },

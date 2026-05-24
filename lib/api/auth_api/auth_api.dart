@@ -30,6 +30,7 @@ Future<AuthResponse> login(
   }
 
   final token = (loginRes.data as Map<String, dynamic>)['token'] as String;
+  debugPrint("User Token : $token");
   final authHeader = Options(headers: {'Authorization': 'Bearer $token'});
 
   // 2. Shift Status + 3. Shift Times — بالتوازي

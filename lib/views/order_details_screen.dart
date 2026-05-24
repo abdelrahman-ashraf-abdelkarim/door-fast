@@ -36,6 +36,7 @@ class OrderDetailsScreen extends StatelessWidget {
       return const SizedBox.shrink();
     }
     final token = authState.token;
+    final user = authState.user.name;
 
     return BlocProvider(
       create: (_) => InvoiceCubit(),
@@ -67,6 +68,7 @@ class OrderDetailsScreen extends StatelessWidget {
               children: [
                 if (order.kind == OrderKind.personToPerson)
                   ContactCard(
+                    user: user,
                     title: 'المرسل',
                     contact: order.sender,
                     iconBg: AppColors.senderIconBackground,
@@ -76,6 +78,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                 SizedBox(height: 12.h),
                 ContactCard(
+                  user: user,
                   title: 'المستلم',
                   contact: order.receiver,
                   iconBg: AppColors.receiverIconBackground,
