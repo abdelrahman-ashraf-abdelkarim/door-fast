@@ -2,6 +2,7 @@ import 'package:captain_app/core/app_logger.dart';
 import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class AuthException implements Exception {
   final String message;
