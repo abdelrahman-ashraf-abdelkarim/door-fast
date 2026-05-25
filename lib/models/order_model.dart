@@ -27,7 +27,7 @@ class OrderContact {
 
 class OrderItem {
   final String productName;
-  final int quantity;
+  final double quantity;
   final double deliveryPrice;
   final String details;
   final String marketPlace;
@@ -74,7 +74,8 @@ class Order {
   bool get isPending =>
       status == OrderStatus.waiting || status == OrderStatus.newOrder;
 
-  int get totalItemsCount => items.fold(0, (sum, item) => sum + item.quantity);
+  double get totalItemsCount =>
+      items.fold(0, (sum, item) => sum + item.quantity);
 
   double get itemsTotalPrice =>
       items.fold(0, (sum, item) => sum + item.totalPrice);
@@ -146,11 +147,11 @@ class Order {
     return value?.toString() ?? fallback;
   }
 
-  static int _asInt(Object? value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    return int.tryParse(value?.toString() ?? '') ?? 0;
-  }
+  // static int _asInt(Object? value) {
+  //   if (value is int) return value;
+  //   if (value is num) return value.toInt();
+  //   return int.tryParse(value?.toString() ?? '') ?? 0;
+  // }
 
   static double _asDouble(Object? value) {
     if (value is num) return value.toDouble();
@@ -222,10 +223,10 @@ class Order {
     final hasSendTo = sendTo.isNotEmpty;
 
     final receiver = OrderContact(
-      name: _asString(sendTo['name'] ?? client['name']),
-      phoneOne: _asString(sendTo['phone'] ?? client['phone']),
-      phoneTwo: _asString(sendTo['phone2'] ?? client['phone2']),
-      address: _asString(sendTo['address'] ?? client['address']),
+      name: _asString(sendTo['name']),
+      phoneOne: _asString(sendTo['phone']),
+      phoneTwo: _asString(sendTo['phone2']),
+      address: _asString(sendTo['address']),
       linkAddress: _asString(
         sendTo['delivery_link'] ?? client['delivery_link'],
       ),
@@ -261,7 +262,7 @@ class Order {
         final shop = _asMap(itemMap['shop']);
         return OrderItem(
           productName: _asString(itemMap['item_name']),
-          quantity: _asInt(itemMap['quantity']),
+          quantity: _asDouble(itemMap['quantity']),
           deliveryPrice: _asDouble(itemMap['unit_price']),
           marketPlace: _asString(shop['name']),
         );

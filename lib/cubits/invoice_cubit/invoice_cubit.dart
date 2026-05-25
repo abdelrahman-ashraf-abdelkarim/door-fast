@@ -22,7 +22,8 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         token: token,
       );
 
-      final message = "فاتورة الطلب رقم $orderNumber";
+      final message =
+          "مرحباً،\nإليك فاتورة طلبك رقم #$orderNumber من DoorFast .\nشكراً لثقتك بنا!";
       if (isClosed) return;
       // Share the PDF file (user can choose WhatsApp, SMS, etc.)
       await SharePlus.instance.share(

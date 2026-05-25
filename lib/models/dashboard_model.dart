@@ -10,8 +10,10 @@ class DashboardData {
   final int currentTier;
   final double collectionToday;
   final double discountToday;
+  final DateTime? shiftStartDate;
 
   const DashboardData({
+    this.shiftStartDate,
     required this.shiftActive,
     required this.shiftId,
     required this.newOrders,
@@ -39,6 +41,9 @@ class DashboardData {
       collectionToday: (data['collection_today'] as num?)?.toDouble() ?? 0.0,
       profitToday: (data['profit_today'] as num?)?.toDouble() ?? 0.0,
       currentTier: data['current_tier'] as int? ?? 0,
+      shiftStartDate: data['shift_started'] != null
+          ? DateTime.tryParse(data['shift_started'] as String)
+          : null,
     );
   }
 }

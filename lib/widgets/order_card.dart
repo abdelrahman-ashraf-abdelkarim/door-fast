@@ -14,7 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class OrderCard extends StatelessWidget {
   const OrderCard({super.key, required this.itemsCount, required this.order});
 
-  final int itemsCount;
+  final double itemsCount;
   final Order order;
 
   bool get _isPendingOrder {

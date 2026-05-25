@@ -90,6 +90,7 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayDate = data.shiftStartDate ?? DateTime.now();
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.r),
       child: Column(
@@ -109,7 +110,7 @@ class _DashboardContent extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'أداءك ليوم ${formatArabicDateDashboard(DateTime.now())}',
+                    'أداءك ليوم ${formatArabicDateDashboard(displayDate)}',
                     style: TextStyle(fontSize: 18.sp, color: Colors.grey[600]),
                   ),
                 ],
@@ -117,11 +118,11 @@ class _DashboardContent extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-          _DeliveryEarningsCard(feesToday: data.feesToday),
+          _DeliveryEarningsCard(profitToday: data.profitToday),
           SizedBox(height: 20.h),
           _StatsGrid(data: data),
-          SizedBox(height: 20.h),
-          _CancelledOrdersCard(cancelledCount: data.cancelledToday),
+          // SizedBox(height: 20.h),
+          // _CancelledOrdersCard(cancelledCount: data.cancelledToday),
         ],
       ),
     );
@@ -131,9 +132,9 @@ class _DashboardContent extends StatelessWidget {
 // ─── Earnings Card ────────────────────────────────────────────
 
 class _DeliveryEarningsCard extends StatelessWidget {
-  const _DeliveryEarningsCard({required this.feesToday});
+  const _DeliveryEarningsCard({required this.profitToday});
 
-  final double feesToday;
+  final double profitToday;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +145,7 @@ class _DeliveryEarningsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         color: Colors.white70,
         border: Border(
-          bottom: BorderSide(width: 4.w, color: Colors.teal),
+          bottom: BorderSide(width: 4.w, color: Colors.deepPurpleAccent),
         ),
       ),
       child: Column(
@@ -152,7 +153,7 @@ class _DeliveryEarningsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
-            'خدمة التوصيل',
+            'إجمالي الأرباح',
             style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w600),
           ),
           Row(
@@ -161,17 +162,20 @@ class _DeliveryEarningsCard extends StatelessWidget {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  ' ${feesToday.toStringAsFixed(2)} ',
+                  ' ${profitToday.toStringAsFixed(2)} ',
                   style: TextStyle(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal,
+                    color: Colors.deepPurpleAccent,
                   ),
                 ),
               ),
               Text(
                 'ج',
-                style: TextStyle(fontSize: 22.sp, color: Colors.teal),
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  color: Colors.deepPurpleAccent,
+                ),
               ),
             ],
           ),
@@ -243,9 +247,10 @@ class _StatsGrid extends StatelessWidget {
           color: Colors.deepPurpleAccent,
         ),
         StatCard(
-          title: 'إجمالي الأرباح',
-          value: '${data.profitToday.toStringAsFixed(2)} ج',
-          color: Colors.deepPurpleAccent,
+          title: 'طلبات ملغاة',
+          value: '${data.cancelledToday} ',
+          icon: Icons.cancel,
+          color: AppColors.dangerRed2,
         ),
       ],
     );
@@ -254,47 +259,47 @@ class _StatsGrid extends StatelessWidget {
 
 // ─── Cancelled Card ───────────────────────────────────────────
 
-class _CancelledOrdersCard extends StatelessWidget {
-  const _CancelledOrdersCard({required this.cancelledCount});
+// class _CancelledOrdersCard extends StatelessWidget {
+//   const _CancelledOrdersCard({required this.cancelledCount});
 
-  final int cancelledCount;
+//   final int cancelledCount;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        color: Colors.pink[50],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16.r,
-                backgroundColor: Colors.red[100],
-                child: Icon(Icons.cancel, color: AppColors.dangerRed2),
-              ),
-              SizedBox(width: 4.w),
-              Text(
-                'طلبات ملغاة',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          Text(
-            ' $cancelledCount ',
-            style: TextStyle(
-              fontSize: 20.sp,
-              color: AppColors.dangerRed2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: double.infinity,
+//       padding: EdgeInsets.all(16.r),
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(16.r),
+//         color: Colors.pink[50],
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Row(
+//             children: [
+//               CircleAvatar(
+//                 radius: 16.r,
+//                 backgroundColor: Colors.red[100],
+//                 child: Icon(Icons.cancel, color: AppColors.dangerRed2),
+//               ),
+//               SizedBox(width: 4.w),
+//               Text(
+//                 'طلبات ملغاة',
+//                 style: TextStyle(fontWeight: FontWeight.bold),
+//               ),
+//             ],
+//           ),
+//           Text(
+//             ' $cancelledCount ',
+//             style: TextStyle(
+//               fontSize: 20.sp,
+//               color: AppColors.dangerRed2,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

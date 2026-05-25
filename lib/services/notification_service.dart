@@ -8,15 +8,39 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 🔥 Duplicate Detection
+// ─────────────────────────────────────────────────────────────────────────────
+String? _lastForegroundMessageId;
+final Set<String> _handledBackgroundMessages = {};
+
 // ─── Background handler — لازم يكون top-level function ───────────────────────
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint(
-    '🔥 BG HANDLER CALLED — data: ${message.data}, notification: ${message.notification?.title}',
-  );
+  debugPrint('══════════════════════════════════════');
+  debugPrint('🔥 BG HANDLER CALLED');
+  debugPrint('🆔 Message ID: ${message.messageId}');
+  debugPrint('📦 DATA: ${message.data}');
+  debugPrint('🔔 Notification Title: ${message.notification?.title}');
+  debugPrint('══════════════════════════════════════');
+
+  final id = message.messageId;
+
+  if (id != null && _handledBackgroundMessages.contains(id)) {
+    debugPrint('🚫 DUPLICATE BACKGROUND MESSAGE BLOCKED');
+    return;
+  }
+
+  if (id != null) {
+    _handledBackgroundMessages.add(id);
+  }
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationService.showFcmAsLocal(message);
+
+  await NotificationService.showFcmAsLocal(
+    message,
+    source: 'BACKGROUND_HANDLER',
+  );
 }
 
 class NotificationService {
@@ -35,7 +59,7 @@ class NotificationService {
     _channelId,
     _channelName,
     description: 'Notifications for new delivery orders',
-    importance: Importance.max, // ← HIGH PRIORITY
+    importance: Importance.max,
     playSound: true,
     enableVibration: true,
     enableLights: true,
@@ -43,7 +67,13 @@ class NotificationService {
 
   // ─── init الكاملة (Foreground) ────────────────────────────────────────────
   static Future<void> init() async {
-    if (_isInitialized) return;
+    debugPrint('🚀 NotificationService.init() CALLED');
+
+    if (_isInitialized) {
+      debugPrint('⚠️ NotificationService already initialized');
+      return;
+    }
+
     _isInitialized = true;
 
     tz.initializeTimeZones();
@@ -52,24 +82,32 @@ class NotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
+
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (response) {
+        debugPrint('👆 Notification clicked');
+        debugPrint('📦 Payload: ${response.payload}');
         _handlePayload(response.payload);
       },
     );
 
-    // ✅ إنشاء الـ channel صريحاً — ضروري جداً على Android 8+
+    debugPrint('✅ Local notification plugin initialized');
+
     await _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.createNotificationChannel(_androidChannel);
 
+    debugPrint('✅ Notification channel created');
+
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+
     if (launchDetails?.didNotificationLaunchApp ?? false) {
+      debugPrint('🚀 App launched from notification');
       _handlePayload(launchDetails?.notificationResponse?.payload);
     }
 
@@ -78,7 +116,13 @@ class NotificationService {
 
   // ─── init المخففة (Background / Terminated isolate) ──────────────────────
   static Future<void> _initForBackground() async {
-    if (_isInitialized) return;
+    debugPrint('🌙 _initForBackground() CALLED');
+
+    if (_isInitialized) {
+      debugPrint('⚠️ Background already initialized');
+      return;
+    }
+
     _isInitialized = true;
 
     tz.initializeTimeZones();
@@ -86,42 +130,79 @@ class NotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
+
     const initSettings = InitializationSettings(android: androidSettings);
+
     await _plugin.initialize(initSettings);
 
-    // ✅ لازم يتعمل هنا كمان — الـ background isolate محتاجه
+    debugPrint('✅ Background notification plugin initialized');
+
     await _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.createNotificationChannel(_androidChannel);
+
+    debugPrint('✅ Background notification channel created');
   }
 
   // ─── FCM Listeners ────────────────────────────────────────────────────────
   static Future<void> _initFcm() async {
-    final fcm = FirebaseMessaging.instance;
-    await fcm.requestPermission(alert: true, badge: true, sound: true);
+    debugPrint('🔥 _initFcm() STARTED');
 
-    // ✅ منع FCM من عرض notification تلقائياً (علشان نعرضها بالـ channel بتاعنا)
+    final fcm = FirebaseMessaging.instance;
+
+    final settings = await fcm.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    debugPrint('🔐 FCM Permission: ${settings.authorizationStatus}');
+
     await fcm.setForegroundNotificationPresentationOptions(
       alert: false,
       badge: false,
       sound: false,
     );
 
-    // Foreground
-    FirebaseMessaging.onMessage.listen((message) {
-      showFcmAsLocal(message);
+    debugPrint('✅ Foreground presentation options configured');
+
+    // ─── Foreground ─────────────────────────────────────────────
+    FirebaseMessaging.onMessage.listen((message) async {
+      debugPrint('══════════════════════════════════════');
+      debugPrint('📩 FOREGROUND MESSAGE RECEIVED');
+      debugPrint('🆔 Message ID: ${message.messageId}');
+      debugPrint('📦 DATA: ${message.data}');
+      debugPrint('🔔 Notification: ${message.notification?.title}');
+      debugPrint('══════════════════════════════════════');
+
+      final id = message.messageId;
+
+      if (id != null && _lastForegroundMessageId == id) {
+        debugPrint('🚫 DUPLICATE FOREGROUND MESSAGE BLOCKED');
+        return;
+      }
+
+      _lastForegroundMessageId = id;
+
+      await showFcmAsLocal(message, source: 'FOREGROUND_LISTENER');
     });
 
-    // Background (ضغط على notification)
+    // ─── Opened App ────────────────────────────────────────────
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      debugPrint('📲 Notification opened app');
+      debugPrint('📦 DATA: ${message.data}');
       _handleData(message.data);
     });
 
-    // Terminated (فتح التطبيق من notification)
+    // ─── Terminated ────────────────────────────────────────────
     final initial = await fcm.getInitialMessage();
+
     if (initial != null) {
+      debugPrint('🚀 App opened from terminated notification');
+      debugPrint('📦 DATA: ${initial.data}');
+
       Future.delayed(const Duration(milliseconds: 500), () {
         _handleData(initial.data);
       });
@@ -132,10 +213,17 @@ class NotificationService {
     for (int i = 0; i < 3; i++) {
       try {
         final token = await FirebaseMessaging.instance.getToken();
+
+        debugPrint('🎯 TRY ${i + 1} FCM TOKEN: $token');
+
         if (token != null) return token;
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('❌ FCM TOKEN ERROR: $e');
+      }
+
       await Future.delayed(const Duration(seconds: 2));
     }
+
     return null;
   }
 
@@ -143,7 +231,16 @@ class NotificationService {
   static Future<void> showNotification({
     required String title,
     String? body,
+    required String source,
   }) async {
+    debugPrint('══════════════════════════════════════');
+    debugPrint('🔔 SHOW LOCAL NOTIFICATION');
+    debugPrint('📍 SOURCE: $source');
+    debugPrint('📝 TITLE: $title');
+    debugPrint('📝 BODY: $body');
+    debugPrint('🆔 LOCAL ID: $_notificationId');
+    debugPrint('══════════════════════════════════════');
+
     final androidDetails = AndroidNotificationDetails(
       _channelId,
       _channelName,
@@ -153,8 +250,7 @@ class NotificationService {
       playSound: true,
       enableVibration: true,
       showWhen: true,
-      // ✅ fullscreen intent — يصحي الشاشة حتى لو مقفول
-      fullScreenIntent: true,
+      autoCancel: true,
       styleInformation: const DefaultStyleInformation(true, true),
     );
 
@@ -168,35 +264,56 @@ class NotificationService {
   }
 
   // ─── بيتكال من الـ background handler ────────────────────────────────────
-  static Future<void> showFcmAsLocal(RemoteMessage message) async {
+  static Future<void> showFcmAsLocal(
+    RemoteMessage message, {
+    required String source,
+  }) async {
+    debugPrint('📨 showFcmAsLocal() FROM: $source');
+
     await _initForBackground();
+
     final title =
         message.notification?.title ??
         message.data['title'] as String? ??
         'طلب جديد';
+
     final body =
         message.notification?.body ?? message.data['body'] as String? ?? '';
-    await showNotification(title: title, body: body);
+
+    debugPrint('📩 FINAL TITLE: $title');
+    debugPrint('📩 FINAL BODY: $body');
+
+    await showNotification(title: title, body: body, source: source);
   }
 
-  static Future<void> cancelAll() async => _plugin.cancelAll();
+  static Future<void> cancelAll() async {
+    debugPrint('🧹 Cancel all notifications');
+    await _plugin.cancelAll();
+  }
 
   static Future<void> requestAllPermissions() async {
+    debugPrint('🔋 Requesting battery permissions');
+
     final isBatteryIgnoring =
         await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+
     if (isBatteryIgnoring != true) {
       await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
     }
+
     final isAutoStartEnabled =
         await DisableBatteryOptimization.isAutoStartEnabled;
+
     if (isAutoStartEnabled != true) {
       await DisableBatteryOptimization.showEnableAutoStartSettings(
         "Enable Auto Start",
         "Please enable auto start to allow notifications and background service to work properly.",
       );
     }
+
     final isManufacturerIgnoring = await DisableBatteryOptimization
         .isManufacturerBatteryOptimizationDisabled;
+
     if (isManufacturerIgnoring != true) {
       await DisableBatteryOptimization.showDisableManufacturerBatteryOptimizationSettings(
         "Your device has additional battery optimization that may block notifications.",
@@ -206,10 +323,18 @@ class NotificationService {
   }
 
   static void _handlePayload(String? payload) {
-    if (payload == _ordersPayload) openOrdersScreen();
+    debugPrint('📦 HANDLE PAYLOAD: $payload');
+
+    if (payload == _ordersPayload) {
+      debugPrint('📂 Opening orders screen');
+      openOrdersScreen();
+    }
   }
 
   static void _handleData(Map<String, dynamic> data) {
+    debugPrint('📦 HANDLE DATA: $data');
+    debugPrint('📂 Opening orders screen');
+
     openOrdersScreen();
   }
 }
