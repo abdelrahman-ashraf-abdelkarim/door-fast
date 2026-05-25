@@ -5,6 +5,7 @@ import 'package:captain_app/core/app_logger.dart';
 import 'package:captain_app/cubits/order_cubit/order_state.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/order_model.dart';
+import 'package:captain_app/services/notification_service.dart';
 import 'package:captain_app/services/orders_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:captain_app/services/web_socket_service.dart';
@@ -133,10 +134,12 @@ class OrdersCubit extends Cubit<OrdersState> {
 
       if (!exists) {
         emit(state.copyWith(orders: [...state.orders, updated]));
-        // NotificationService.showNotification(
-        //   title: updated.isDeliveryChosen ? 'الطلب مرسل اليك' : 'طلب جديد',
-        //   body: 'رقم الطلب: ${updated.orderNumber}',
-        // );
+        if (updated.isDeliveryChosen) {
+          NotificationService.showNotification(
+            title: 'الطلب مرسل اليك',
+            body: 'رقم الطلب: ${updated.orderNumber}',
+          );
+        }
       } else {
         final updatedList = state.orders.map((o) {
           return o.id == orderId ? updated : o;

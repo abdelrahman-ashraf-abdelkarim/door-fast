@@ -61,7 +61,7 @@ class AuthModel {
       loginAt: user['login_at'] != null
           ? DateTime.tryParse(user['login_at'])
           : null,
-      role: (user['role'] as String?) == 'reserve'
+      role: (user['role'] as String?) == 'reserve_delivery'
           ? DeliveryType.reserve
           : DeliveryType.delivery,
     );
@@ -74,7 +74,7 @@ class AuthModel {
       'phone': phone,
       'status': status.name,
       'login_at': loginAt?.toIso8601String(),
-      'role': role == DeliveryType.reserve ? 'reserve' : 'delivery',
+      'role': role == DeliveryType.reserve ? 'reserve_delivery' : 'delivery',
     };
   }
 }

@@ -231,11 +231,9 @@ class NotificationService {
   static Future<void> showNotification({
     required String title,
     String? body,
-    required String source,
   }) async {
     debugPrint('══════════════════════════════════════');
     debugPrint('🔔 SHOW LOCAL NOTIFICATION');
-    debugPrint('📍 SOURCE: $source');
     debugPrint('📝 TITLE: $title');
     debugPrint('📝 BODY: $body');
     debugPrint('🆔 LOCAL ID: $_notificationId');
@@ -283,7 +281,7 @@ class NotificationService {
     debugPrint('📩 FINAL TITLE: $title');
     debugPrint('📩 FINAL BODY: $body');
 
-    await showNotification(title: title, body: body, source: source);
+    await showNotification(title: title, body: body);
   }
 
   static Future<void> cancelAll() async {
