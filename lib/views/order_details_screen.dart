@@ -81,11 +81,13 @@ class OrderDetailsScreen extends StatelessWidget {
                   SizedBox(height: 12.h),
                   ContactCard(
                     user: user,
-                    title: 'المستلم',
+                    title: order.kind == OrderKind.personToPerson
+                        ? 'المستلم'
+                        : 'العميل',
                     contact: order.receiver,
                     iconBg: AppColors.receiverIconBackground,
-                    iconFg: AppColors.accentOrange,
                     titleLocation: "عنوان التسليم",
+                    iconFg: AppColors.accentOrange,
                     orderLocation: order.receiverAddress,
                   ),
 

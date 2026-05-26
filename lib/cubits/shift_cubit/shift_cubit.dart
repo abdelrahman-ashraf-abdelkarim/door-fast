@@ -87,12 +87,22 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
       }
 
       final start = result.shiftStart ?? state.user?.loginAt ?? DateTime.now();
-      emit(state.copyWith(startTime: start, duration: Duration.zero));
+      emit(
+        state.copyWith(
+          startTime: start,
+          duration: DateTime.now().difference(start),
+        ),
+      );
       _startTimer(start);
     } catch (_) {
       final start = state.user?.loginAt ?? DateTime.now();
       if (isClosed) return;
-      emit(state.copyWith(startTime: start, duration: Duration.zero));
+      emit(
+        state.copyWith(
+          startTime: start,
+          duration: DateTime.now().difference(start),
+        ),
+      );
       _startTimer(start);
     }
   }

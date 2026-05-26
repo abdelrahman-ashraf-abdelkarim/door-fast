@@ -223,10 +223,10 @@ class Order {
     final hasSendTo = sendTo.isNotEmpty;
 
     final receiver = OrderContact(
-      name: _asString(sendTo['name']),
-      phoneOne: _asString(sendTo['phone']),
-      phoneTwo: _asString(sendTo['phone2']),
-      address: _asString(sendTo['address']),
+      name: _asString(sendTo['name'] ?? client['name']),
+      phoneOne: _asString(sendTo['phone'] ?? client['phone']),
+      phoneTwo: _asString(sendTo['phone2'] ?? client['phone2']),
+      address: _asString(sendTo['address'] ?? client['address']),
       linkAddress: _asString(
         sendTo['delivery_link'] ?? client['delivery_link'],
       ),
