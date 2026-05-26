@@ -231,11 +231,13 @@ class NotificationService {
   static Future<void> showNotification({
     required String title,
     String? body,
+    bool isDeliveryChosen = false, // ✅ جديد
   }) async {
     debugPrint('══════════════════════════════════════');
     debugPrint('🔔 SHOW LOCAL NOTIFICATION');
     debugPrint('📝 TITLE: $title');
     debugPrint('📝 BODY: $body');
+    debugPrint('🎯 IS DELIVERY CHOSEN: $isDeliveryChosen');
     debugPrint('🆔 LOCAL ID: $_notificationId');
     debugPrint('══════════════════════════════════════');
 
@@ -249,6 +251,8 @@ class NotificationService {
       enableVibration: true,
       showWhen: true,
       autoCancel: true,
+      // ✅ لو الطلب موجّه يظهر حتى لو الشاشة مقفولة
+      fullScreenIntent: isDeliveryChosen,
       styleInformation: const DefaultStyleInformation(true, true),
     );
 
@@ -270,18 +274,27 @@ class NotificationService {
 
     await _initForBackground();
 
+    final type = message.data['type'] as String?;
+    // ✅ لو الباك اند بعت type == 'assigned_order' يبقى الطلب موجّه
+    final isDeliveryChosen = type == 'assigned_order';
+
     final title =
         message.notification?.title ??
         message.data['title'] as String? ??
-        'طلب جديد';
+        (isDeliveryChosen ? 'الطلب مرسل إليك 🎯' : 'طلب جديد 🛵');
 
     final body =
         message.notification?.body ?? message.data['body'] as String? ?? '';
 
     debugPrint('📩 FINAL TITLE: $title');
     debugPrint('📩 FINAL BODY: $body');
+    debugPrint('🎯 TYPE: $type | IS DELIVERY CHOSEN: $isDeliveryChosen');
 
-    await showNotification(title: title, body: body);
+    await showNotification(
+      title: title,
+      body: body,
+      isDeliveryChosen: isDeliveryChosen, // ✅
+    );
   }
 
   static Future<void> cancelAll() async {
