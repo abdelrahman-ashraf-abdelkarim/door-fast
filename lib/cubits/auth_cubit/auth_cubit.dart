@@ -64,6 +64,7 @@ class AuthCubit extends HydratedCubit<AuthState> {
 
       await _secureStorage.write(key: _authTokenKey, value: response.token);
       await _fcmTokenRefreshSub?.cancel();
+      await FirebaseMessaging.instance.deleteToken();
 
       _fcmTokenRefreshSub = FirebaseMessaging.instance.onTokenRefresh.listen((
         newFcmToken,
@@ -134,6 +135,15 @@ class AuthCubit extends HydratedCubit<AuthState> {
     await _wsSubscription?.cancel();
     _fcmTokenRefreshSub = null;
     _wsSubscription = null;
+    final state = this.state;
+    if (state is AuthAuthenticated) {
+      final fcmToken = await NotificationService.getFcmToken();
+      if (fcmToken != null) {
+        await authapi.removeFcmToken(state.token, fcmToken, state.user.role);
+      }
+    }
+
+    await FirebaseMessaging.instance.deleteToken();
     await _secureStorage.delete(key: _authTokenKey);
     emit(AuthUnauthenticated());
   }

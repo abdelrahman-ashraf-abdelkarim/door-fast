@@ -59,6 +59,8 @@ class OrderDetailsScreen extends StatelessWidget {
                 ),
               ],
             ),
+            scrolledUnderElevation: 0,
+            backgroundColor: AppColors.screenBackground,
             centerTitle: true,
           ),
           backgroundColor: AppColors.screenBackground,

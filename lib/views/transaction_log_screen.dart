@@ -20,6 +20,8 @@ class TransactionLogScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('سجل العمليات المالية'),
           centerTitle: true,
+          backgroundColor: AppColors.screenBackground,
+          scrolledUnderElevation: 0,
         ),
         body: CustomScrollView(
           slivers: [
@@ -162,4 +164,3 @@ class TransactionLogScreen extends StatelessWidget {
     );
   }
 }
- 

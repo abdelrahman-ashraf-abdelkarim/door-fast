@@ -85,3 +85,25 @@ Future<bool> validateToken(String authToken, DeliveryType role) async {
     return false;
   }
 }
+
+Future<void> removeFcmToken(
+  String authToken,
+  String fcmToken,
+  DeliveryType role,
+) async {
+  try {
+    final url = '${AppConstants.getBaseUrl(role)}/fcm-token';
+    await Dio().delete(
+      url,
+      data: {'fcm_token': fcmToken},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+  } catch (e) {
+    AppLogger.w('AuthApi', 'FCM Token removal failed', e);
+  }
+}

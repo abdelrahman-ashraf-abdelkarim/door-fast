@@ -143,7 +143,7 @@ class ShowModelSheetBottomWidget extends StatelessWidget {
               onPressed: () {
                 _openWhatsApp(
                   phone: "2$contactPhone",
-                  message: 'اهلا وسهلا , مع حضرتك $user مندوب توصيل دوور فاست',
+                  message: 'اهلا وسهلا, مع حضرتك $user مندوب توصيل دوور فاست',
                 );
               },
               icon: FaIcon(

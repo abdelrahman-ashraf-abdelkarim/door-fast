@@ -203,7 +203,7 @@ class _StatsGrid extends StatelessWidget {
       childAspectRatio: 1.5,
       children: [
         const StatCard(
-          title: 'بداية الوردية',
+          title: 'وقت بدء الشيفت',
           valueWidget: StartShiftTimeWidget(),
           color: Colors.black,
           icon: Icons.access_time,
@@ -215,13 +215,13 @@ class _StatsGrid extends StatelessWidget {
           icon: Icons.timer_outlined,
         ),
         StatCard(
-          title: 'طلبات مكتمله',
+          title: 'عدد الطلبات الكاملة',
           value: data.deliveredToday.toString(),
           icon: Icons.check_circle,
           color: Colors.green,
         ),
         StatCard(
-          title: 'طلبات مقبولة',
+          title: 'عدد الطلبات المعلقة',
           value: data.activeOrders.toString(),
           icon: Icons.add_circle,
           color: Colors.blue,
