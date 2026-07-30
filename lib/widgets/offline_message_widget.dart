@@ -1,4 +1,5 @@
 import 'package:captain_app/core/constants.dart';
+import 'package:captain_app/widgets/custom_button_shift_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,16 +11,23 @@ class OfflineMessageWidget extends StatelessWidget {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'انت غير نشط حاليا',
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.dangerRed2,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                'انت غير نشط حاليا',
+                style: TextStyle(
+                  fontSize: 28.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.dangerRed2,
+                ),
+              ),
             ),
-          ),
+            SizedBox(height: 12.h),
+            CustomButtonShiftState(isShiftStarted: false),
+          ],
         ),
       ),
     );

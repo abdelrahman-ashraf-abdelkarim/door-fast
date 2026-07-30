@@ -25,4 +25,16 @@ class ShiftService {
       shiftStart: raw != null ? DateTime.tryParse(raw) : null,
     );
   }
+
+  Future<void> requestStartShift(String token) async {
+    await _api.post(
+      url: '${_api.baseUrl}/shift/start',
+      token: token,
+      body: null,
+    );
+  }
+
+  Future<void> requestEndShift(String token) async {
+    await _api.post(url: '${_api.baseUrl}/shift/end', token: token, body: null);
+  }
 }

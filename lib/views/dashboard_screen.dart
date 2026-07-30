@@ -10,6 +10,7 @@ import 'package:captain_app/cubits/shift_cubit/shift_state.dart';
 import 'package:captain_app/models/auth_model.dart';
 import 'package:captain_app/models/dashboard_model.dart';
 import 'package:captain_app/widgets/app_bar.dart';
+import 'package:captain_app/widgets/custom_button_shift_state.dart';
 import 'package:captain_app/widgets/offline_message_widget.dart';
 import 'package:captain_app/widgets/stat_card.dart';
 import 'package:captain_app/widgets/work_time_widget.dart';
@@ -121,8 +122,8 @@ class _DashboardContent extends StatelessWidget {
           _DeliveryEarningsCard(profitToday: data.profitToday),
           SizedBox(height: 20.h),
           _StatsGrid(data: data),
-          // SizedBox(height: 20.h),
-          // _CancelledOrdersCard(cancelledCount: data.cancelledToday),
+          SizedBox(height: 20.h),
+          CustomButtonShiftState(isShiftStarted: data.shiftActive),
         ],
       ),
     );
@@ -202,15 +203,15 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12.h,
       childAspectRatio: 1.5,
       children: [
-         StatCard(
+        StatCard(
           title: 'وقت بدء الشيفت',
           valueWidget: StartShiftTimeWidget(data.shiftStartDate),
           color: Colors.black,
           icon: Icons.access_time,
         ),
-         StatCard(
+        StatCard(
           title: 'مدة العمل',
-          valueWidget: WorkTimerWidget(startTime:  data.shiftStartDate),
+          valueWidget: WorkTimerWidget(startTime: data.shiftStartDate),
           color: Colors.black,
           icon: Icons.timer_outlined,
         ),

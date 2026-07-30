@@ -60,6 +60,19 @@ class ShiftCubit extends HydratedCubit<ShiftState> {
     endShift();
   }
 
+  Future<void> toggleShift() async {
+    final authState = authCubit.state;
+    if (authState is! AuthAuthenticated) return;
+    if (state.hasShiftActive) {
+      await shiftService.requestEndShift(authState.token);
+    } else {
+      await shiftService.requestStartShift(authState.token);
+    }
+
+    // إعادة تحميل الحالة من السيرفر
+    await startShift();
+  }
+
   Future<void> startShift() async {
     try {
       final authState = authCubit.state;
