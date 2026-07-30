@@ -13,7 +13,8 @@
         android:enableOnBackInvokedCallback="true">
         <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="orders_channel" />
+        android:value="orders_channel"
+         />
         <activity
             android:name=".MainActivity"
             android:exported="true"

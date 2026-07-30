@@ -1,32 +1,15 @@
 name: captain_app
 description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
+publish_to: "none" 
+
+
 version: 1.0.0+1
 
 environment:
   sdk: ^3.9.2
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
+
 dependencies:
   dio: ^5.9.2
   disable_battery_optimization: ^1.1.2
@@ -38,7 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  flutter_local_notifications: ^17.2.2
+  flutter_local_notifications: ^22.0.0
   flutter_localizations:
     sdk: flutter
   flutter_map: ^8.3.0
@@ -50,21 +33,21 @@ dependencies:
   intl: any
   latlong2: ^0.9.1
   logger: ^2.7.0
-  package_info_plus: ^8.0.0
+  package_info_plus: ^10.1.0
   path_provider: ^2.1.5
   pdf: ^3.12.0
   printing: ^5.14.3
   pusher_channels_flutter: ^2.6.0
   pusher_client_socket: ^0.0.7
-  share_plus: ^12.0.2
-  timezone: ^0.9.4  
+  share_plus: ^13.1.0
+  timezone: ^0.11.0  
   url_launcher: ^6.3.2
   web_socket_channel: ^3.0.3
 
 dev_dependencies:
   bloc_test: ^10.0.0
   flutter_launcher_icons: ^0.14.4
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
@@ -86,6 +69,7 @@ flutter:
     - assets/fonts/Noto_Naskh_Arabic/NotoNaskhArabic-Regular.ttf
     - assets/images/logo-removebg-preview.png
     - assets/images/DF_logo_for_dash.png
+    - assets/images/splash.png
 
   fonts:
     - family: Roboto
@@ -95,14 +79,14 @@ flutter:
     # see https://flutter.dev/to/font-from-package
 flutter_native_splash:
   color: "#f8c624"
-  image: assets/images/logo-removebg-preview.png
-  image_dark: assets/images/logo-removebg-preview.png
+  image: assets/images/splash.png
+  image_dark: assets/images/splash.png
   color_dark: "#f8c624"
   android: true
   android_gravity: center
   ios_content_mode: center
   android_12:
     color: "#f8c624"
-    image: assets/images/logo-removebg-preview.png
-    image_dark: assets/images/logo-removebg-preview.png
+    image: assets/images/splash.png
+    image_dark: assets/images/splash.png
     color_dark: "#f8c624"

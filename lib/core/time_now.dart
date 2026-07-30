@@ -6,7 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 class StartShiftTimeWidget extends StatelessWidget {
-  const StartShiftTimeWidget({super.key});
+  const StartShiftTimeWidget(this.date, {super.key});
+  final DateTime? date;
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +17,13 @@ class StartShiftTimeWidget extends StatelessWidget {
           return const Text('--:--');
         }
 
-        final formattedTime = DateFormat('HH:mm').format(state.startTime!);
+        final formattedTime = DateFormat(
+          'hh:mm a',
+        ).format(date!.add(const Duration(hours: 3)));
 
         return Text(
           formattedTime,
-          style:  TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
         );
       },
     );

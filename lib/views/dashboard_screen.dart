@@ -202,15 +202,15 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12.h,
       childAspectRatio: 1.5,
       children: [
-        const StatCard(
+         StatCard(
           title: 'وقت بدء الشيفت',
-          valueWidget: StartShiftTimeWidget(),
+          valueWidget: StartShiftTimeWidget(data.shiftStartDate),
           color: Colors.black,
           icon: Icons.access_time,
         ),
-        const StatCard(
+         StatCard(
           title: 'مدة العمل',
-          valueWidget: WorkTimerWidget(),
+          valueWidget: WorkTimerWidget(startTime:  data.shiftStartDate),
           color: Colors.black,
           icon: Icons.timer_outlined,
         ),
@@ -247,7 +247,7 @@ class _StatsGrid extends StatelessWidget {
           color: Colors.deepPurpleAccent,
         ),
         StatCard(
-          title: 'طلبات ملغاة',
+          title: 'عدد الطلبات الملغية',
           value: '${data.cancelledToday} ',
           icon: Icons.cancel,
           color: AppColors.dangerRed2,

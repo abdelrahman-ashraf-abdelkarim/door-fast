@@ -3,11 +3,7 @@
     <item>
         <color android:color="#f8c624"/>
     </item>
-    <item
-        android:bottom="250dp"
-        android:left="60dp"
-        android:right="60dp"
-        android:top="250dp">
-        <bitmap android:gravity="center" android:src="@drawable/splash_test"/>
+    <item>
+        <bitmap android:gravity="center" android:src="@drawable/splash"/>
     </item>
 </layer-list>

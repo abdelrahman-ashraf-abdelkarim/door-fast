@@ -5,7 +5,9 @@ import '../cubits/shift_cubit/shift_cubit.dart';
 import '../cubits/shift_cubit/shift_state.dart';
 
 class WorkTimerWidget extends StatelessWidget {
-  const WorkTimerWidget({super.key});
+  const WorkTimerWidget({super.key, this.startTime});
+
+  final DateTime? startTime;
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -22,7 +24,7 @@ class WorkTimerWidget extends StatelessWidget {
         return FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            _formatDuration(state.duration),
+            _formatDuration(DateTime.now().difference(startTime!)),
             style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
           ),
         );

@@ -12,7 +12,8 @@ class ContactCard extends StatelessWidget {
     required this.iconBg,
     required this.iconFg,
     required this.titleLocation,
-    required this.orderLocation, required this.user,
+    required this.orderLocation,
+    required this.user,
   });
   final String title;
   final OrderContact? contact;
@@ -111,7 +112,10 @@ class ContactCard extends StatelessWidget {
                             ),
                           ),
                           builder: (_) {
-                            return ShowModelSheetBottomWidget(contact: contact, user: user);
+                            return ShowModelSheetBottomWidget(
+                              contact: contact,
+                              user: user,
+                            );
                           },
                         );
                       },
@@ -157,7 +161,7 @@ class ContactCard extends StatelessWidget {
                         SizedBox(height: 6.h),
                         Text(
                           orderLocation,
-                          maxLines: 3,
+                          maxLines: 6,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 18.sp,

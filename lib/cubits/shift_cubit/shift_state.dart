@@ -55,7 +55,7 @@ class ShiftState extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'startTime': startTime?.toIso8601String(),
+      'shift_started': startTime?.toIso8601String(),
       // duration is intentionally excluded — recalculated from startTime on restore
       'user': user?.toJson(),
     };

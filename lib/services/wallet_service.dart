@@ -10,10 +10,7 @@ class WalletService {
     String? from,
     String? to,
   }) async {
-    final queryParams = {
-      if (from != null) 'from': from,
-      if (to != null) 'to': to,
-    };
+    final queryParams = {'from': ?from, 'to': ?to};
 
     final uri = Uri.parse(
       '${_api.baseUrl}/wallet/statement',

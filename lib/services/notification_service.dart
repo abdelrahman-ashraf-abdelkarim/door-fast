@@ -12,7 +12,7 @@ import 'package:timezone/timezone.dart' as tz;
 // 🔥 Duplicate Detection
 // ─────────────────────────────────────────────────────────────────────────────
 String? _lastForegroundMessageId;
-final Set<String> _handledBackgroundMessages = {};
+final Map<String, DateTime> _recentMessageIds = {};
 
 // ─── Background handler — لازم يكون top-level function ───────────────────────
 @pragma('vm:entry-point')
@@ -26,13 +26,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   final id = message.messageId;
 
-  if (id != null && _handledBackgroundMessages.contains(id)) {
-    debugPrint('🚫 DUPLICATE BACKGROUND MESSAGE BLOCKED');
+  if (id != null && _recentMessageIds.containsKey(id)) {
+    debugPrint('🚫 DUPLICATE BACKGROUND MESSAGE BLOCKED: (id : $id)');
     return;
   }
 
   if (id != null) {
-    _handledBackgroundMessages.add(id);
+    _recentMessageIds[id] = DateTime.now();
   }
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -51,7 +51,8 @@ class NotificationService {
   static const _channelName = 'New Orders';
   static const _ordersPayload = 'orders';
 
-  static int _notificationId = 0;
+  static int get _notificationId =>
+      DateTime.now().millisecondsSinceEpoch % 100000;
   static bool _isInitialized = false;
 
   // ─── Channel مستقل يُستخدم في كل مكان ───────────────────────────────────
@@ -86,7 +87,7 @@ class NotificationService {
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _plugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (response) {
         debugPrint('👆 Notification clicked');
         debugPrint('📦 Payload: ${response.payload}');
@@ -133,7 +134,7 @@ class NotificationService {
 
     const initSettings = InitializationSettings(android: androidSettings);
 
-    await _plugin.initialize(initSettings);
+    await _plugin.initialize(settings: initSettings);
 
     debugPrint('✅ Background notification plugin initialized');
 
@@ -179,9 +180,17 @@ class NotificationService {
 
       final id = message.messageId;
 
-      if (id != null && _lastForegroundMessageId == id) {
-        debugPrint('🚫 DUPLICATE FOREGROUND MESSAGE BLOCKED');
-        return;
+      if (id != null) {
+        final now = DateTime.now();
+        _recentMessageIds.removeWhere(
+          (_, time) => now.difference(time).inSeconds > 60,
+        );
+
+        if (_recentMessageIds.containsKey(id)) {
+          debugPrint('🚫 DUPLICATE FOREGROUND MESSAGE BLOCKED: (id : $id)');
+          return;
+        }
+        _recentMessageIds[id] = now;
       }
 
       _lastForegroundMessageId = id;
@@ -257,10 +266,10 @@ class NotificationService {
     );
 
     await _plugin.show(
-      _notificationId++,
-      '\u200F$title',
-      body ?? '',
-      NotificationDetails(android: androidDetails),
+      id: _notificationId,
+      title: '\u200F$title',
+      body: body ?? '',
+      notificationDetails: NotificationDetails(android: androidDetails),
       payload: _ordersPayload,
     );
   }
@@ -271,6 +280,10 @@ class NotificationService {
     required String source,
   }) async {
     debugPrint('📨 showFcmAsLocal() FROM: $source');
+    if (source == 'BACKGROUND_HANDLER' && message.notification != null) {
+      debugPrint('⏭️ SKIPPED: FCM already showing this in background');
+      return;
+    }
 
     await _initForBackground();
 
@@ -290,11 +303,13 @@ class NotificationService {
     debugPrint('📩 FINAL BODY: $body');
     debugPrint('🎯 TYPE: $type | IS DELIVERY CHOSEN: $isDeliveryChosen');
 
-    await showNotification(
-      title: title,
-      body: body,
-      isDeliveryChosen: isDeliveryChosen, // ✅
-    );
+    if (source != 'BACKGROUND_HANDLER') {
+      await showNotification(
+        title: title,
+        body: body,
+        isDeliveryChosen: isDeliveryChosen, // ✅
+      );
+    }
   }
 
   static Future<void> cancelAll() async {

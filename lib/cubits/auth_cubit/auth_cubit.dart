@@ -119,12 +119,21 @@ class AuthCubit extends HydratedCubit<AuthState> {
     DeliveryType role,
   ) async {
     try {
-      final isValid = await authapi.validateToken(authToken, role);
+      final result = await Future.wait([
+        authapi.validateToken(authToken, role),
+        NotificationService.getFcmToken(),
+      ]);
+
+      final isValid = result[0] as bool;
       if (!isValid) {
         emit(AuthUnauthenticated());
         return;
       }
-      _sendFcmTokenToBackend(authToken, role: role);
+      final fcmToken = result[1] as String?;
+      if (fcmToken != null) {
+        await authapi.updateFcmToken(authToken, fcmToken, role);
+        debugPrint('📱 FCM TOKEN (app open): $fcmToken');
+      }
     } catch (e) {
       emit(AuthUnauthenticated());
     }

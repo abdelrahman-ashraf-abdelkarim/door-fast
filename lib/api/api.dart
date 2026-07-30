@@ -4,7 +4,6 @@ import 'package:captain_app/core/constants.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:captain_app/cubits/auth_cubit/auth_state.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
 class Api {
   late final Dio _dio;
@@ -37,7 +36,7 @@ class Api {
   String invoiceUrl(String orderId) => '$baseUrl/orders/$orderId/invoice';
 
   // ─── GET ─────────────────────────────────────────────────────────────────
-  Future<dynamic> get({required String url, @required String? token}) async {
+  Future<dynamic> get({required String url, required String? token}) async {
     try {
       final response = await _dio.get(
         url,
@@ -52,8 +51,8 @@ class Api {
   // ─── POST ────────────────────────────────────────────────────────────────
   Future<dynamic> post({
     required String url,
-    @required dynamic body,
-    @required String? token,
+    required dynamic body,
+    required String? token,
   }) async {
     try {
       final response = await _dio.post(
@@ -70,8 +69,8 @@ class Api {
   // ─── PUT ─────────────────────────────────────────────────────────────────
   Future<dynamic> put({
     required String url,
-    @required dynamic body,
-    @required String? token,
+    required dynamic body,
+    required String? token,
   }) async {
     try {
       final response = await _dio.put(
@@ -170,6 +169,7 @@ class ApiException implements Exception {
   @override
   String toString() => message;
 }
+
 class RetryInterceptor extends Interceptor {
   RetryInterceptor(this._dio);
 
@@ -207,7 +207,7 @@ class RetryInterceptor extends Interceptor {
     AppLogger.d(
       'RetryInterceptor',
       'attempt ${attempt + 1}/$_maxRetries — '
-      'retrying in ${delay.inSeconds}s → ${options.method} ${options.path}',
+          'retrying in ${delay.inSeconds}s → ${options.method} ${options.path}',
     );
 
     await Future<void>.delayed(delay);
